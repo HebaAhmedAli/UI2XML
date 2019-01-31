@@ -8,13 +8,14 @@ def createEncoderDecoderRNN(encoderInputs,decoderInputs):
     # Create the encoder_decoder rnn layers to use them in training the model.
     encoder = LSTM(Constants.ENCODER_HIDDEN_UNITS, return_state=True)    
     encoderOutputs, stateH, stateC = encoder(encoderInputs)
-    # We discard `encoder_outputs` and only keep the states.
+    # Discard `encoderOutputs` and only keep the states.
     encoderStates = [stateH, stateC]
     decoderLstm = LSTM(Constants.DECODER_HIDDEN_UNITS, return_sequences=True, return_state=True)
     decoderOutputs, _, _ = decoderLstm(decoderInputs,
                                      initial_state=encoderStates)
     decoderDense = Dense(Constants.VOCAB_SIZE, activation='softmax')
     decoderOutputs = decoderDense(decoderOutputs)
+    return decoderOutputs,encoderStates,decoderLstm,decoderDense
     
 # Create the encoder & decoder models from the trained layers to use in prediction.
 def getTrainedEncoderDecoderModel(encoderInputs,encoderStates,decoderInputs,decoderLstm,decoderDense):
