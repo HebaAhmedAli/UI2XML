@@ -7,3 +7,6 @@
 
 
 # TODO : Predict.
+# Hint:  prediction = np.argmax(prediction, axis = -1)
+#        outputSequnce = indicesToSequence(prediction , invVocab)
+

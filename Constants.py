@@ -1,8 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 30 23:21:23 2019
-
-@author: heba
-"""
-
+IMAGE_SIZE = 256
+VOCAB_SIZE = 299
+BATCH_SIZE = 64
+EPOCHS = 15
+CNN_FINAL_DEPTH = 512
+ENCODER_HIDDEN_UNITS = 256
+DECODER_HIDDEN_UNITS = 256
+MAX_SEQUENCE_LENGTH = 150
+LR_DECAY = 0.5
+LEARNING_RATE = 0.1
+DROPOUT = 0.0
