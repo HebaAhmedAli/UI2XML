@@ -1,5 +1,5 @@
 from keras.preprocessing import image
-import Constants
+import Model.Constants as Constants
 
 
 def preprocessing(imgPath):
