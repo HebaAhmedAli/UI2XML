@@ -3,7 +3,8 @@ import Model.Constants as Constants
 import numpy as np
 from keras.utils import to_categorical
 
-# TODO: Complete this function.
+# TODO: Add function to load dataSet.
+
 def preprocessData(dataset, vocab):
     X, Y = zip(*dataset)  
     Y = [Utils.sequenceToIndices(t , vocab) for t in Y]
