@@ -38,8 +38,8 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     decoderModelForPrediction.save('decoderModel.h5')
     return model
     
-def evaluateModel(xTest,yTest,yTestShiftedLeft,model):
-    evaluate =model.evaluate(x = [xTest,yTest], y = yTestShiftedLeft)
+def evaluateModel(xTest,yTest,yTestShiftedLeft):
+    model = load_model('UI2XML.h5')
     print ("Loss = " + str(evaluate[0]))
     print ("Test Accuracy = " + str(evaluate[1]))
 
