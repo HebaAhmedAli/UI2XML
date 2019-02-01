@@ -40,6 +40,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     
 def evaluateModel(xTest,yTest,yTestShiftedLeft):
     model = load_model('UI2XML.h5')
+    evaluate =model.evaluate(x = [xTest,yTest], y = yTestShiftedLeft)
     print ("Loss = " + str(evaluate[0]))
     print ("Test Accuracy = " + str(evaluate[1]))
 
