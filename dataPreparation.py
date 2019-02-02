@@ -11,12 +11,13 @@ def constructData(fileKeyValue,imagesFrom,imagesTo,xmlFrom,xmlTo):
         for line in ins:
             imageName,lineIndex=line.split()
             shutil.copy(imagesFrom+imageName, imagesTo+str(i)+'.png')
-            fTo.write(sequences[int(lineIndex)]+'\n')
+            fTo.write(sequences[int(lineIndex)])
             i=i+1
             
     fFrom.close()
     fTo.close()
-            
-#constructData('data/train.lst','data/processedImage/','data/trainingImages/','data/XMLsequence.lst','data/XmlTraining.lst')
-constructData('data/validate.lst','data/processedImage/','data/validationImages/','data/XMLsequence.lst','data/XmlVlidation.lst')
-#constructData('data/test_shuffle.lst','data/processedImage/','data/testingImages/','data/XMLsequence.lst','data/XmlTesting.lst')
+    
+constructData('data/try.lst','data/processedImage/','data/tryImages/','data/XMLsequence.lst','data/XmlTry.lst')
+constructData('data/train.lst','data/processedImage/','data/trainingImages/','data/XMLsequence.lst','data/XmlTraining.lst')
+constructData('data/validate.lst','data/processedImage/','data/validationImages/','data/XMLsequence.lst','data/XmlValidation.lst')
+constructData('data/test_shuffle.lst','data/processedImage/','data/testingImages/','data/XMLsequence.lst','data/XmlTesting.lst')
