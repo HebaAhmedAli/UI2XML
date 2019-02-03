@@ -3,12 +3,11 @@ sys.path.append('../')
 from keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Activation,Lambda, Permute
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop
-import tensorflow as tf
 import keras.backend as K
 import numpy as np
 
 def lamdbda_split(value):
-    
+    import tensorflow as tf
     x = K.expand_dims(value, 4)
     #(batch_size,rows,cols,depth,?)
     x1 = tf.split(x, num_or_size_splits=x.shape[1], axis=1)  #(batch_size,1,cols,depth)

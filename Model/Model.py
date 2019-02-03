@@ -47,13 +47,11 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
-def makeAprediction(imgPath,vocab,invVocab,cnnModel,encoderModel,decoderModel):
+def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderModel):
     inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
-    '''
     cnnModel = load_model('cnnModel.h5')
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
-    '''
     inputImage = np.expand_dims(inputImage, 0)
     print("image to predict shape: "+str(inputImage.shape))
     encoderInputs = cnnModel.predict(inputImage)
