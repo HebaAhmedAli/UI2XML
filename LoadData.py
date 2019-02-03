@@ -1,6 +1,5 @@
 import Utils
 import Preprocessing
-import Model.Constants as Constants
 import numpy as np
 from keras.utils import to_categorical
 
@@ -34,14 +33,11 @@ def loadData(imagesPath,xmlPath,vocab):
     
     
 def preprocessY(Y,vocab):
-    #X, Y = zip(*dataset) 
     Y = [Utils.sequenceToIndices(t , vocab) for t in Y]
-    print(Y[0])
     YhotShiftedLeft=[Y[i][1:len(Y[i])]+[vocab['<pad>']] for i in range(len(Y))]
     Yhot = np.array(list(map(lambda x: to_categorical(x, num_classes=len(vocab)), Y)))
     YhotShiftedLeft =np.array(list(map(lambda x: to_categorical(x, num_classes=len(vocab)), YhotShiftedLeft)))
     return  Yhot , YhotShiftedLeft
 
-vocab,invVocab = loadVocab('data/xml_vocab.txt')
-X, Yhot , YhotShiftedLeft = loadData('data/tryImages/','data/XmlTry.lst',vocab)
+
 

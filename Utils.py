@@ -1,4 +1,6 @@
-import Model.Constants as Constants
+import sys
+sys.path.append('../')
+import Constants as Constants
 import numpy as np
 from keras.utils import to_categorical
 
