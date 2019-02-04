@@ -20,8 +20,15 @@ def loadVocab(vocabPath):
     return vocab, invVocab
 
 def loadData(imagesPath,xmlPath,vocab,start,end):
-    fXml=open(xmlPath)
-    Y=fXml.readlines()
+    Y=[]
+    i=0
+    with open(xmlPath, "r") as ins:
+        for line in ins:
+            i=i+1
+            if i>=start and i<=end:
+                Y.append(line)
+            elif i>end:
+                break
     Yhot , YhotShiftedLeft = preprocessY(Y,vocab)
     X=[]
     for i in range(start,min(end,len(Y))):
