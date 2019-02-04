@@ -19,12 +19,12 @@ def loadVocab(vocabPath):
     print("inv vocabulary length = "+str(len(invVocab)))
     return vocab, invVocab
 
-def loadData(imagesPath,xmlPath,vocab):
+def loadData(imagesPath,xmlPath,vocab,start,end):
     fXml=open(xmlPath)
     Y=fXml.readlines()
     Yhot , YhotShiftedLeft = preprocessY(Y,vocab)
     X=[]
-    for i in range(len(Y)):
+    for i in range(start,min(end,len(Y))):
         x=Preprocessing.imageReadAndPreprocessing(imagesPath+str(i)+'.png')
         X.append(x)
     print("X shape = "+str(np.array(X).shape))
