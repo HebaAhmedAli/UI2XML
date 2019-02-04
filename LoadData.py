@@ -31,7 +31,7 @@ def loadData(imagesPath,xmlPath,vocab,start,end):
                 break
     Yhot , YhotShiftedLeft = preprocessY(Y,vocab)
     X=[]
-    for i in range(start,min(end,len(Y))):
+    for i in range(start,end):
         x=Preprocessing.imageReadAndPreprocessing(imagesPath+str(i)+'.png')
         X.append(x)
     print("X shape = "+str(np.array(X).shape))
