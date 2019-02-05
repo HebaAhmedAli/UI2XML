@@ -20,11 +20,18 @@ def loadVocab(vocabPath):
     return vocab, invVocab
 
 def loadData(imagesPath,xmlPath,vocab,start,end):
-    fXml=open(xmlPath)
-    Y=fXml.readlines()
+    Y=[]
+    i=0
+    with open(xmlPath, "r") as ins:
+        for line in ins:
+            if i>=start and i<end:
+                Y.append(line)
+            elif i>=end:
+                break
+            i=i+1
     Yhot , YhotShiftedLeft = preprocessY(Y,vocab)
     X=[]
-    for i in range(start,min(end,len(Y))):
+    for i in range(start,end):
         x=Preprocessing.imageReadAndPreprocessing(imagesPath+str(i)+'.png')
         X.append(x)
     print("X shape = "+str(np.array(X).shape))
