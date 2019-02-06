@@ -6,7 +6,12 @@ from keras.optimizers import Adam
 from keras.utils import to_categorical
 from keras.models import load_model, Model
 import keras.backend as K
+import numpy as np
 import Constants
+
+def lamdbda_split(value):
+    x = K.expand_dims(value, axis=1)
+    return x
 
 # Performs one step of attention: Outputs a context vector computed as a dot product of the attention weights
 # "alphas" and the hidden states "a" of the Bi-LSTM.
@@ -44,8 +49,8 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
     a = biLstm(attentionInputs)
     for t in range(Constants.MAX_SEQUENCE_LENGTH):
         context = one_step_attention(a, s,repeator,concatenator,densor1,densor2,activator,dotor)
-        contextAndInput = concatenatorPost([postAttentionInputs , context ])
-        print("contextAndInput : "+str(contextAndInput.shape))
+        postAttentionInputsT = Lambda(lamdbda_split)(postAttentionInputs[:,t,:])
+        contextAndInput = concatenatorPost([postAttentionInputsT, context ])
         s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s,c])
         out = output_layer(s)
         outputs.append(out)
@@ -56,8 +61,9 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
 
 
 # Create the attention from the trained layers to use in prediction.
-def getTrainedEncoderDecoderModel(biLstm,repeator,concatenator,densor1,densor2,activator,dotor,postAttentionInputs,s0,c0,concatenatorPost,post_activation_LSTM_cell,output_layer,n_a):
+def getTrainedattentionRnnModel(biLstm,repeator,concatenator,densor1,densor2,activator,dotor,s0,c0,concatenatorPost,post_activation_LSTM_cell,output_layer,n_a):
     attentionInputs = Input(shape=(Constants.CNN_FINAL_H*Constants.CNN_FINAL_W, Constants.CNN_FINAL_DEPTH))
+    postAttentionInputs = Input(shape=(1, Constants.VOCAB_SIZE))
     a = biLstm(attentionInputs)
     biDirectionalModel = Model(attentionInputs, a, name='biDirectionalModel')
     
@@ -67,6 +73,6 @@ def getTrainedEncoderDecoderModel(biLstm,repeator,concatenator,densor1,densor2,a
     contextAndInput = concatenatorPost([postAttentionInputs , context ])
     s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s0,c0])
     out = output_layer(s)
-    attentionRnnModel = Model([aPostInput,s0,c0], out, name='attentionRnnModel')
+    attentionRnnModel = Model([aPostInput,postAttentionInputs,s0,c0], [out,s,c], name='attentionRnnModel')
     
     return biDirectionalModel,attentionRnnModel

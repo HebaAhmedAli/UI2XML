@@ -17,7 +17,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     n_a = 32
     n_s = 64
     cnnInput=Input(shape=(Constants.IMAGE_SIZE,Constants.IMAGE_SIZE,3))
-    postAttentionInputs = Input(shape=(None, Constants.VOCAB_SIZE))
+    postAttentionInputs = Input(shape=(Constants.MAX_SEQUENCE_LENGTH, Constants.VOCAB_SIZE))
     s0 = Input(shape=(n_s,), name='s0')
     c0 = Input(shape=(n_s,), name='c0')
     
@@ -27,14 +27,15 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     ,concatenatorPost,post_activation_LSTM_cell,output_layer \
     =attentionRNN.createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s)
     
+    print(outputs[0])
     model = Model([cnnInput, postAttentionInputs , s0 ,c0], outputs,name='UI2XMLattention')
     
     opt = Adam(lr=Constants.LEARNING_RATE, beta_1=0.9, beta_2=0.999, decay=Constants.LR_DECAY)
     model.compile(optimizer=opt, loss='categorical_crossentropy' , metrics=['accuracy'])
-    s0 = np.zeros((Constants.BATCH_SIZE, n_s))
-    c0 = np.zeros((Constants.BATCH_SIZE, n_s))
+    sInitial = np.zeros((Constants.BATCH_SIZE, n_s))
+    cInitial = np.zeros((Constants.BATCH_SIZE, n_s))
     #outputs = list(Yoh.swapaxes(0,1))
-    model.fit([X, Y,s0,c0], YshiftedLeft,
+    model.fit([X, Y,sInitial,cInitial], YshiftedLeft,
           batch_size=Constants.BATCH_SIZE,
           epochs=Constants.EPOCHS,
           validation_split=0.2)
@@ -44,7 +45,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     # Models to used in prediction.
     cnnModelForPrediction=CNN.getTrainedCnnModel(cnnInput,attentionInputs)
     biDirectionalModel,attentionRnnModel \
-    =attentionRNN.getTrainedEncoderDecoderModel(biLstm,repeator,concatenator,densor1,densor2,activator,dotor,postAttentionInputs,s0,c0,concatenatorPost,post_activation_LSTM_cell,output_layer,n_a)
+    =attentionRNN.getTrainedattentionRnnModel(biLstm,repeator,concatenator,densor1,densor2,activator,dotor,s0,c0,concatenatorPost,post_activation_LSTM_cell,output_layer,n_a)
     cnnModelForPrediction.save('cnnModel.h5')
     biDirectionalModel.save('biDirectionalModel.h5')
     attentionRnnModel.save('attentionRnnModel.h5')
@@ -62,21 +63,26 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
        
 # TODO : Complete this function.
 def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderModel):
+    n_s = 64
     inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
     cnnModel = load_model('cnnModel.h5')
     biDirectionalModel = load_model('biDirectionalModel.h5')
     attentionRnnModel = load_model('attentionRnnModel.h5')
     inputImage = np.expand_dims(inputImage, 0)
     print("image to predict shape: "+str(inputImage.shape))
-    encoderInputs = cnnModel.predict(inputImage)
-    statesValue = encoderModel.predict(encoderInputs)
+    attentionInputs = cnnModel.predict(inputImage)
+    a = biDirectionalModel.predict(attentionInputs)
     
+    s0 = np.zeros((Constants.BATCH_SIZE, n_s))
+    c0 = np.zeros((Constants.BATCH_SIZE, n_s))
+    s=s0
+    c=c0
     targetSeq = np.zeros((1, 1, Constants.VOCAB_SIZE))
     targetSeq[0, 0, vocab['\t']] = 1.
     stopCondition = False
     outputIndices = []
     while not stopCondition:
-        outputToken, h, c = decoderModel.predict([targetSeq] + statesValue)
+        outputToken, s, c = attentionRnnModel.predict([a,targetSeq,s,c])
 
         # Sample a token
         sampledTokenIndex = np.argmax(outputToken,axis=-1)
@@ -90,11 +96,30 @@ def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderMod
         # Update the target sequence (of length 1).
         targetSeq = np.zeros((1, 1, Constants.VOCAB_SIZE))
         targetSeq[0, 0, sampledTokenIndex] = 1.
-        # Update states
-        statesValue = [h, c]
+
         
     outputSequnce = Utils.indicesToSequence(outputIndices , invVocab)
     return outputSequnce
+
+
+def saveModelsForPrediction():
+    # Models to used in prediction.
+    model = load_model('UI2XML.h5')
+    cnnInput=model.input[0]   # input_1 layer in model
+    encoderInputs=model.layers[18].output #output of permute layer in cnn
+    decoderInputs=model.input[1]       # input_2 layer in model    
+    encoderLstm=model.layers[20]
+    _, stateH, stateC = encoderLstm(encoderInputs)
+    encoderStates=[stateH, stateC]
+    decoderLstm=model.layers[21]
+    decoderDense=model.layers[22]
+    cnnModelForPrediction=CNN.getTrainedCnnModel(cnnInput,encoderInputs)
+    encoderModelForPrediction,decoderModelForPrediction \
+    =EncoderDecoderRNN.getTrainedEncoderDecoderModel(encoderLstm,encoderStates,decoderInputs,decoderLstm,decoderDense)
+    cnnModelForPrediction.save('cnnModel.h5')
+    encoderModelForPrediction.save('encoderModel.h5')
+    decoderModelForPrediction.save('decoderModel.h5')
+    return 
     
 
     
