@@ -55,8 +55,6 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
         s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s,c])
         out = output_layer(s)
         outputs.append(out)
-    
-    
     return outputs,biLstm,repeator,concatenator,densor1,densor2,activator,dotor,concatenatorPost,post_activation_LSTM_cell,output_layer
 
 

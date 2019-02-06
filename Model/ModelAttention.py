@@ -27,15 +27,14 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     ,concatenatorPost,post_activation_LSTM_cell,output_layer \
     =attentionRNN.createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s)
     
-    print(outputs[0])
-    
     model = Model([cnnInput, postAttentionInputs , s0 ,c0], outputs,name='UI2XMLattention')
     
     opt = Adam(lr=Constants.LEARNING_RATE, beta_1=0.9, beta_2=0.999, decay=Constants.LR_DECAY)
     model.compile(optimizer=opt, loss='categorical_crossentropy' , metrics=['accuracy'])
-    sInitial = np.zeros((Constants.BATCH_SIZE, n_s))
-    cInitial = np.zeros((Constants.BATCH_SIZE, n_s))
-    #outputs = list(Yoh.swapaxes(0,1))
+    sInitial = np.zeros((X.shape[0], n_s))
+    cInitial = np.zeros((X.shape[0], n_s))
+    YshiftedLeft = list(YshiftedLeft.swapaxes(0,1))
+    
     model.fit([X, Y,sInitial,cInitial], YshiftedLeft,
           batch_size=Constants.BATCH_SIZE,
           epochs=Constants.EPOCHS,
@@ -55,8 +54,8 @@ def createAndTrainModel(X,Y,YshiftedLeft):
 def evaluateModel(xTest,yTest,yTestShiftedLeft):
     model = load_model('UI2XMLattention.h5')
     n_s = 64
-    s0 = np.zeros((Constants.BATCH_SIZE, n_s))
-    c0 = np.zeros((Constants.BATCH_SIZE, n_s))
+    s0 = np.zeros((xTest.shape[0], n_s))
+    c0 = np.zeros((xTest.shape[0], n_s))
     evaluate =model.evaluate(x = [xTest,yTest,s0,c0], y = yTestShiftedLeft)
     print ("Loss = " + str(evaluate[0]))
     print ("Test Accuracy = " + str(evaluate[1]))
@@ -74,8 +73,8 @@ def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderMod
     attentionInputs = cnnModel.predict(inputImage)
     a = biDirectionalModel.predict(attentionInputs)
     
-    s0 = np.zeros((Constants.BATCH_SIZE, n_s))
-    c0 = np.zeros((Constants.BATCH_SIZE, n_s))
+    s0 = np.zeros((1, n_s))
+    c0 = np.zeros((1, n_s))
     s=s0
     c=c0
     targetSeq = np.zeros((1, 1, Constants.VOCAB_SIZE))
