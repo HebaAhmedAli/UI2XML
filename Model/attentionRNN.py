@@ -49,7 +49,8 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
     a = biLstm(attentionInputs)
     for t in range(Constants.MAX_SEQUENCE_LENGTH):
         context = one_step_attention(a, s,repeator,concatenator,densor1,densor2,activator,dotor)
-        postAttentionInputsT = Lambda(lamdbda_split)(postAttentionInputs[:,t,:])
+        slicedPostAttentionInputs = Lambda(lambda x: x[:, t, :])(postAttentionInputs)
+        postAttentionInputsT = Lambda(lamdbda_split)(slicedPostAttentionInputs)
         contextAndInput = concatenatorPost([postAttentionInputsT, context ])
         s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s,c])
         out = output_layer(s)

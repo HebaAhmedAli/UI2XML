@@ -17,7 +17,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     n_a = 32
     n_s = 64
     cnnInput=Input(shape=(Constants.IMAGE_SIZE,Constants.IMAGE_SIZE,3))
-    postAttentionInputs = Input(shape=(Constants.MAX_SEQUENCE_LENGTH, Constants.VOCAB_SIZE))
+    postAttentionInputs = Input(shape=(None, Constants.VOCAB_SIZE))
     s0 = Input(shape=(n_s,), name='s0')
     c0 = Input(shape=(n_s,), name='c0')
     
@@ -28,6 +28,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     =attentionRNN.createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s)
     
     print(outputs[0])
+    
     model = Model([cnnInput, postAttentionInputs , s0 ,c0], outputs,name='UI2XMLattention')
     
     opt = Adam(lr=Constants.LEARNING_RATE, beta_1=0.9, beta_2=0.999, decay=Constants.LR_DECAY)
