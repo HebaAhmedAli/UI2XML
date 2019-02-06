@@ -82,6 +82,23 @@ def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderMod
     outputSequnce = Utils.indicesToSequence(outputIndices , invVocab)
     return outputSequnce
     
-
+def saveModelsForPrediction():
+    # Models to used in prediction.
+    model = load_model('UI2XML.h5')
+    cnnInput=model.input[0]   # input_1 layer in model
+    encoderInputs=model.layers[18].output #output of permute layer in cnn
+    decoderInputs=model.input[1]       # input_2 layer in model    
+    encoderLstm=model.layers[20]
+    _, stateH, stateC = encoderLstm(encoderInputs)
+    encoderStates=[stateH, stateC]
+    decoderLstm=model.layers[21]
+    decoderDense=model.layers[22]
+    cnnModelForPrediction=CNN.getTrainedCnnModel(cnnInput,encoderInputs)
+    encoderModelForPrediction,decoderModelForPrediction \
+    =EncoderDecoderRNN.getTrainedEncoderDecoderModel(encoderLstm,encoderStates,decoderInputs,decoderLstm,decoderDense)
+    cnnModelForPrediction.save('cnnModel.h5')
+    encoderModelForPrediction.save('encoderModel.h5')
+    decoderModelForPrediction.save('decoderModel.h5')
+    return 
     
 
