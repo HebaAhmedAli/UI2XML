@@ -7,7 +7,7 @@ import numpy as np
 vocab,invVocab = LoadData.loadVocab('data/xml_vocab.txt')
 
 start=0
-end=5
+end=3
 X, Yhot , YhotShiftedLeft = LoadData.loadData('data/tryImages/','./data/XmlTry.lst',vocab,start,end)
 model,_,_,_=ModelAttention.createAndTrainModel(X, Yhot,YhotShiftedLeft)
 model.summary()

@@ -56,6 +56,7 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
     n_s = 64
     s0 = np.zeros((xTest.shape[0], n_s))
     c0 = np.zeros((xTest.shape[0], n_s))
+    yTestShiftedLeft = list(yTestShiftedLeft.swapaxes(0,1))
     evaluate =model.evaluate(x = [xTest,yTest,s0,c0], y = yTestShiftedLeft)
     print ("Loss = " + str(evaluate[0]))
     print ("Test Accuracy = " + str(evaluate[1]))
