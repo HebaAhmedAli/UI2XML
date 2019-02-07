@@ -13,12 +13,14 @@ model,_,_,_=ModelAttention.createAndTrainModel(X, Yhot,YhotShiftedLeft)
 model.summary()
 
 Xtesting, YhotTesting , YhotShiftedLeftTesting = LoadData.loadData('data/tryImages/','./data/XmlTry.lst',vocab,0,3)
-ModelAttention.evaluateModel(X, Yhot,YhotShiftedLeft)
+#ModelAttention.evaluateModel(X, Yhot,YhotShiftedLeft)
+'''
+ModelAttention.saveModelsForPrediction()
 
-#ModelAttention.saveModelsForPrediction()
 
 predFile=open("prediction.txt", 'w+')
 outputSequnce=ModelAttention.makeAprediction('data/tryImages/1.png',vocab,invVocab)  #,cnnModel,encoderModel,decoderModel)
 predFile.write(outputSequnce)
 predFile.close()
 
+'''

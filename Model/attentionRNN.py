@@ -8,8 +8,14 @@ from keras.models import load_model, Model
 import keras.backend as K
 import numpy as np
 import Constants
+import tensorflow as tf
 
-def lamdbda_split(value):
+def lamdbda_split(arr):
+    import tensorflow as tf
+    value=arr[0]
+    t=arr[1]
+    t=tf.cast(t, tf.int32)
+    value=value[:,t,:]
     x = K.expand_dims(value, axis=1)
     return x
 
@@ -41,6 +47,7 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
     densor2 = Dense(1, activation = "relu")
     activator = Activation('softmax', name='attention_weights') 
     dotor = Dot(axes = 1)
+    lambdaLayer=Lambda(lamdbda_split)
     concatenatorPost=Concatenate(axis=-1)
     post_activation_LSTM_cell = LSTM(n_s, return_state = True)
     output_layer = Dense(Constants.VOCAB_SIZE, activation='softmax')
@@ -49,8 +56,8 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
     a = biLstm(attentionInputs)
     for t in range(Constants.MAX_SEQUENCE_LENGTH):
         context = one_step_attention(a, s,repeator,concatenator,densor1,densor2,activator,dotor)
-        slicedPostAttentionInputs = Lambda(lambda x: x[:, t, :])(postAttentionInputs)
-        postAttentionInputsT = Lambda(lamdbda_split)(slicedPostAttentionInputs)
+        #slicedPostAttentionInputs = Lambda(lambda x: x[:, t, :])(postAttentionInputs)
+        postAttentionInputsT = lambdaLayer([postAttentionInputs,tf.constant(t)])
         contextAndInput = concatenatorPost([postAttentionInputsT, context ])
         s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s,c])
         out = output_layer(s)
