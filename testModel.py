@@ -5,7 +5,7 @@ import numpy as np
 
 
 vocab,invVocab = LoadData.loadVocab('data/xml_vocab.txt')
-
+'''
 start=0
 end=3
 X, Yhot , YhotShiftedLeft = LoadData.loadData('data/tryImages/','./data/XmlTry.lst',vocab,start,end)
@@ -22,5 +22,3 @@ predFile=open("prediction.txt", 'w+')
 outputSequnce=ModelAttention.makeAprediction('data/tryImages/1.png',vocab,invVocab)  #,cnnModel,encoderModel,decoderModel)
 predFile.write(outputSequnce)
 predFile.close()
-
-'''

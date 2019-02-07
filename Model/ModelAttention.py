@@ -111,27 +111,22 @@ def saveModelsForPrediction():
     s0 = model.input[2] 
     c0 = model.input[3] 
     attentionInputs=model.layers[18].output #output of permute layer in cnn
-    print(model.layers[18])
-    for i in range(len(model.layers)):
-        print(model.layers[i])
-    '''
-    biLstm=
-    repeator=
-    concatenator=
-    densor1=
-    densor2=
-    activator=
-    dotor=
-    concatenatorPost=
-    post_activation_LSTM_cell=
-    output_layer=
+    biLstm=model.layers[20]
+    repeator=model.layers[21]
+    concatenator=model.layers[22]
+    densor1=model.layers[23]
+    densor2=model.layers[24]
+    activator=model.layers[26]
+    dotor=model.layers[28]
+    concatenatorPost=model.layers[29]
+    post_activation_LSTM_cell=model.layers[31]
+    output_layer=model.layers[32]
     cnnModelForPrediction=CNN.getTrainedCnnModel(cnnInput,attentionInputs)
     biDirectionalModel,attentionRnnModel \
     =attentionRNN.getTrainedattentionRnnModel(biLstm,repeator,concatenator,densor1,densor2,activator,dotor,s0,c0,concatenatorPost,post_activation_LSTM_cell,output_layer,n_a)
     cnnModelForPrediction.save('cnnModel.h5')
     biDirectionalModel.save('biDirectionalModel.h5')
     attentionRnnModel.save('attentionRnnModel.h5')
-    '''
     return 
     
 
