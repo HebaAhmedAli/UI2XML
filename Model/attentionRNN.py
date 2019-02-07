@@ -10,12 +10,10 @@ import numpy as np
 import Constants
 import tensorflow as tf
 
-def lamdbda_split(arr):
-    import tensorflow as tf
-    value=arr[0]
-    t=arr[1]
-    t=tf.cast(t, tf.int32)
-    value=value[:,t,:]
+def lamdbda_split(value):
+    #import tensorflow as tf
+    print(Constants.t)
+    value=value[:,Constants.t,:]
     x = K.expand_dims(value, axis=1)
     return x
 
@@ -55,9 +53,10 @@ def createAttentionRnn(attentionInputs,s0,c0,postAttentionInputs,n_a,n_s):
     outputs = []
     a = biLstm(attentionInputs)
     for t in range(Constants.MAX_SEQUENCE_LENGTH):
+        Constants.t=t
         context = one_step_attention(a, s,repeator,concatenator,densor1,densor2,activator,dotor)
         #slicedPostAttentionInputs = Lambda(lambda x: x[:, t, :])(postAttentionInputs)
-        postAttentionInputsT = lambdaLayer([postAttentionInputs,tf.constant(t)])
+        postAttentionInputsT = lambdaLayer(postAttentionInputs)
         contextAndInput = concatenatorPost([postAttentionInputsT, context ])
         s, _, c = post_activation_LSTM_cell(contextAndInput,initial_state=[s,c])
         out = output_layer(s)
