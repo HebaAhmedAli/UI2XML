@@ -12,7 +12,6 @@ import tensorflow as tf
 
 def lamdbda_split(value):
     #import tensorflow as tf
-    print(Constants.t)
     value=value[:,Constants.t,:]
     x = K.expand_dims(value, axis=1)
     return x
