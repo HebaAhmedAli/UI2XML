@@ -95,9 +95,11 @@ def removeUnwantedIndices(listIndices,imagePath,imagePathTo,maxFileSize,xmlFrom,
 def printNewVocab(vocabPath,unwantedVocabPath,finalPath):
     fVocabs=open(vocabPath)
     vocabs=fVocabs.readlines()
-    fUnwantedVocabs=open(vocabPath)
-    unwantedVocabs=fUnwantedVocabs.readlines()
+    fUnwantedVocabs=open(unwantedVocabPath)
+    unwantedVocabs=fUnwantedVocabs.readlines()     
     finalVocabs=list(set(vocabs) - set(unwantedVocabs))
+    print(len(set(vocabs)),len(set(unwantedVocabs)))
+    print(len(vocabs),len(unwantedVocabs),len(finalVocabs))
     fTo=open(finalPath, 'w+')  
     for i in range(len(finalVocabs)):
         fTo.write(finalVocabs[i])
@@ -112,12 +114,14 @@ def replaceVocabs(repPath,xmlPath):
     fFromRep.close()
     for i in range(len(sequences)):
         for j in range(len(vocabs)):
-            sequences[i]=sequences[i].replace(vocabs[j].split()[0],vocabs[j].split()[1])
+            firstStr=vocabs[j].split()[0]
+            secondString=vocabs[j].split()[1]
+            sequences[i]=sequences[i].replace(firstStr,secondString)
     fTo=open(xmlPath, 'w+')  
     for i in range(len(sequences)):
         fTo.write(sequences[i])
     fTo.close()
-    
+'''
 unwantedVocab=getUnwantedVoab("data/unwanted_vocab.txt")
 printNewVocab('data/xml_vocabR.txt',"data/unwanted_vocab.txt",'data/xml_vocab.txt')
 listIndices1=printUnwantedIndices("data/XmlTrainingR.lst",unwantedVocab)
@@ -126,10 +130,14 @@ listIndices3=printUnwantedIndices('data/XmlValidationR.lst',unwantedVocab)
 removeUnwantedIndices(listIndices1,'data/trainingImagesR/','data/trainingImages/',165887,'data/XmlTrainingR.lst','data/XmlTraining.lst')
 removeUnwantedIndices(listIndices2,'data/testingImagesR/','data/testingImages/',12643,'data/XmlTestingR.lst','data/XmlTesting.lst')
 removeUnwantedIndices(listIndices3,'data/validationImagesR/','data/validationImages/',5539,'data/XmlValidationR.lst','data/XmlValidation.lst')
+'''
+printNewVocab('data/xml_vocabR.txt',"data/unwanted_vocab.txt",'data/xml_vocabInter.txt')
+printNewVocab('data/xml_vocabInter.txt',"data/replacementRemove.txt",'data/xml_vocab.txt')
+'''
 replaceVocabs('data/replacement.txt','data/XmlTraining.lst')
 replaceVocabs('data/replacement.txt','data/XmlValidation.lst')
 replaceVocabs('data/replacement.txt','data/XmlTesting.lst')
-
+'''
 #constructData('data/try.lst','data/processedImage/','data/tryImages/','data/XMLsequence.lst','data/XmlTry.lst')
 #constructData('data/train.lst','data/processedImage/','data/trainingImages/','data/XMLsequence.lst','data/XmlTraining.lst')
 #constructData('data/validate.lst','data/processedImage/','data/validationImages/','data/XMLsequence.lst','data/XmlValidation.lst')
