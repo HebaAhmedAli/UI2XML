@@ -72,7 +72,6 @@ def printUnwantedIndices(xmlPath,unwantedVocab):
     print("len of indices = "+str(len(indices)))
     listIndices=list(indices)
     listIndices.sort()
-    print(listIndices)
     return listIndices
 def removeUnwantedIndices(listIndices,imagePath,imagePathTo,maxFileSize,xmlFrom,xmlTo):
     allIndices=[i for i in range(maxFileSize)]
