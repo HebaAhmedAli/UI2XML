@@ -75,13 +75,18 @@ def printUnwantedIndices(xmlPath,unwantedVocab):
     print(listIndices)
     return listIndices
 def removeUnwantedIndices(listIndices,imagePath,imagePathTo,maxFileSize,xmlFrom,xmlTo):
-    finalIndices=[i for i in range(maxFileSize)]
+    allIndices=[i for i in range(maxFileSize)]
+    finalIndices=[]
+    booleanIndices=[True for i in range(maxFileSize)]
     for i in range(len(listIndices)):
         #os.remove(imagePath+str(listIndices[i])+".png")
-        finalIndices.pop(listIndices[i])
+        booleanIndices[listIndices[i]]=False
     fFrom=open(xmlFrom)
     sequences=fFrom.readlines()
     fTo=open(xmlTo, 'w+')  
+    for i in range(len(allIndices)):
+        if booleanIndices[i] == True:
+            finalIndices.append(allIndices[i])
     for i in range(len(finalIndices)):
         fTo.write(sequences[finalIndices[i]])
         shutil.copy(imagePath+str(finalIndices[i])+'.png', imagePathTo+str(i)+'.png')
