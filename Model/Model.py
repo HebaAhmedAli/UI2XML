@@ -52,7 +52,7 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
         totalModelAccuracy+=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
-    return totalModelAccuracy/len(xTest)
+    print("Calculated accuracy = "+str(totalModelAccuracy/len(xTest)))
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
