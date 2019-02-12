@@ -1,5 +1,7 @@
-import EncoderDecoderRNN as EncoderDecoderRNN
-import CNN as CNN
+import sys
+sys.path.append('../')
+import Model.EncoderDecoderRNN as EncoderDecoderRNN
+import Model.CNN as CNN
 from keras.layers import Input
 from keras.models import Model,load_model
 import keras.backend as K
@@ -8,6 +10,7 @@ import Utils
 import Constants 
 import Preprocessing
 import LoadData
+
 
 
 def createAndTrainModel(X,Y,YshiftedLeft):
@@ -47,7 +50,7 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
 def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
     totalModelAccuracy=0
     for i in range(len(xTest)):
-        outputSequnce=makeAprediction(vocab=vocab,invVocab=invVocab,None,img=xTest[i])  #,cnnModel,encoderModel,decoderModel)
+        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False)  #,cnnModel,encoderModel,decoderModel)
         Y=[]
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
@@ -65,7 +68,7 @@ def makeAprediction(vocab,invVocab,imgPath=None,img=None,pathGiven=True ): #,cnn
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
     inputImage = np.expand_dims(inputImage, 0)
-    print("image to predict shape: "+str(inputImage.shape))
+    #print("image to predict shape: "+str(inputImage.shape))
     encoderInputs = cnnModel.predict(inputImage)
     statesValue = encoderModel.predict(encoderInputs)
     
