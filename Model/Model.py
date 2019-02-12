@@ -1,7 +1,5 @@
-import sys
-sys.path.append('../')
-import Model.EncoderDecoderRNN as EncoderDecoderRNN
-import Model.CNN as CNN
+import EncoderDecoderRNN as EncoderDecoderRNN
+import CNN as CNN
 from keras.layers import Input
 from keras.models import Model,load_model
 import keras.backend as K
@@ -9,6 +7,7 @@ import numpy as np
 import Utils
 import Constants 
 import Preprocessing
+import LoadData
 
 
 def createAndTrainModel(X,Y,YshiftedLeft):
@@ -22,7 +21,7 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     
     model = Model([cnnInput, decoderInputs], decoderOutputs,name='UI2XML')
     
-    model.compile(optimizer='sgd', loss='categorical_crossentropy' , metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='categorical_crossentropy' , metrics=['categorical_accuracy'])
     model.fit([X, Y], YshiftedLeft,
           batch_size=Constants.BATCH_SIZE,
           epochs=Constants.EPOCHS,
@@ -45,10 +44,23 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
     print ("Loss = " + str(evaluate[0]))
     print ("Test Accuracy = " + str(evaluate[1]))
 
+def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
+    totalModelAccuracy=0
+    for i in range(len(xTest)):
+        outputSequnce=makeAprediction(None,vocab=vocab,invVocab=invVocab,img=xTest[i])  #,cnnModel,encoderModel,decoderModel)
+        Y=[]
+        Y.append(outputSequnce)
+        yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
+        totalModelAccuracy+=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
+    return totalModelAccuracy/len(xTest)
+
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
-def makeAprediction(imgPath,vocab,invVocab ): #,cnnModel,encoderModel,decoderModel):
-    inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
+def makeAprediction(imgPath=None,vocab,invVocab,img=None,pathGiven=True ): #,cnnModel,encoderModel,decoderModel):
+    if pathGiven == True:
+        inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
+    else:
+        inputImage=img
     cnnModel = load_model('cnnModel.h5')
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
@@ -100,5 +112,8 @@ def saveModelsForPrediction():
     encoderModelForPrediction.save('encoderModel.h5')
     decoderModelForPrediction.save('decoderModel.h5')
     return 
+    
+    
+
     
 
