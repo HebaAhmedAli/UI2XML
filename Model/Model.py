@@ -49,8 +49,11 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
 
 def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
     totalModelAccuracy=0
+    cnnModel = load_model('cnnModel.h5')
+    encoderModel = load_model('encoderModel.h5')
+    decoderModel = load_model('decoderModel.h5')
     for i in range(len(xTest)):
-        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False)  #,cnnModel,encoderModel,decoderModel)
+        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,cnnModel,encoderModel,decoderModel) 
         Y=[]
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
@@ -59,14 +62,14 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
-def makeAprediction(vocab,invVocab,imgPath=None,img=None,pathGiven=True ): #,cnnModel,encoderModel,decoderModel):
+def makeAprediction(vocab,invVocab,imgPath=None,inputImage=None,pathGiven=True,cnnModel=None,encoderModel=None,decoderModel=None ):
     if pathGiven == True:
         inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
-    else:
-        inputImage=img
-    cnnModel = load_model('cnnModel.h5')
-    encoderModel = load_model('encoderModel.h5')
-    decoderModel = load_model('decoderModel.h5')
+        cnnModel = load_model('cnnModel.h5')
+        encoderModel = load_model('encoderModel.h5')
+        decoderModel = load_model('decoderModel.h5')
+
+    
     inputImage = np.expand_dims(inputImage, 0)
     #print("image to predict shape: "+str(inputImage.shape))
     encoderInputs = cnnModel.predict(inputImage)
