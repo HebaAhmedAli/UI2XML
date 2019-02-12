@@ -47,7 +47,7 @@ def evaluateModel(xTest,yTest,yTestShiftedLeft):
 def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
     totalModelAccuracy=0
     for i in range(len(xTest)):
-        outputSequnce=makeAprediction(None,vocab=vocab,invVocab=invVocab,img=xTest[i])  #,cnnModel,encoderModel,decoderModel)
+        outputSequnce=makeAprediction(vocab=vocab,invVocab=invVocab,None,img=xTest[i])  #,cnnModel,encoderModel,decoderModel)
         Y=[]
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
@@ -56,7 +56,7 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
-def makeAprediction(imgPath=None,vocab,invVocab,img=None,pathGiven=True ): #,cnnModel,encoderModel,decoderModel):
+def makeAprediction(vocab,invVocab,imgPath=None,img=None,pathGiven=True ): #,cnnModel,encoderModel,decoderModel):
     if pathGiven == True:
         inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
     else:
