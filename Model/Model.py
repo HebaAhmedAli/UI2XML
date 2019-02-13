@@ -4,6 +4,7 @@ import Model.EncoderDecoderRNN as EncoderDecoderRNN
 import Model.CNN as CNN
 from keras.layers import Input
 from keras.models import Model,load_model
+from nltk.translate.bleu_score import corpus_bleu
 import keras.backend as K
 import numpy as np
 import Utils
@@ -59,6 +60,16 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
         totalModelAccuracy+=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
     print("Calculated accuracy = "+str(totalModelAccuracy/len(xTest)))
+    
+def evaluateUsingBleu(xTest,yTest,vocab,invVocab):
+    cnnModel = load_model('cnnModel.h5')
+    encoderModel = load_model('encoderModel.h5')
+    decoderModel = load_model('decoderModel.h5')
+    predicted=list()
+    for i in range(len(xTest)):
+        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,cnnModel,encoderModel,decoderModel) 
+        predicted.append(outputSequnce.split())
+    print("Bleu accuracy = "+str(corpus_bleu(yTest, predicted)))
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
