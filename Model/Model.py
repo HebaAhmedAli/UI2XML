@@ -41,39 +41,77 @@ def createAndTrainModel(X,Y,YshiftedLeft):
     encoderModelForPrediction.save('encoderModel.h5')
     decoderModelForPrediction.save('decoderModel.h5')
     return model,cnnModelForPrediction,encoderModelForPrediction,decoderModelForPrediction
-    
-def evaluateModel(xTest,yTest,yTestShiftedLeft):
-    model = load_model('UI2XML.h5')
-    evaluate =model.evaluate(x = [xTest,yTest], y = yTestShiftedLeft)
-    print ("Loss = " + str(evaluate[0]))
-    print ("Test Accuracy = " + str(evaluate[1]))
 
-def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab):
+def createAndTrainModelPredictedSequence(X,YshiftedLeft,vocab):
+    cnnInput=Input(shape=(Constants.IMAGE_SIZE,Constants.IMAGE_SIZE,3))
+    decoderInputs = Input(shape=(None, Constants.VOCAB_SIZE)) # Note it will be (1,1,vocab_size)
+    
+    encoderInputs=CNN.createCNN(cnnInput)
+    
+    decoderOutputs,encoderStates,decoderLstm,decoderDense,encoderLstm \
+    =EncoderDecoderRNN.createEncoderDecoderRNNfromPrediction(encoderInputs,decoderInputs)
+    
+    model = Model([cnnInput, decoderInputs], decoderOutputs,name='UI2XML')
+    
+    model.compile(optimizer='adam', loss='categorical_crossentropy' , metrics=['categorical_accuracy'])
+    YshiftedLeft = list(YshiftedLeft.swapaxes(0,1))
+    startSeq = np.zeros((X.shape[0], 1, Constants.VOCAB_SIZE))
+    startSeq[:, 0, vocab['\t']] = 1.
+    print("startSeq = "+str(startSeq.shape))
+    model.fit([X,startSeq], YshiftedLeft,
+          batch_size=Constants.BATCH_SIZE,
+          epochs=Constants.EPOCHS,
+          validation_split=0.2)
+    # Save model
+    model.save('UI2XML.h5')
+    # Models to used in prediction.
+    cnnModelForPrediction=CNN.getTrainedCnnModel(cnnInput,encoderInputs)
+    encoderModelForPrediction,decoderModelForPrediction \
+    =EncoderDecoderRNN.getTrainedEncoderDecoderModel(encoderLstm,encoderStates,decoderInputs,decoderLstm,decoderDense)
+    cnnModelForPrediction.save('cnnModel.h5')
+    encoderModelForPrediction.save('encoderModel.h5')
+    decoderModelForPrediction.save('decoderModel.h5')
+    return model,cnnModelForPrediction,encoderModelForPrediction,decoderModelForPrediction
+    
+def evaluateModel(xTest,yTest,yTestShiftedLeft,fromPrediction=False,vocab=None):
+    model = load_model('UI2XML.h5')
+    evaluate=[]
+    if fromPrediction == True:
+        yTestShiftedLeft = list(yTestShiftedLeft.swapaxes(0,1))
+        startSeq = np.zeros((xTest.shape[0], 1, Constants.VOCAB_SIZE))
+        startSeq[:, 0, vocab['\t']] = 1.
+        evaluate =model.evaluate(x = [xTest,startSeq], y = yTestShiftedLeft)
+    else:
+        evaluate =model.evaluate(x = [xTest,yTest], y = yTestShiftedLeft)
+    print(model.metrics_names)
+    print ("Evaluation = " + str(evaluate))
+
+def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab,predictionSeq=False):
     totalModelAccuracy=0
     cnnModel = load_model('cnnModel.h5')
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
     for i in range(len(xTest)):
-        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,cnnModel,encoderModel,decoderModel) 
+        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,predictionSeq,cnnModel,encoderModel,decoderModel) 
         Y=[]
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
         totalModelAccuracy+=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
     print("Calculated accuracy = "+str(totalModelAccuracy/len(xTest)))
     
-def evaluateUsingBleu(xTest,yTest,vocab,invVocab):
+def evaluateUsingBleu(xTest,yTest,vocab,invVocab,predictionSeq=False):
     cnnModel = load_model('cnnModel.h5')
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
     predicted=list()
     for i in range(len(xTest)):
-        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,cnnModel,encoderModel,decoderModel) 
+        outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,predictionSeq,cnnModel,encoderModel,decoderModel) 
         predicted.append(outputSequnce.split())
     print("Bleu accuracy = "+str(corpus_bleu(yTest, predicted)))
 
        
 # TODO : Remove the models from the arguments and uncomment them inside func.
-def makeAprediction(vocab,invVocab,imgPath=None,inputImage=None,pathGiven=True,cnnModel=None,encoderModel=None,decoderModel=None ):
+def makeAprediction(vocab,invVocab,imgPath=None,inputImage=None,pathGiven=True,predictionSeq=False,cnnModel=None,encoderModel=None,decoderModel=None ):
     if pathGiven == True:
         inputImage = Preprocessing.imageReadAndPreprocessing(imgPath)
         cnnModel = load_model('cnnModel.h5')
@@ -95,7 +133,10 @@ def makeAprediction(vocab,invVocab,imgPath=None,inputImage=None,pathGiven=True,c
 
         # Sample a token
         sampledTokenIndex = np.argmax(outputToken,axis=-1)
-        sampledTokenIndex = sampledTokenIndex [0][0]
+        if predictionSeq==False:
+            sampledTokenIndex = sampledTokenIndex [0][0]
+        else:
+             sampledTokenIndex = sampledTokenIndex [0]
         outputIndices.append(sampledTokenIndex)
         # Exit condition: either hit max length
         # or find stop character.

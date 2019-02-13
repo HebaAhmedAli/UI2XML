@@ -1,8 +1,14 @@
 import sys
 sys.path.append('../')
 from keras.models import Model
-from keras.layers import Input, LSTM, Dense
+from keras.layers import Input, LSTM, Dense,Lambda
 import Constants
+import keras.backend as K
+
+
+def lamdbda_split(value):
+    x = K.expand_dims(value, axis=1)
+    return x
 
 # Create the encoder_decoder rnn layers to use them in training the model.
 def createEncoderDecoderRNN(encoderInputs,decoderInputs):
@@ -17,7 +23,28 @@ def createEncoderDecoderRNN(encoderInputs,decoderInputs):
     decoderDense = Dense(Constants.VOCAB_SIZE, activation='softmax')
     decoderOutputs = decoderDense(decoderOutputs)
     return decoderOutputs,encoderStates,decoderLstm,decoderDense,encoderLstm
-    
+
+def createEncoderDecoderRNNfromPrediction(encoderInputs,decoderInput0):
+    # Create the encoder_decoder rnn layers to use them in training the model.
+    encoderLstm = LSTM(Constants.ENCODER_HIDDEN_UNITS, return_state=True)    
+    encoderOutputs, stateH, stateC = encoderLstm(encoderInputs)
+    # Discard `encoderOutputs` and only keep the states.
+    encoderStates = [stateH, stateC]
+    decoderLstm = LSTM(Constants.DECODER_HIDDEN_UNITS , return_state=True)
+    decoderDense = Dense(Constants.VOCAB_SIZE, activation='softmax')
+    lambdaLayer=Lambda(lamdbda_split)
+    decoderOutputs = []
+    decoderInput=decoderInput0
+    for t in range(Constants.MAX_SEQUENCE_LENGTH):
+        decoderOutput, h,c = decoderLstm(decoderInput,
+                                     initial_state=encoderStates)
+        decoderOutput = decoderDense(decoderOutput)
+        encoderStates = [h,c]
+        decoderOutputs.append(decoderOutput)
+        decoderOutput = lambdaLayer(decoderOutput)
+        decoderInput = decoderOutput
+    return decoderOutputs,encoderStates,decoderLstm,decoderDense,encoderLstm
+
 # Create the encoder & decoder models from the trained layers to use in prediction.
 def getTrainedEncoderDecoderModel(encoderLstm,encoderStates,decoderInputs,decoderLstm,decoderDense):
     encoderInputs = Input(shape=(None , Constants.CNN_FINAL_DEPTH))
