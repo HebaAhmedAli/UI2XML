@@ -91,13 +91,38 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab,predicti
     cnnModel = load_model('cnnModel.h5')
     encoderModel = load_model('encoderModel.h5')
     decoderModel = load_model('decoderModel.h5')
+    from0_50=0
+    from50_60=0
+    from60_75=0
+    from75_85=0
+    from85_100=0
+    accuracies=[]
     for i in range(len(xTest)):
         outputSequnce=makeAprediction(vocab,invVocab,None,xTest[i],False,predictionSeq,cnnModel,encoderModel,decoderModel) 
         Y=[]
         Y.append(outputSequnce)
         yPred,yPredShifted=LoadData.preprocessY(Y,vocab)
-        totalModelAccuracy+=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
+        accuracy=np.mean(np.equal(np.argmax(yTestShiftedLeft[i], axis=-1),np.argmax(yPredShifted, axis=-1)))
+        totalModelAccuracy+=accuracy
+        accuracies.append(accuracy)
+        accuracy=accuracy*100
+        if accuracy>0 and accuracy<=50:
+            from0_50+=1
+        elif accuracy>50 and accuracy<=60:
+            from50_60+=1
+        elif accuracy>60 and accuracy<=75:
+            from60_75+=1
+        elif accuracy>75 and accuracy<=85:
+            from75_85+=1
+        elif accuracy>85 and accuracy<=100:
+            from85_100+1
     print("Calculated accuracy = "+str(totalModelAccuracy/len(xTest)))
+    print("From0_50 = "+str(from0_50))
+    print("From50_60 = "+str(from50_60))
+    print("From60_75 = "+str(from60_75))
+    print("From75_85 = "+str(from75_85))
+    print("From85_100 = "+str(from85_100))
+    print(accuracies)
     
 def evaluateUsingBleu(xTest,yTest,vocab,invVocab,predictionSeq=False):
     cnnModel = load_model('cnnModel.h5')
