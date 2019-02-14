@@ -115,7 +115,7 @@ def evaluateUsingPrediction(xTest,yTest,yTestShiftedLeft,vocab,invVocab,predicti
         elif accuracy>75 and accuracy<=85:
             from75_85+=1
         elif accuracy>85 and accuracy<=100:
-            from85_100+1
+            from85_100+=1
     print("Calculated accuracy = "+str(totalModelAccuracy/len(xTest)))
     print("From0_50 = "+str(from0_50))
     print("From50_60 = "+str(from50_60))
