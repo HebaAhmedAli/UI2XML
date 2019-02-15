@@ -104,7 +104,7 @@ def evaluateUsingPredictionShorterPadding(xTest,yTest,vocab,invVocab,predictionS
         if len(YTestShiftedLeft[i]) > len(outputSequnce):
             outputSequnce=outputSequnce+(['<pad>']*(len(YTestShiftedLeft[i])-len(outputSequnce)))
         else:
-            YTestShiftedLeft[i]=YTestShiftedLeft[i]+(['<pad>']*(len(outputSequnce))-len(YTestShiftedLeft[i]))
+            YTestShiftedLeft[i]=YTestShiftedLeft[i]+(['<pad>']*(len(outputSequnce)-len(YTestShiftedLeft[i])))
         accuracy=np.mean(np.asarray(YTestShiftedLeft[i])==np.asarray(outputSequnce))
         totalModelAccuracy+=accuracy
         accuracies.append(accuracy)

@@ -8,3 +8,9 @@ def imageReadAndPreprocessing(imgPath):
         img = np.array(img,dtype='float32')  
         img /= 255.
         return img
+
+def imageReadAndPreprocessingClassification(imgPath):
+        img = image.load_img(imgPath, target_size = (Constants.IMAGE_SIZE_CLASSIFICATION,Constants.IMAGE_SIZE_CLASSIFICATION))
+        img = np.array(img,dtype='float32')  
+        img /= 255.
+        return img
