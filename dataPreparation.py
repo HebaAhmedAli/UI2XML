@@ -121,6 +121,16 @@ def replaceVocabs(repPath,xmlPath):
     for i in range(len(sequences)):
         fTo.write(sequences[i])
     fTo.close()
+
+def copyData(imagesFrom,imagesTo1,imagesTo2):
+  root,directories,files=next(os.walk(imagesFrom))
+  for i in range(len(files)):
+    if i<(len(files)/2):
+        shutil.copy(imagesFrom+files[i], imagesTo1+files[i])
+    else:
+        shutil.copy(imagesFrom+files[i], imagesTo2+files[i])
+
+copyData('data/testAndValidationToRename/TestAll/','data/testAndValidationToRename/Test1/','data/testAndValidationToRename/Test2/')
 '''
 unwantedVocab=getUnwantedVoab("data/unwanted_vocab.txt")
 printNewVocab('data/xml_vocabR.txt',"data/unwanted_vocab.txt",'data/xml_vocab.txt')
@@ -131,8 +141,8 @@ removeUnwantedIndices(listIndices1,'data/trainingImagesR/','data/trainingImages/
 removeUnwantedIndices(listIndices2,'data/testingImagesR/','data/testingImages/',12643,'data/XmlTestingR.lst','data/XmlTesting.lst')
 removeUnwantedIndices(listIndices3,'data/validationImagesR/','data/validationImages/',5539,'data/XmlValidationR.lst','data/XmlValidation.lst')
 '''
-printNewVocab('data/xml_vocabR.txt',"data/unwanted_vocab.txt",'data/xml_vocabInter.txt')
-printNewVocab('data/xml_vocabInter.txt',"data/replacementRemove.txt",'data/xml_vocab.txt')
+#printNewVocab('data/xml_vocabR.txt',"data/unwanted_vocab.txt",'data/xml_vocabInter.txt')
+#printNewVocab('data/xml_vocabInter.txt',"data/replacementRemove.txt",'data/xml_vocab.txt')
 '''
 replaceVocabs('data/replacement.txt','data/XmlTraining.lst')
 replaceVocabs('data/replacement.txt','data/XmlValidation.lst')
