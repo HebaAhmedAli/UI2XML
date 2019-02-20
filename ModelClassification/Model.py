@@ -42,6 +42,6 @@ def makeAprediction(invVocab,imgPath):
     inputImage = np.expand_dims(inputImage, 0)
     output = model.predict(inputImage)
     outputIndex = np.argmax(output,axis=-1)
-    print("Prediction = "+invVocab[outputIndex[0]])
+    #print("Prediction = "+invVocab[outputIndex[0]])
     return invVocab[outputIndex[0]]
     

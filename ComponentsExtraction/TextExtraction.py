@@ -1,3 +1,5 @@
+import pytesseract as pt
+
 # Extract text from given image or box.
 def extractText(image):
     textExtracted=[]
