@@ -10,7 +10,6 @@ vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt
 imagesPath='data/ScreenShots'
 
 def processSave(subdir, file):
-    print(subdir+'/' +file)
     img=cv2.imread(subdir+'/' +file)
     imgCopy = img
     file = file.replace('.jpeg','.jpg')
