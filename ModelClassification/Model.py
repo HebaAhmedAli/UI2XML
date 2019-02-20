@@ -37,7 +37,7 @@ def evaluateModel(xTest,yTest):
     print ("Evaluation = " + str(evaluate))
     
 def makeAprediction(invVocab,imgPath):
-    model = load_model('UI2XMLclassification.h5')
+    model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
     inputImage = Preprocessing.imageReadAndPreprocessingClassification(imgPath)
     inputImage = np.expand_dims(inputImage, 0)
     output = model.predict(inputImage)
