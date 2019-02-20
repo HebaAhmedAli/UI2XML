@@ -1,5 +1,10 @@
 import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
+import ModelClassification.Model as Model
+import LoadDataClassification
+import numpy as np
 
+
+vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 
 imagesPath='data/ScreenShots'
 
@@ -13,7 +18,7 @@ def processSave(imageDir, subdir, i):
     image=[] # TODO: Contains the image.
     ComponentsExtraction.extractComponents(image, imageDir)
     cv2.imwrite(subdir+"/output"+str(i)+".jpg",img)
-
+    Model.makeAprediction(invVocab,'data/SampleData/1-android.widget.RadioButton.png')
 
 
 
@@ -26,3 +31,4 @@ for subdir, dirs, files in os.walk(imagesPath):
         if ".png" in imgPath or ".jpeg" in imgPath:
             processSave(imgPath, subdir, i)
             i=i+1
+
