@@ -34,24 +34,22 @@ def preProcess(image):
     edges = cv2.Canny(blurred, lowThreshold, highThreshold)
     morph = cv2.dilate(edges,kernel,iterations = 5)
     return morph
-
 # Extract boxes from given image.
-def extractBoxes(img, directory):
+def extractBoxes(img):
     allBoxes=[]
-
-    preProcessedImage = preProcess(img)
+    preProcess(img)
     #finding the contours
-    (contours, hierarchy, _) = cv2.findContours(preProcessedImage, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    (contours, hierarchy, _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
     j = 0
     margin = 10
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        # testing: print the cropped in folder
-        crop_img = img[y-margin:y+h+margin, x-margin:x+w+margin]
-        cv2.imwrite(directory + "/comp"+str(j) + ".jpg",crop_img)
+        # if not os.path.exists(directory):
+        #     os.makedirs(directory)
+        # # testing: print the cropped in folder
+        # crop_img = img[y-margin:y+h+margin, x-margin:x+w+margin]
+        # cv2.imwrite(directory + "/comp"+str(j) + ".jpg",crop_img)
         cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
         allBoxes.append([x, y, w, h])
         j=j+1
