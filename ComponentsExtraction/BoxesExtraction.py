@@ -7,6 +7,6 @@ def extractBoxes(image):
     return filteredBoxes
 
 def filterBoxes(allBoxes):
-    filteredBoxes=[]
+    filteredBoxes=allBoxes #TODO: Filter Them.
     
     return filteredBoxes
