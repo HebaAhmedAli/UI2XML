@@ -1,10 +1,13 @@
 import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
 import ModelClassification.Model as Model
+from keras.models import load_model
 import LoadDataClassification
 import cv2
 import os
 import copy
-#vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+
+vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
 
 imagesPath='data/ScreenShots'
 
@@ -24,9 +27,9 @@ def processSave(subdir, file):
     for x,y,w,h in boxes:
         # testing: print the cropped in folder
         crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]),crop_img)
-        #pedictedComp=Model.makeAprediction(invVocab,subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]))
-        #cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ pedictedComp + str(file[len(file)-4:len(file)]),crop_img)
+        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+texts[j] + str(file[len(file)-4:len(file)]),crop_img)
+        pedictedComp=Model.makeAprediction(invVocab,subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+texts[j] + str(file[len(file)-4:len(file)]),model)
+        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ pedictedComp + str(file[len(file)-4:len(file)]),crop_img)
         j+=1     
     cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
