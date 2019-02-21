@@ -12,7 +12,7 @@ def processSave(subdir, file):
     img=cv2.imread(subdir+'/' +file)
     imgCopy = copy.copy(img)
     file = file.replace('.jpeg','.jpg')
-    boxes, texts = ComponentsExtraction.extractComponents(img)
+    boxes, texts = ComponentsExtraction.extractComponents(img,imgCopy)
     margin = 5
     if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
         os.makedirs(subdir+'/compOutputs'+file[:-4])
