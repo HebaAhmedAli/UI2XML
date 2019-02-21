@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import random
 
 
 # CANNY algorithm
@@ -29,14 +29,13 @@ def extractBoxes(img):
     allBoxes=[]
     morph=preProcess(img)
     #finding the contours
-    (contours, hierarchy, _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)   
-    #contours = np.array(contours).reshape((-1,1,2)).astype(np.int32)
+    (_, contours , _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)   
     #cv2.drawContours(img,contours,-1,(0,0,255),2)
     for cnt in contours:
-        cnt = np.array(cnt).reshape((-1,1,2)).astype(np.int32)
-        cv2.drawContours(img,[cnt],0,(0,0,255),2)
+        #cnt = np.array(cnt).reshape((-1,1,2)).astype(np.int32)
+        #cv2.drawContours(img,[cnt],0,(0,0,255),2)
         x,y,w,h = cv2.boundingRect(cnt)
-        cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+        cv2.rectangle(img,(x,y),(x+w,y+h),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),2)
         allBoxes.append([x, y, w, h])
      
     filteredBoxes=filterBoxes(allBoxes)

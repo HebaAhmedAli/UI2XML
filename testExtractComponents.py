@@ -3,15 +3,14 @@ import ModelClassification.Model as Model
 import LoadDataClassification
 import cv2
 import os
-
-
-vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+import copy
+#vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 
 imagesPath='data/ScreenShots'
 
 def processSave(subdir, file):
     img=cv2.imread(subdir+'/' +file)
-    imgCopy = img
+    imgCopy = copy.copy(img)
     file = file.replace('.jpeg','.jpg')
     boxes, texts = ComponentsExtraction.extractComponents(img)
     margin = 5
@@ -19,18 +18,16 @@ def processSave(subdir, file):
         os.makedirs(subdir+'/compOutputs'+file[:-4])
     if not os.path.exists(subdir+'/boxOutputs'):
         os.makedirs(subdir+'/boxOutputs')
-    '''
     j = 0
-    height=img.shape[0]
-    width=img.shape[1]
+    height= img.shape[0]
+    width= img.shape[1]
     for x,y,w,h in boxes:
         # testing: print the cropped in folder
         crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]),crop_img)
-        pedictedComp=Model.makeAprediction(invVocab,subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]))
-        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ pedictedComp + str(file[len(file)-4:len(file)]),crop_img)
+        #pedictedComp=Model.makeAprediction(invVocab,subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]))
+        #cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ pedictedComp + str(file[len(file)-4:len(file)]),crop_img)
         j+=1     
-    '''
     cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
 subdir, dirs, _= next(os.walk(imagesPath))
