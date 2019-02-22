@@ -8,6 +8,7 @@ import copy
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
+#print(Model.makeAprediction(invVocab,'data/ScreenShots/ourTest/compOutputsuber/comp28.jpg'))
 
 imagesPath='data/ScreenShots'
 
@@ -16,7 +17,7 @@ def processSave(subdir, file):
     imgCopy = copy.copy(img)
     file = file.replace('.jpeg','.jpg')
     boxes, texts = ComponentsExtraction.extractComponents(img,imgCopy)
-    margin = 0
+    margin = 10
     if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
         os.makedirs(subdir+'/compOutputs'+file[:-4])
     if not os.path.exists(subdir+'/boxOutputs'):
@@ -42,4 +43,3 @@ for direc in dirs:
         imgPath = os.path.join(subdir, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             processSave(subdir+'/'+direc, file)
-
