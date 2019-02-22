@@ -8,7 +8,7 @@ def extractComponents(image,imageCopy):
     extratctedBoxes=BoxesExtraction.extractBoxes(image)
     extractedText=[] # List of strings coreesponding to the text in each box.
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
-    margin = 0
+    margin = 10
     height=image.shape[0]
     width=image.shape[1]
     for x,y,w,h in extratctedBoxes:
