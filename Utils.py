@@ -41,7 +41,11 @@ def iou(boxA, boxB):
     
 
 
-
+def isSliceList(s,l):
+    for i in range(len(s)):
+        if s[i] not in l:
+            return False
+    return True
 
 
 

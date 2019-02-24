@@ -25,7 +25,7 @@ def extractComponentsAndPredict(image,imageCopy,model,invVocab):
 
 
         
-def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy):
+def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \
     removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents)
     
@@ -37,12 +37,13 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
     predictedComponentsFiltered = []
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
     if 'android.widget.Button' not in predictedComponentsFiltered \
     and 'android.widget.EditText' in predictedComponentsFiltered:
         changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
         changeProgressBarVerticalToRadioButton(predictedComponentsFiltered)
+    buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
 # Case image containing all image or text inside.
@@ -65,7 +66,29 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
             return False
     else:
         return False
+
+def checkPredictionBeforeAppendWithDefferentMargin(box,text,predictedComponent,imageCopy,model,invVocab):
+    margin = 5
+    x,y,w,h=box
+    height = imageCopy.shape[0]
+    width = imageCopy.shape[1]
+    croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+    if predictedComponent == 'android.widget.ImageView' or (predictedComponent == 'android.widget.TextView' and text == ''):
+        return Model.makeAprediction(invVocab,croppedImage,model)
+    else:
+        return predictedComponent
     
+def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
+    keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']
+    for i in range(len(textsFiltered)):
+        if boxesFiltered[i][1] < (imageCopy.shape[0]/3.0):
+            continue
+        lowerStrings=textsFiltered[i].lower().split()
+        for j in range(len(keyStrings)):
+            if Utils.isSliceList(keyStrings[j].split(),lowerStrings):
+                predictedComponentsFiltered[i]='android.widget.Button'
+                break
+        
 def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered):
     for i in range(len(predictedComponentsFiltered)):
         if predictedComponentsFiltered[i]== 'android.widget.EditText':
@@ -102,11 +125,14 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     
     
 def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
     if (predictedComponentsInBacket[0] != 'android.widget.ImageView' \
     and predictedComponentsInBacket[0] != 'android.widget.TextView')\
     or specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) \
     or len(predictedComponentsInBacket)==1:
+        # For RadioButton and CheckBox Cases.
+        predictedComponentsInBacket[0]= \
+        checkPredictionBeforeAppendWithDefferentMargin(boxesInBacket[0],textsInBacket[0],predictedComponentsInBacket[0],imageCopy,model,invVocab)
         if not neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
             boxesFiltered.append(boxesInBacket[0])
             textsFiltered.append(textsInBacket[0])
@@ -116,9 +142,9 @@ def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
         return False
     
 def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
     stop=stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
     if stop==True:
         return
     # Backet the rest of array.
@@ -126,7 +152,7 @@ def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
     backetOverlappingBoxes(boxesInBacket[1:len(boxesInBacket)],textsInBacket[1:len(boxesInBacket)],predictedComponentsInBacket[1:len(boxesInBacket)])
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
         
 def getFirstUnvisitedIndex(visited):
     for i in range(len(visited)):
@@ -170,3 +196,4 @@ def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedCo
             textsRemovingManual.append(texts[i])
             predictedComponentsRemovingManual.append(predictedComponents[i])
     return boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual
+
