@@ -3,8 +3,11 @@ sys.path.append('../')
 import ComponentsExtraction.BoxesExtraction as BoxesExtraction
 import ComponentsExtraction.TextExtraction as TextExtraction
 import ModelClassification.Model as Model
+from PIL import Image
 import Utils
 
+heightThrshold = 20
+margin = 10
 # Extract the boxes and text from given image -extracted components- and predict them.
 def extractComponentsAndPredict(image,imageCopy,model,invVocab):
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
@@ -22,7 +25,7 @@ def extractComponentsAndPredict(image,imageCopy,model,invVocab):
 
 
         
-def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageArea):
+def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \
     removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents)
     
@@ -34,11 +37,17 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageA
     predictedComponentsFiltered = []
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageArea)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
+    if 'android.widget.Button' not in predictedComponentsFiltered \
+    and 'android.widget.EditText' in predictedComponentsFiltered:
+        changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)
+    if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
+        changeProgressBarVerticalToRadioButton(predictedComponentsFiltered)
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
 # Case image containing all image or text inside.
-def specialCase(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageArea):
+def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
+    imageArea=imageCopy.shape[0]*imageCopy.shape[1]
     if predictedComponentsInBacket[0] == 'android.widget.ImageView' \
     or predictedComponentsInBacket[0] == 'android.widget.TextView':
         baseArea = boxesInBacket[0][2]*boxesInBacket[0][3]
@@ -57,29 +66,59 @@ def specialCase(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageAre
     else:
         return False
     
-def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageArea):
-    if predictedComponentsInBacket[0] == 'android.widget.EditText' \
-    or predictedComponentsInBacket[0] == 'android.widget.Button'\
-    or predictedComponentsInBacket[0] == 'android.widget.ImageButton' \
-    or predictedComponentsInBacket[0] == 'android.widget.TextView' \
-    or len(predictedComponentsInBacket)==1:
-        boxesFiltered.append(boxesInBacket[0])
-        textsFiltered.append(textsInBacket[0])
-        predictedComponentsFiltered.append(predictedComponentsInBacket[0])
+def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered):
+    for i in range(len(predictedComponentsFiltered)):
+        if predictedComponentsFiltered[i]== 'android.widget.EditText':
+            predictedComponentsFiltered[i] = 'android.widget.TextView'
+    
+def changeProgressBarVerticalToRadioButton(predictedComponentsFiltered):
+    for i in range(len(predictedComponentsFiltered)):
+        if predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical':
+            predictedComponentsFiltered[i] = 'android.widget.RadioButton'
+            
+def checkSeekProgress(boxesInBacket,imageCopy):
+    croppedImage = imageCopy[max(0,boxesInBacket[0][1] - margin):min(imageCopy.shape[0],boxesInBacket[0][1] + boxesInBacket[0][3] + margin), max(boxesInBacket[0][0] - margin,0):min(imageCopy.shape[1],boxesInBacket[0][0] + boxesInBacket[0][2] + margin)]
+    colors = Image.fromarray(croppedImage).convert('RGB').getcolors()
+    for i in range(len(colors)):  # Gray above (192,192,192)
+        if colors[i][1][0] < 192 or colors[i][1][1] < 192 or colors[i][1][2] < 192:
+            return True
+    return False
+
+def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
+    # Case very thin image.
+    if boxesInBacket[0][3]<heightThrshold and \
+    predictedComponentsInBacket[0] == 'android.widget.ImageView':
         return True
-    elif specialCase(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageArea):
-        boxesFiltered.append(boxesInBacket[0])
-        textsFiltered.append(textsInBacket[0])
-        predictedComponentsFiltered.append(predictedComponentsInBacket[0])
+    # Case wrong line classified as SeekBar or ProgressBar.
+    if (predictedComponentsInBacket[0] == 'android.widget.SeekBar' \
+    or predictedComponentsInBacket[0] == 'android.widget.ProgressBarHorizontal') and \
+          not checkSeekProgress(boxesInBacket,imageCopy):
+        return True
+    # Case textView that don't have text so wrong classification.
+    if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
+        textsInBacket[0] == '':
+        return True
+    return False
+    
+    
+def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
+    if (predictedComponentsInBacket[0] != 'android.widget.ImageView' \
+    and predictedComponentsInBacket[0] != 'android.widget.TextView')\
+    or specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) \
+    or len(predictedComponentsInBacket)==1:
+        if not neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
+            boxesFiltered.append(boxesInBacket[0])
+            textsFiltered.append(textsInBacket[0])
+            predictedComponentsFiltered.append(predictedComponentsInBacket[0])
         return True
     else:
         return False
     
 def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageArea):
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
     stop=stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageArea)
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     if stop==True:
         return
     # Backet the rest of array.
@@ -87,7 +126,7 @@ def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
     backetOverlappingBoxes(boxesInBacket[1:len(boxesInBacket)],textsInBacket[1:len(boxesInBacket)],predictedComponentsInBacket[1:len(boxesInBacket)])
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageArea)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
         
 def getFirstUnvisitedIndex(visited):
     for i in range(len(visited)):
@@ -119,8 +158,6 @@ def backetOverlappingBoxes(boxesRemovingManual,textsRemovingManual,predictedComp
         textsInBackets.append(backetTexts)
         predictedComponentsInBackets.append(backetPredicted)
         indexUnvisited=getFirstUnvisitedIndex(visited)
-        
-    #print(boxesInBackets,textsInBackets)
     return boxesInBackets,textsInBackets,predictedComponentsInBackets
 
 def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents):

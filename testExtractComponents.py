@@ -28,7 +28,7 @@ def processSave(subdir, file):
     height= img.shape[0]
     width= img.shape[1]
     fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
-    boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,height*width)
+    boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy)
     for x,y,w,h in boxes:
         # testing: print the cropped in folder
         crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
