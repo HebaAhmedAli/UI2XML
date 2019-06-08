@@ -36,10 +36,10 @@ def evaluateModel(xTest,yTest):
     print(model.metrics_names)
     print ("Evaluation = " + str(evaluate))
     
-def makeAprediction(invVocab,imgPath,model=None):
+def makeAprediction(invVocab,image=None,model=None,imgPath=None):
     if model==None:
         model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
-    inputImage = Preprocessing.imageReadAndPreprocessingClassification(imgPath)
+    inputImage = Preprocessing.imageReadAndPreprocessingClassification(image,imgPath)
     inputImage = np.expand_dims(inputImage, 0)
     output = model.predict(inputImage)
     outputIndex = np.argmax(output,axis=-1)
