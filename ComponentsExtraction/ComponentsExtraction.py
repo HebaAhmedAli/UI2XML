@@ -40,7 +40,7 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
                          boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
     if 'android.widget.Button' not in predictedComponentsFiltered \
     and 'android.widget.EditText' in predictedComponentsFiltered:
-        changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)
+        changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)    
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
         changeProgressBarVerticalToRadioButton(predictedComponentsFiltered)
     buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.

@@ -8,7 +8,6 @@ import copy
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
-#print(Model.makeAprediction(invVocab,'data/ScreenShots/ourTest/compOutputsuber/comp28.jpg'))
 
 imagesPath='data/ScreenShots'
 
