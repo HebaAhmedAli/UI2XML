@@ -68,6 +68,7 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
         return False
 
 def checkPredictionBeforeAppendWithDefferentMargin(box,text,predictedComponent,imageCopy,model,invVocab):
+    '''
     margin = 5
     x,y,w,h=box
     height = imageCopy.shape[0]
@@ -76,7 +77,8 @@ def checkPredictionBeforeAppendWithDefferentMargin(box,text,predictedComponent,i
     if predictedComponent == 'android.widget.ImageView' or (predictedComponent == 'android.widget.TextView' and text == ''):
         return Model.makeAprediction(invVocab,croppedImage,model)
     else:
-        return predictedComponent
+        '''
+    return predictedComponent
     
 def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
     keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']

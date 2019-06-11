@@ -1,4 +1,5 @@
 import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
+import XmlGeneration.XmlGeneration as XmlGeneration
 import ModelClassification.Model as Model
 from keras.models import load_model
 import LoadDataClassification
@@ -7,7 +8,9 @@ import os
 import copy
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
+model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
+
+# UI2XMLclassification245000_97_87 with 64 * 64
 
 imagesPath='data/ScreenShots'
 
@@ -28,6 +31,7 @@ def processSave(subdir, file):
     width= img.shape[1]
     fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
     boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
+    XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgCopy,file[:-4])
     for x,y,w,h in boxes:
         # testing: print the cropped in folder
         crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
