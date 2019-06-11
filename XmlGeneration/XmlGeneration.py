@@ -213,9 +213,60 @@ def buildHierarchy(boxes,texts,predictedComponents,img):
     rootNode = createRoot(parentNodes,img.shape[0])
     return rootNode
 
+def getTypeAndOriAndID(nodeType,tabsString):
+    if nodeType == 'LinearLayoutVertical':
+        return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
+                '\n'+tabsString+'\t'
+    elif nodeType == 'LinearLayoutHorizontal':
+        return 'LinearLayout\n'+'android:orientation = "horizontal"'\
+                '\n'+tabsString+'\t'
+    toReturn = nodeType[15:len(nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+nodeType[15:len(nodeType)]+str(Constants.ID) \
+                +'"\n'+tabsString+'\t'
+    Constants.ID += 1         
+    return toReturn
+       
+def getType(nodeType):
+    if nodeType == 'LinearLayoutVertical' or nodeType == 'LinearLayoutHorizontal':
+        return 'LinearLayout'
+    return nodeType[15:len(nodeType)]
+
+def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
+        " android:layout_height = "+str(parentNode.height)+
+        " android:layout_width = "+str(parentNode.width)+
+        " android:gravity = "+parentNode.gravity+
+        " ndroid:layout_weight = "+str(parentNode.weight)+
+        
+def printNodeXml(fTo,parentNode,myParentType,tabs):    
+    tabsString=""
+    for i in range(tabs):
+        tabsString+='\t'
+    if tabs == 0:
+        fTo.write('<?xml version="1.0" encoding="utf-8"?>\n'+
+                  '<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"\n'+
+                  +'\t'+'xmlns:app="http://schemas.android.com/apk/res-auto"\n'+
+                  +'\t'+'xmlns:tools="http://schemas.android.com/tools"\n'+
+                  +'\t'+'android:layout_width="match_parent"\n'+
+                  +'\t'+'android:layout_height="match_parent"\n'+
+                  +'\t'+'android:orientation="vertical"\n'+
+                  +'\t'+'tools:context=".'+myParentType.capitalize()+'Activity">\n')
+    else:
+        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
+                  getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
+                                    ,parentNode.gravity,parentNode.weight,tabsString)+\
+                                    printSpecialCase(parentNode)+'>\n')
+    if len(parentNode.childNodes)==0:
+        return
+    for i in range(len(parentNode.childNodes)):
+        printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1)
+    fTo.write(tabsString+"</"+ getType(nodeType)+'>'+'\n')
+        
 def mapToXml(parentNode,appName):
     # map and out xml file
     # ems of EditText = width of node/16px, hint
+    if not os.path.exists(Constants.DIRECTORY+'/layout'):
+            os.makedirs(Constants.DIRECTORY+'/layout') 
+    fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
+    printNodeXml(fTo,parentNode,appName,0)
     return
     
 def generateXml(boxes,texts,predictedComponents,img,appName):
@@ -224,6 +275,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName):
     # To test.
     printHierarchy(parentNode,appName)
     return
+
 
 # TO test.
 '''
@@ -235,7 +287,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName):
         " textColor = "+parentNode.textColor+
 '''
 def printNode(fTo,parentNode):        
-    fTo.write('<'+parentNode.nodeType+" ("+" x = "+ str(parentNode.x)+
+    fTo.write(parentNode.nodeType+" ("+" x = "+ str(parentNode.x)+
         " y = "+str(parentNode.y)+
         " text = "+parentNode.text+
         " imagePath = "+parentNode.imagePath+
@@ -252,8 +304,7 @@ def printNode(fTo,parentNode):
         
 def printHierarchy(parentNode,appName):
     if not os.path.exists(Constants.DIRECTORY+'/XML'):
-            os.makedirs(Constants.DIRECTORY+'/XML')
-        
+            os.makedirs(Constants.DIRECTORY+'/XML') 
     fTo=open(Constants.DIRECTORY+'/XML/'+'xmlHirarchy_'+appName+'.txt', 'w+')
     printNode(fTo,parentNode)
     
