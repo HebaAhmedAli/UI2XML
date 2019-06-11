@@ -31,15 +31,55 @@ def getFirstUnvisitedIndex(visited):
             return i
     return -1
 
-def setWeightsAndMarginsHorizontal(groupedNodes):
+def setMarginsHorizontal(groupedNodes):
     groupedNodes = sorted(groupedNodes, key=operator.attrgetter('x'))
     
     return groupedNodes
 
-def setWeightsAndMarginsVertical(groupedNodes):
+def setMarginsVertical(groupedNodes):
     groupedNodes = sorted(groupedNodes, key=operator.attrgetter('y'))
 
     return groupedNodes
+
+def getWeightFromRatio(ratio,step):
+    i = 1
+    weight = 0
+    while i*step <= 1:
+        if ratio <= i*step:
+            weight = i
+            break
+        i = i+1    
+    return weight 
+  
+def setWeights(groupedNodes,sortAttr,screenDim,root):
+    groupedNodes = sorted(groupedNodes, key=operator.attrgetter(sortAttr))
+    if len(groupedNodes) == 1 and sortAttr == 'x':
+        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - screenDim/2) <= 30:
+            groupedNodes[0].gravity = "center_horizontal"
+        return groupedNodes
+    ratio = 0
+    weight = 0
+    for i in range(len(groupedNodes)):
+        if sortAttr == 'x':
+            if i+1 >= len(groupedNodes):
+                nextX = screenDim
+            else:
+                nextX = groupedNodes[i+1].x
+            ratio = (nextX - (groupedNodes[i].x + groupedNodes[i].width)) / screenDim
+            weight = getWeightFromRatio(ratio,0.2)
+        else:
+            if i+1 >= len(groupedNodes) and root: 
+                nextY = screenDim
+            elif i+1 >= len(groupedNodes) and not root: 
+                groupedNodes[i].weight = 1 # TODO: set width or hight = 0 in mapping.
+                return groupedNodes
+            else:
+                nextY = groupedNodes[i+1].y
+            ratio = (nextY - (groupedNodes[i].y + groupedNodes[i].height)) / screenDim
+            weight = getWeightFromRatio(ratio,0.1)
+        groupedNodes[i].weight = weight # TODO: set width or hight = 0 in mapping.
+    return groupedNodes
+
 
 # set nodeType , text , color , x, y , width , hight , imagePath here.
 def createLeafNode(box,text,predictedComponent,img):
@@ -50,7 +90,7 @@ def createLeafNode(box,text,predictedComponent,img):
     leafNode.height = box[3]
     leafNode.text = text
     leafNode.nodeType = predictedComponent
-    if predictedComponent == 'android.widget.ImageView':
+    if predictedComponent == 'android.widget.ImageView' or predictedComponent == 'android.widget.ImageButton':
         if not os.path.exists(Constants.DIRECTORY+'/drawable'):
             os.makedirs(Constants.DIRECTORY+'/drawable')
         cropImg = img[leafNode.y:leafNode.y+leafNode.height, leafNode.x:leafNode.x+leafNode.width]
@@ -85,7 +125,7 @@ def groupHorizontalLeafNodes(boxes,texts,predictedComponents,img):
         indexUnvisited=getFirstUnvisitedIndex(visited)
     return groupedNodes
 
-def groupVerticalLeafNodes(groupedNodesI):
+def groupVerticalLeafNodes(groupedNodesI,imgH):
     groupedNodesVertical = []
     visited = [False for i in range(len(groupedNodesI))]
     indexUnvisited = 0
@@ -109,11 +149,11 @@ def groupVerticalLeafNodes(groupedNodesI):
         if len(backetNodes) == 1:
             groupedNodesVertical.append(backetNodes[0])
         else:
-            groupedNodesVertical.append(createParentNodeVertical(backetNodes))
+            groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH))
         indexUnvisited=getFirstUnvisitedIndex(visited)
     return groupedNodesVertical
 
-def createParentNodeVertical(groupedNodes):
+def createParentNodeVertical(groupedNodes,imgH):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutVertical"
     minX=1000000
@@ -129,11 +169,11 @@ def createParentNodeVertical(groupedNodes):
     parentNode.width = maxX - minX
     parentNode.y = minY
     parentNode.height = maxY - minY  # TODO: replace with match_parent in mapping
-    groupedNodes = setWeightsAndMarginsVertical(groupedNodes)
+    groupedNodes = setWeights(groupedNodes,'y',imgH,False)
     parentNode.childNodes = groupedNodes
     return parentNode
  
-def createParentNodeHorizontal(groupedNodes):
+def createParentNodeHorizontal(groupedNodes,imgW):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutHorizontal"
     parentNode.width = "match_parent"
@@ -144,37 +184,38 @@ def createParentNodeHorizontal(groupedNodes):
         maxY=max(maxY,groupedNodes[i].y+int(groupedNodes[i].height))
     parentNode.y = minY
     parentNode.height = maxY - minY
-    groupedNodes = setWeightsAndMarginsHorizontal(groupedNodes)
+    groupedNodes = setWeights(groupedNodes,'x',imgW,False)
     parentNode.childNodes = groupedNodes
     return parentNode
 
-def createLeavesParents(groupedNodes):
+def createLeavesParents(groupedNodes,img):
     parentNodes = []
     for i in range(len(groupedNodes)):
-        groupedNodesVertical = groupVerticalLeafNodes(groupedNodes[i])
-        parentNode = createParentNodeHorizontal(groupedNodesVertical)
+        groupedNodesVertical = groupVerticalLeafNodes(groupedNodes[i],img.shape[0])
+        parentNode = createParentNodeHorizontal(groupedNodesVertical,img.shape[1])
         parentNodes.append(parentNode)
     return parentNodes
     
 def buildParentNodes(boxes,texts,predictedComponents,img):
     groupedNodes = groupHorizontalLeafNodes(boxes,texts,predictedComponents,img)
-    parentNodes = createLeavesParents(groupedNodes)
+    parentNodes = createLeavesParents(groupedNodes,img)
     return parentNodes
 
-def createRoot(parentNodes):
+def createRoot(parentNodes,imgH):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutVertical"
-    parentNodes = setWeightsAndMarginsVertical(parentNodes)
+    parentNodes = setWeights(parentNodes,'y',imgH,True)
     parentNode.childNodes = parentNodes
     return parentNode
     
 def buildHierarchy(boxes,texts,predictedComponents,img):
     parentNodes = buildParentNodes(boxes,texts,predictedComponents,img)
-    rootNode = createRoot(parentNodes)
+    rootNode = createRoot(parentNodes,img.shape[0])
     return rootNode
 
 def mapToXml(parentNode,appName):
     # map and out xml file
+    # ems of EditText = width of node/16px, hint
     return
     
 def generateXml(boxes,texts,predictedComponents,img,appName):
@@ -190,18 +231,18 @@ def generateXml(boxes,texts,predictedComponents,img,appName):
         " leftMargin = "+str(parentNode.leftMargin)+
         " topMargin = "+str(parentNode.topMargin)+
         " bottomMargin = "+str(parentNode.bottomMargin)+
-        " gravity = "+parentNode.gravity+
-        " weight = "+str(parentNode.weight)+
         " backgroundColor = "+parentNode.backgroundColor+
         " textColor = "+parentNode.textColor+
 '''
 def printNode(fTo,parentNode):        
-    fTo.write(parentNode.nodeType+" ("+" x = "+ str(parentNode.x)+
+    fTo.write('<'+parentNode.nodeType+" ("+" x = "+ str(parentNode.x)+
         " y = "+str(parentNode.y)+
         " text = "+parentNode.text+
         " imagePath = "+parentNode.imagePath+
         " height = "+str(parentNode.height)+
-        " width = "+str(parentNode.width)+" )\n")
+        " width = "+str(parentNode.width)+
+        " gravity = "+parentNode.gravity+
+        " weight = "+str(parentNode.weight)+" )\n")
     if len(parentNode.childNodes)==0:
         return
     fTo.write("{\n")
