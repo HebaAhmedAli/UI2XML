@@ -218,7 +218,7 @@ def getTypeAndOriAndID(nodeType,tabsString):
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t'
     elif nodeType == 'LinearLayoutHorizontal':
-        return 'LinearLayout\n'+'android:orientation = "horizontal"'\
+        return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t'
     toReturn = nodeType[15:len(nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+nodeType[15:len(nodeType)]+str(Constants.ID) \
                 +'"\n'+tabsString+'\t'
@@ -231,34 +231,69 @@ def getType(nodeType):
     return nodeType[15:len(nodeType)]
 
 def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
-        " android:layout_height = "+str(parentNode.height)+
-        " android:layout_width = "+str(parentNode.width)+
-        " android:gravity = "+parentNode.gravity+
-        " ndroid:layout_weight = "+str(parentNode.weight)+
+    toReturn = ""
+    if myParentType == 'LinearLayoutVertical':
+        toReturn+= "android:layout_width = "+'"match_parent"'+'\n'+tabsString+'\t'
+        if weight == 0:
+            toReturn+= 'android:layout_height = "wrap_content"'+'\n'+tabsString+'\t'
+        else:
+            toReturn+= 'android:layout_height = "0dp"'+'\n'+tabsString+'\t'
+            toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
+    else:
+        toReturn+= "android:layout_height = "+'"match_parent"'+'\n'+tabsString+'\t'
+        if weight == 0:
+           toReturn+= 'android:layout_width = "wrap_content"'+'\n'+tabsString+'\t'
+        else:
+            toReturn+= 'android:layout_width = "0dp"'+'\n'+tabsString+'\t'
+            toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
+            if gravity != "":
+                toReturn+= 'android:gravity = "'+gravity+'"'+'\n'+tabsString+'\t'
+    return toReturn
+
+def printSpecialCase(parentNode,tabsString):
+    attributeString = ""
+    if parentNode.nodeType == 'android.widget.EditText':
+        attributeString += "android:hint = "+'"'+parentNode.text+'"'+'\n'+tabsString+'\t'+ \
+        "android:ems = "+'"'+str(parentNode.width // 16)+'dp"'+'\n'+tabsString+'\t'
+   
+    if parentNode.nodeType == 'android.widget.TextView'or parentNode.nodeType == 'android.widget.Button':
+        attributeString += "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'+ \
+        "android:textSize = "+'"'+str(int(parentNode.height * 4/3)) +'"'+'\n'+tabsString+'\t'+ \
+        'android:textColor = "@color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
+        'android:background = "@color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+ 
+    if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
+        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
         
+    if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
+         attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID)+'"'+'\n'+tabsString+'\t'
+         Constants.ID+=1
+    return attributeString
+
 def printNodeXml(fTo,parentNode,myParentType,tabs):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
     if tabs == 0:
-        fTo.write('<?xml version="1.0" encoding="utf-8"?>\n'+
-                  '<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"\n'+
-                  +'\t'+'xmlns:app="http://schemas.android.com/apk/res-auto"\n'+
-                  +'\t'+'xmlns:tools="http://schemas.android.com/tools"\n'+
-                  +'\t'+'android:layout_width="match_parent"\n'+
-                  +'\t'+'android:layout_height="match_parent"\n'+
-                  +'\t'+'android:orientation="vertical"\n'+
-                  +'\t'+'tools:context=".'+myParentType.capitalize()+'Activity">\n')
+        fTo.write('<?xml version = "1.0" encoding = "utf-8"?>\n'+
+                  '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'
+                  +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'
+                  +'\t'+'xmlns:tools = "http://schemas.android.com/tools"\n'
+                  +'\t'+'android:layout_width = "match_parent"\n'
+                  +'\t'+'android:layout_height = "match_parent"\n'
+                  +'\t'+'android:orientation = "vertical"\n'
+                  +'\t'+'tools:context = "'+'.'+myParentType.capitalize()+'Activity"'+'>\n')
     else:
         fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
-                                    printSpecialCase(parentNode)+'>\n')
+                                    printSpecialCase(parentNode,tabsString)+'>\n')
     if len(parentNode.childNodes)==0:
+        fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         return
     for i in range(len(parentNode.childNodes)):
         printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1)
-    fTo.write(tabsString+"</"+ getType(nodeType)+'>'+'\n')
+    fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName):
     # map and out xml file
@@ -307,22 +342,5 @@ def printHierarchy(parentNode,appName):
             os.makedirs(Constants.DIRECTORY+'/XML') 
     fTo=open(Constants.DIRECTORY+'/XML/'+'xmlHirarchy_'+appName+'.txt', 'w+')
     printNode(fTo,parentNode)
-    
-def printSpecialCase(parentNode):
-    attributeString = ""
-    if parentNode.nodeType == 'android.widget.EditText':
-        attributeString += "android:hint="+'"'+parentNode.text+'"'+'\n'+ \
-        "android:ems="+'"'+parentNode.width // 16+'dp"'+'\n'
-   
-    if parentNode.nodeType == 'android.widget.TextView'or parentNode.nodeType == 'android.widget.Button':
-        attributeString += "android:text="+'"'+parentNode.text+'"'+'\n'+ \
-        "android:textSize="+'"'+int(parentNode.height * 4/3) +'"'+'\n'
-    
-    if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
-        attributeString += "android:src="+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'
-        
-    if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
-         attributeString += "android:onClick="+'"'+"clickMe"+Constants.ID+'"'+'\n'
-        
-        
+
     
