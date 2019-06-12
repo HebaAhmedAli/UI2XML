@@ -62,7 +62,7 @@ def setWeights(groupedNodes,sortAttr,screenDim,root):
                 nextX = screenDim
             else:
                 nextX = groupedNodes[i+1].x
-            ratio = (nextX - (groupedNodes[i].x + groupedNodes[i].width)) / screenDim
+            ratio = (nextX - (groupedNodes[i].x)) / screenDim
             weight = getWeightFromRatio(ratio,0.2)
         else:
             if i+1 >= len(groupedNodes) and root: 
@@ -184,7 +184,7 @@ def createParentNodeHorizontal(groupedNodes,imgW):
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
         if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 30:
-            parentNode.gravity = "center_horizontal"
+            parentNode.gravity = "center"
         parentNode.childNodes = groupedNodes
         return parentNode
     groupedNodes = setWeights(groupedNodes,'x',imgW,False)
