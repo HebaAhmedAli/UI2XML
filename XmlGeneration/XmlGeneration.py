@@ -53,7 +53,8 @@ def getWeightFromRatio(ratio,step):
     return weight 
   
 def setWeights(groupedNodes,sortAttr,screenDim,root):
-    groupedNodes = sorted(groupedNodes, key=operator.attrgetter(sortAttr))
+    if not root:
+        groupedNodes = sorted(groupedNodes, key=operator.attrgetter(sortAttr))
     ratio = 0
     weight = 0
     for i in range(len(groupedNodes)):
@@ -96,6 +97,7 @@ def createLeafNode(box,text,predictedComponent,img):
         leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
     # TODO: set Color.
     return leafNode
+
 
 def groupHorizontalLeafNodes(boxes,texts,predictedComponents,img):
     groupedNodes = []
@@ -147,13 +149,13 @@ def groupVerticalLeafNodes(groupedNodesI,imgH):
         if len(backetNodes) == 1:
             groupedNodesVertical.append(backetNodes[0])
         else:
-            groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH))
+            groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH,"LinearLayoutHorizontal"))
         indexUnvisited=getFirstUnvisitedIndex(visited)
     return groupedNodesVertical
 
-def createParentNodeVertical(groupedNodes,imgH):
+def createParentNodeVertical(groupedNodes,imgH,parentType):
     parentNode = node()
-    parentNode.nodeType = "LinearLayoutVertical"
+    parentNode.nodeType = parentType
     minX=1000000
     maxX=0
     minY=1000000
@@ -174,12 +176,18 @@ def createParentNodeVertical(groupedNodes,imgH):
 def createParentNodeHorizontal(groupedNodes,imgW):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutHorizontal"
-    parentNode.width = "match_parent"
+    #parentNode.width = "match_parent"
+    minX=1000000
+    maxX=0
     minY=1000000
     maxY=0
     for i in range(len(groupedNodes)):
+        minX=min(minX,groupedNodes[i].x)
+        maxX=max(maxX,groupedNodes[i].x+int(groupedNodes[i].width))
         minY=min(minY,groupedNodes[i].y)
         maxY=max(maxY,groupedNodes[i].y+int(groupedNodes[i].height))
+    parentNode.x = minX
+    parentNode.width = maxX - minX
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
@@ -207,6 +215,8 @@ def buildParentNodes(boxes,texts,predictedComponents,img):
 def createRoot(parentNodes,imgH):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutVertical"
+    parentNodes = sorted(parentNodes, key=operator.attrgetter('y'))
+    parentNodes = groupListViewAndRadio(parentNodes,imgH)
     parentNodes = setWeights(parentNodes,'y',imgH,True)
     parentNode.childNodes = parentNodes
     return parentNode
@@ -316,16 +326,43 @@ def generateXml(boxes,texts,predictedComponents,img,appName):
     printHierarchy(parentNode,appName)
     return
 
+def groupListViewAndRadio(groupedNodes,imgH):
+    groupedNodesNew = []
+    i = 0
+    while i<len(groupedNodes):
+        patternToSearch = extractPatternOfNode(groupedNodes[i])
+        lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
+        if lastIndex != i:
+            childs = groupedNodes[i:lastIndex]
+            if patternToSearch ==  'android.widget.RadioButton':
+                groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup'))
+                i = lastIndex
+            elif lastIndex-i>=3 and patternToSearch.find('android.widget.TextView') != -1 and patternToSearch.find('android.widget.CheckBox') == -1:
+                groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.ListView'))
+                i = lastIndex
+            else:
+                groupedNodesNew.append(groupedNodes[i])
+        else:
+            groupedNodesNew.append(groupedNodes[i])
+        i+=1
+    return groupedNodesNew
+
+def extractPatternOfNode(parentNode):
+    pattern = ""
+    for i in range(len(parentNode.childNodes)):
+        pattern += parentNode.childNodes[i].nodeType
+        if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
+            return parentNode.childNodes[i].nodeType
+    return pattern
+        
+def getLastPatternIndex(firstIndex,groupedNodes,pattern):
+    for i in range(firstIndex+1,len(groupedNodes)):
+        if extractPatternOfNode(groupedNodes[i]) != pattern:
+            return i-1
+    return len(groupedNodes)-1
 
 # TO test.
-'''
-        " rightMargin = "+str(parentNode.rightMargin)+
-        " leftMargin = "+str(parentNode.leftMargin)+
-        " topMargin = "+str(parentNode.topMargin)+
-        " bottomMargin = "+str(parentNode.bottomMargin)+
-        " backgroundColor = "+parentNode.backgroundColor+
-        " textColor = "+parentNode.textColor+
-'''
+
 def printNode(fTo,parentNode):        
     fTo.write(parentNode.nodeType+" ("+" x = "+ str(parentNode.x)+
         " y = "+str(parentNode.y)+
