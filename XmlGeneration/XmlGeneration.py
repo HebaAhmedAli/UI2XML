@@ -257,3 +257,21 @@ def printHierarchy(parentNode,appName):
     fTo=open(Constants.DIRECTORY+'/XML/'+'xmlHirarchy_'+appName+'.txt', 'w+')
     printNode(fTo,parentNode)
     
+def printSpecialCase(parentNode):
+    attributeString = ""
+    if parentNode.nodeType == 'android.widget.EditText':
+        attributeString += "android:hint="+'"'+parentNode.text+'"'+'\n'+ \
+        "android:ems="+'"'+parentNode.width // 16+'dp"'+'\n'
+   
+    if parentNode.nodeType == 'android.widget.TextView'or parentNode.nodeType == 'android.widget.Button':
+        attributeString += "android:text="+'"'+parentNode.text+'"'+'\n'+ \
+        "android:textSize="+'"'+int(parentNode.height * 4/3) +'"'+'\n'
+    
+    if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
+        attributeString += "android:src="+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'
+        
+    if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
+         attributeString += "android:onClick="+'"'+"clickMe"+Constants.ID+'"'+'\n'
+        
+        
+    
