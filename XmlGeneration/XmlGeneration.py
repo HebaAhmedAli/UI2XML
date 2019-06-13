@@ -53,10 +53,6 @@ def getWeightFromRatio(ratio,step):
   
 def setWeights(groupedNodes,sortAttr,screenDim,root):
     groupedNodes = sorted(groupedNodes, key=operator.attrgetter(sortAttr))
-    if len(groupedNodes) == 1 and sortAttr == 'x':
-        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - screenDim/2) <= 30:
-            groupedNodes[0].gravity = "center_horizontal"
-        return groupedNodes
     ratio = 0
     weight = 0
     for i in range(len(groupedNodes)):
@@ -94,8 +90,8 @@ def createLeafNode(box,text,predictedComponent,img):
         if not os.path.exists(Constants.DIRECTORY+'/drawable'):
             os.makedirs(Constants.DIRECTORY+'/drawable')
         cropImg = img[leafNode.y:leafNode.y+leafNode.height, leafNode.x:leafNode.x+leafNode.width]
-        cv2.imwrite(Constants.DIRECTORY+'/drawable/'+str(leafNode.x)+'_'+str(leafNode.y)+'.png',cropImg)
-        leafNode.imagePath = Constants.DIRECTORY+'/drawable/'+str(leafNode.x)+'_'+str(leafNode.y)+'.png'
+        cv2.imwrite(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png',cropImg)
+        leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
     # TODO: set Color.
     return leafNode
 
@@ -184,6 +180,11 @@ def createParentNodeHorizontal(groupedNodes,imgW):
         maxY=max(maxY,groupedNodes[i].y+int(groupedNodes[i].height))
     parentNode.y = minY
     parentNode.height = maxY - minY
+    if len(groupedNodes) == 1 :
+        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 30:
+            parentNode.gravity = "center_horizontal"
+        parentNode.childNodes = groupedNodes
+        return parentNode
     groupedNodes = setWeights(groupedNodes,'x',imgW,False)
     parentNode.childNodes = groupedNodes
     return parentNode
@@ -231,7 +232,7 @@ def getType(nodeType):
     return nodeType[15:len(nodeType)]
 
 def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
-    toReturn = ""
+    toReturn = "" 
     if myParentType == 'LinearLayoutVertical':
         toReturn+= "android:layout_width = "+'"match_parent"'+'\n'+tabsString+'\t'
         if weight == 0:
@@ -240,34 +241,35 @@ def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsStr
             toReturn+= 'android:layout_height = "0dp"'+'\n'+tabsString+'\t'
             toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
     else:
-        toReturn+= "android:layout_height = "+'"match_parent"'+'\n'+tabsString+'\t'
+        toReturn+= "android:layout_height = "+'"wrap_content"'+'\n'+tabsString+'\t'
         if weight == 0:
            toReturn+= 'android:layout_width = "wrap_content"'+'\n'+tabsString+'\t'
         else:
             toReturn+= 'android:layout_width = "0dp"'+'\n'+tabsString+'\t'
             toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
-            if gravity != "":
-                toReturn+= 'android:gravity = "'+gravity+'"'+'\n'+tabsString+'\t'
+    if gravity != "":
+        toReturn+= 'android:gravity = "'+gravity+'"'+'\n'+tabsString+'\t'        
     return toReturn
 
+#        "android:textSize = "+'"'+str(int(parentNode.height * 4/3)) +'sp"'+'\n'+tabsString+'\t'+ \
 def printSpecialCase(parentNode,tabsString):
     attributeString = ""
     if parentNode.nodeType == 'android.widget.EditText':
         attributeString += "android:hint = "+'"'+parentNode.text+'"'+'\n'+tabsString+'\t'+ \
-        "android:ems = "+'"'+str(parentNode.width // 16)+'dp"'+'\n'+tabsString+'\t'
+        "android:ems = "+'"'+str(parentNode.width // 16)+'"'+'\n'+tabsString+'\t'
    
     if parentNode.nodeType == 'android.widget.TextView'or parentNode.nodeType == 'android.widget.Button':
         attributeString += "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'+ \
-        "android:textSize = "+'"'+str(int(parentNode.height * 4/3)) +'"'+'\n'+tabsString+'\t'+ \
-        'android:textColor = "@color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
-        'android:background = "@color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+        'android:textColor = "@android:color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
+        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'+\
+        'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
+        
  
     if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
         attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
         
     if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
          attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID)+'"'+'\n'+tabsString+'\t'
-         Constants.ID+=1
     return attributeString
 
 def printNodeXml(fTo,parentNode,myParentType,tabs):    
