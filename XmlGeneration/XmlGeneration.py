@@ -316,6 +316,7 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH):
     returnString+= tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n'
                                     
     return returnString
+
 def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):    
     tabsString=""
     for i in range(tabs):
