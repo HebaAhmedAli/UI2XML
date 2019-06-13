@@ -73,8 +73,8 @@ def setWeights(groupedNodes,sortAttr,screenDim,root):
                 return groupedNodes
             else:
                 nextY = groupedNodes[i+1].y
-            ratio = (nextY - (groupedNodes[i].y + groupedNodes[i].height)) / screenDim
-            weight = getWeightFromRatio(ratio,0.1)
+            ratio = (nextY - (groupedNodes[i].y)) / screenDim
+            weight = getWeightFromRatio(ratio,0.15)
         groupedNodes[i].weight = weight # TODO: set width or hight = 0 in mapping.
     return groupedNodes
 
@@ -149,7 +149,7 @@ def groupVerticalLeafNodes(groupedNodesI,imgH):
         if len(backetNodes) == 1:
             groupedNodesVertical.append(backetNodes[0])
         else:
-            groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH,"LinearLayoutHorizontal"))
+            groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH,"LinearLayoutVertical"))
         indexUnvisited=getFirstUnvisitedIndex(visited)
     return groupedNodesVertical
 
@@ -212,19 +212,23 @@ def buildParentNodes(boxes,texts,predictedComponents,img):
     parentNodes = createLeavesParents(groupedNodes,img)
     return parentNodes
 
-def createRoot(parentNodes,imgH):
+def createRoot(parentNodes,imgH,asIs):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutVertical"
     parentNodes = sorted(parentNodes, key=operator.attrgetter('y'))
-    parentNodes = groupListViewAndRadio(parentNodes,imgH)
+    if asIs == False:
+        parentNodes = groupListViewAndRadio(parentNodes,imgH)
+    else:
+        parentNodes = groupRadio(parentNodes,imgH)
     parentNodes = setWeights(parentNodes,'y',imgH,True)
     parentNode.childNodes = parentNodes
     return parentNode
     
 def buildHierarchy(boxes,texts,predictedComponents,img):
     parentNodes = buildParentNodes(boxes,texts,predictedComponents,img)
-    rootNode = createRoot(parentNodes,img.shape[0])
-    return rootNode
+    rootNode = createRoot(parentNodes,img.shape[0],False)
+    rootNodeAsIs = createRoot(parentNodes,img.shape[0],True)
+    return rootNode,rootNodeAsIs
 
 def getTypeAndOriAndID(nodeType,tabsString):
     if nodeType == 'LinearLayoutVertical':
@@ -298,8 +302,12 @@ def printSpecialCaseListView(parentNode,tabsString,imgH):
     
     if parentNode.nodeType == 'android.widget.TextView':
         attributeString +='android:textColor = "@android:color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
-        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'+\
+        "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'
         
+    if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
+        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
+      
     return attributeString
 
 def printListViewChildNode(parentNode,myParentType,tabs,imgH):
@@ -338,6 +346,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):
     if len(parentNode.childNodes)==0:
         fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         return
+    
     if parentNode.nodeType == 'android.widget.ListView':
         fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+str(Constants.ID-1)+'.xml', 'w+')
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
@@ -359,17 +368,23 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH):
-    # map and out xml file
-    # ems of EditText = width of node/16px, hint
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
     printNodeXml(fTo,parentNode,appName,0,imgH)
     return
+
+def mapToXmlAsIs(parentNode,appName,imgH):
+    if not os.path.exists(Constants.DIRECTORY+'/layoutAsIs'):
+            os.makedirs(Constants.DIRECTORY+'/layoutAsIs') 
+    fTo=open(Constants.DIRECTORY+'/layoutAsIs/'+'activity_'+appName+'.xml', 'w+')
+    printNodeXml(fTo,parentNode,appName,0,imgH)
+    return
     
 def generateXml(boxes,texts,predictedComponents,img,appName):
-    parentNode=buildHierarchy(boxes,texts,predictedComponents,img)
+    parentNode,parentNodeAsIs=buildHierarchy(boxes,texts,predictedComponents,img)
     mapToXml(parentNode,appName,img.shape[0])
+    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0])
     # To test.
     printHierarchy(parentNode,appName)
     return
@@ -390,6 +405,21 @@ def groupListViewAndRadio(groupedNodes,imgH):
                 i = lastIndex
             else:
                 groupedNodesNew.append(groupedNodes[i])
+        else:
+            groupedNodesNew.append(groupedNodes[i])
+        i+=1
+    return groupedNodesNew
+
+def groupRadio(groupedNodes,imgH):
+    groupedNodesNew = []
+    i = 0
+    while i<len(groupedNodes):
+        patternToSearch = extractPatternOfNode(groupedNodes[i])
+        lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
+        if lastIndex != i and patternToSearch ==  'android.widget.RadioButton':
+            childs = groupedNodes[i:lastIndex+1]
+            groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup'))
+            i = lastIndex
         else:
             groupedNodesNew.append(groupedNodes[i])
         i+=1

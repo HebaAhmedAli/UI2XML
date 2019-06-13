@@ -43,7 +43,7 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
         changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)    
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered\
         or 'android.widget.ProgressBarHorizontal' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
-        boxesFiltered,textsFiltered,predictedComponentsFiltered = changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered)
+        boxesFiltered,textsFiltered,predictedComponentsFiltered = changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
@@ -97,15 +97,18 @@ def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered):
         if predictedComponentsFiltered[i]== 'android.widget.EditText':
             predictedComponentsFiltered[i] = 'android.widget.TextView'
     
-def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered):
+def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,img):
     boxesFilteredNew = []
     textsFilteredNew = []
     predictedComponentsFilteredNew = []
     for i in range(len(predictedComponentsFiltered)):
         if predictedComponentsFiltered[i]== 'android.widget.ProgressBarHorizontal':
             continue
-        if predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical':
+        if predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical'\
+            and boxesFiltered[i][2]<img.shape[1]/2 and boxesFiltered[i][3]<img.shape[0]/2:
             predictedComponentsFiltered[i] = 'android.widget.RadioButton'
+        elif predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical':
+            continue
         predictedComponentsFilteredNew.append(predictedComponentsFiltered[i])
         boxesFilteredNew.append(boxesFiltered[i])
         textsFilteredNew.append(textsFiltered[i])
