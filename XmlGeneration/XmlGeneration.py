@@ -252,13 +252,16 @@ def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsStr
         else:
             toReturn+= 'android:layout_height = "0dp"'+'\n'+tabsString+'\t'
             toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
-    else:
+    elif myParentType == 'LinearLayoutHorizontal':
         toReturn+= "android:layout_height = "+'"wrap_content"'+'\n'+tabsString+'\t'
         if weight == 0:
            toReturn+= 'android:layout_width = "wrap_content"'+'\n'+tabsString+'\t'
         else:
             toReturn+= 'android:layout_width = "0dp"'+'\n'+tabsString+'\t'
             toReturn+= 'android:layout_weight = "'+str(weight)+'"'+'\n'+tabsString+'\t'
+    else:
+        toReturn+= "android:layout_width = "+'"match_parent"'+'\n'+tabsString+'\t'
+        toReturn+= 'android:layout_height = "wrap_content"'+'\n'+tabsString+'\t'
     if gravity != "":
         toReturn+= 'android:gravity = "'+gravity+'"'+'\n'+tabsString+'\t'        
     return toReturn
@@ -275,12 +278,17 @@ def printSpecialCase(parentNode,tabsString,imgH):
         'android:textColor = "@android:color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
         'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
         
+    if (parentNode.nodeType == 'android.widget.RadioButton' or parentNode.nodeType == 'android.widget.CheckBox')\
+    and parentNode.text != "":
+        attributeString += "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'
+        
  
     if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
         attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
         
     if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
          attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID)+'"'+'\n'+tabsString+'\t'
+         
     if parentNode.nodeType == 'android.widget.Button':
         attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
     return attributeString

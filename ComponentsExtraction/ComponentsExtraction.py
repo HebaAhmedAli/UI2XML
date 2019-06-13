@@ -41,8 +41,9 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
     if 'android.widget.Button' not in predictedComponentsFiltered \
     and 'android.widget.EditText' in predictedComponentsFiltered:
         changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)    
-    if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
-        changeProgressBarVerticalToRadioButton(predictedComponentsFiltered)
+    if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered\
+        or 'android.widget.ProgressBarHorizontal' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
+        boxesFiltered,textsFiltered,predictedComponentsFiltered = changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered)
     buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
@@ -96,10 +97,19 @@ def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered):
         if predictedComponentsFiltered[i]== 'android.widget.EditText':
             predictedComponentsFiltered[i] = 'android.widget.TextView'
     
-def changeProgressBarVerticalToRadioButton(predictedComponentsFiltered):
+def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered):
+    boxesFilteredNew = []
+    textsFilteredNew = []
+    predictedComponentsFilteredNew = []
     for i in range(len(predictedComponentsFiltered)):
+        if predictedComponentsFiltered[i]== 'android.widget.ProgressBarHorizontal':
+            continue
         if predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical':
             predictedComponentsFiltered[i] = 'android.widget.RadioButton'
+        predictedComponentsFilteredNew.append(predictedComponentsFiltered[i])
+        boxesFilteredNew.append(boxesFiltered[i])
+        textsFilteredNew.append(textsFiltered[i])
+    return boxesFilteredNew,textsFilteredNew,predictedComponentsFilteredNew
             
 def checkSeekProgress(boxesInBacket,imageCopy):
     croppedImage = imageCopy[max(0,boxesInBacket[0][1] - margin):min(imageCopy.shape[0],boxesInBacket[0][1] + boxesInBacket[0][3] + margin), max(boxesInBacket[0][0] - margin,0):min(imageCopy.shape[1],boxesInBacket[0][0] + boxesInBacket[0][2] + margin)]
