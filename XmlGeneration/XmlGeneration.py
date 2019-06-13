@@ -5,6 +5,7 @@ import Constants
 import os
 import cv2
 import operator
+import re
 
 class node:
     def __init__(self):
@@ -84,7 +85,8 @@ def createLeafNode(box,text,predictedComponent,img):
     leafNode.y = box[1]
     leafNode.width = box[2]
     leafNode.height = box[3]
-    leafNode.text = text
+    finalText = " ".join(re.findall(r"[a-zA-Z0-9]+", text))
+    leafNode.text = finalText
     leafNode.nodeType = predictedComponent
     if predictedComponent == 'android.widget.ImageView' or predictedComponent == 'android.widget.ImageButton':
         if not os.path.exists(Constants.DIRECTORY+'/drawable'):
@@ -251,8 +253,8 @@ def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsStr
         toReturn+= 'android:gravity = "'+gravity+'"'+'\n'+tabsString+'\t'        
     return toReturn
 
-#        "android:textSize = "+'"'+str(int(parentNode.height * 4/3)) +'sp"'+'\n'+tabsString+'\t'+ \
-def printSpecialCase(parentNode,tabsString):
+#"android:textSize = "+'"'+str(int(parentNode.height/imgH * 1000)) +'sp"'+'\n'+tabsString+'\t'+ \
+def printSpecialCase(parentNode,tabsString,imgH):
     attributeString = ""
     if parentNode.nodeType == 'android.widget.EditText':
         attributeString += "android:hint = "+'"'+parentNode.text+'"'+'\n'+tabsString+'\t'+ \
@@ -261,8 +263,7 @@ def printSpecialCase(parentNode,tabsString):
     if parentNode.nodeType == 'android.widget.TextView'or parentNode.nodeType == 'android.widget.Button':
         attributeString += "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'+ \
         'android:textColor = "@android:color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
-        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'+\
-        'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
+        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
         
  
     if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
@@ -270,9 +271,11 @@ def printSpecialCase(parentNode,tabsString):
         
     if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
          attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID)+'"'+'\n'+tabsString+'\t'
+    if parentNode.nodeType == 'android.widget.Button':
+        attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
     return attributeString
 
-def printNodeXml(fTo,parentNode,myParentType,tabs):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -289,26 +292,26 @@ def printNodeXml(fTo,parentNode,myParentType,tabs):
         fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
-                                    printSpecialCase(parentNode,tabsString)+'>\n')
+                                    printSpecialCase(parentNode,tabsString,imgH)+'>\n')
     if len(parentNode.childNodes)==0:
         fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         return
     for i in range(len(parentNode.childNodes)):
-        printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1)
+        printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH)
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
-def mapToXml(parentNode,appName):
+def mapToXml(parentNode,appName,imgH):
     # map and out xml file
     # ems of EditText = width of node/16px, hint
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0)
+    printNodeXml(fTo,parentNode,appName,0,imgH)
     return
     
 def generateXml(boxes,texts,predictedComponents,img,appName):
     parentNode=buildHierarchy(boxes,texts,predictedComponents,img)
-    mapToXml(parentNode,appName)
+    mapToXml(parentNode,appName,img.shape[0])
     # To test.
     printHierarchy(parentNode,appName)
     return
