@@ -293,6 +293,29 @@ def printSpecialCase(parentNode,tabsString,imgH):
         attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
     return attributeString
 
+def printSpecialCaseListView(parentNode,tabsString,imgH):
+    attributeString = ""
+    
+    if parentNode.nodeType == 'android.widget.TextView':
+        attributeString +='android:textColor = "@android:color/'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
+        'android:background = "@android:color/'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+        
+    return attributeString
+
+def printListViewChildNode(parentNode,myParentType,tabs,imgH):
+    tabsString=""
+    for i in range(tabs):
+        tabsString+='\t'
+    returnString=""
+    returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
+                  getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
+                                    ,parentNode.gravity,parentNode.weight,tabsString)+\
+                                    printSpecialCaseListView(parentNode,tabsString,imgH)+'>\n'                                  
+    for i in range(len(parentNode.childNodes)) :                                   
+        returnString += printListViewChildNode(parentNode.childNodes[i],parentNode.nodeType,2,imgH)
+    returnString+= tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n'
+                                    
+    return returnString
 def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):    
     tabsString=""
     for i in range(tabs):
@@ -314,8 +337,24 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):
     if len(parentNode.childNodes)==0:
         fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         return
-    for i in range(len(parentNode.childNodes)):
-        printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH)
+    if parentNode.nodeType == 'android.widget.ListView':
+        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+str(Constants.ID-1)+'.xml', 'w+')
+        fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
+        '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
+        +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
+        +'\t'+'xmlns:tools = "http://schemas.android.com/tools"\n'\
+        +'\t'+'android:layout_width = "match_parent"\n'\
+        +'\t'+'android:layout_height = "match_parent"\n'\
+        +'\t'+'android:orientation = "vertical"'+'>\n'
+        fToListView.write(fileOuput)            
+
+        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH))
+        fToListView.write("</LinearLayout>"+'\n')    
+        fToListView.close()    
+        
+    else:
+        for i in range(len(parentNode.childNodes)):
+            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH)
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH):
