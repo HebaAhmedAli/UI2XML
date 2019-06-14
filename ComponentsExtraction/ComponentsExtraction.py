@@ -8,7 +8,7 @@ import Utils
 import numpy 
 
 heightThrshold1 = 20
-heightThrshold2 = 50
+heightThrshold2 = 40
 margin = 10
 
 
@@ -155,6 +155,10 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
         textsInBacket[0] == '':
         return True
+    # Taaief ll edit text aly kan ta3bny whwa fasl.
+    if predictedComponentsInBacket[0] == 'android.widget.EditText' and boxesInBacket[0][3]+2*margin < heightThrshold2:
+        return True
+
     ''' # may be uncommented if needed
     croppedImage = imageCopy[boxesInBacket[0][1]:boxesInBacket[0][1] + boxesInBacket[0][3] , boxesInBacket[0][0]:boxesInBacket[0][0] + boxesInBacket[0][2]]
     numTotalPixel = croppedImage.shape[0] * croppedImage.shape[1]
