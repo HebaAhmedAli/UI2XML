@@ -10,9 +10,8 @@ CANNY_KERRY_WONG_LOW_THRESHOLD_RATIO = 0.66
 CANNY_RATIO_CONTROL_THRESHOLD = 0.1 / CANNY_KERRY_WONG_LOW_THRESHOLD_RATIO
     
 dilationSize = 1
-lowThreshold = 30
-highThreshold = 60
-cannyRatio = 2
+lowThreshold = 30 #30
+highThreshold = 60 #60
 editTextThresholdHeight = 15
 editTextThresholdAddedHeight = 50
 
@@ -25,6 +24,7 @@ def preProcess(image):
     kernel = np.ones((2 * dilationSize + 1, 2 * dilationSize + 1), np.uint8)
     edges = cv2.Canny(blurred, lowThreshold, highThreshold)
     #cv2.imwrite('data/images/'+ran+'accountedges.png',edges)
+    #morph = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
     morph = cv2.dilate(edges,kernel,iterations = 5)
     #cv2.imwrite('data/images/'+ran+'accountmorph.png',morph)
     return morph

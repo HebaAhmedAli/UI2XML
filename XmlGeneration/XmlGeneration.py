@@ -325,7 +325,7 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH):
                                     
     return returnString
 
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -357,34 +357,50 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH):
         +'\t'+'android:layout_height = "match_parent"\n'\
         +'\t'+'android:orientation = "vertical"'+'>\n'
         fToListView.write(fileOuput)            
-
         fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH))
         fToListView.write("</LinearLayout>"+'\n')    
         fToListView.close()    
         
     else:
-        for i in range(len(parentNode.childNodes)):
-            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH)
+        if actionBarOp == 'A' and tabs == 0:
+            fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
+            fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
+                '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
+                +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
+                +'\t'+'xmlns:tools = "http://schemas.android.com/tools"\n'\
+                +'\t'+'android:layout_width = "match_parent"\n'\
+                +'\t'+'android:layout_height = "wrap_content"\n'\
+                +'\t'+'android:orientation = "horizontal"'+'>\n'
+            fToActionBar.write(fileOuput) 
+            for i in range(0,len(parentNode.childNodes[0].childNodes)):
+                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp)
+            fToActionBar.write("</LinearLayout>"+'\n')    
+            fToActionBar.close() 
+            for i in range(1,len(parentNode.childNodes)):
+                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp)
+        else:
+            for i in range(len(parentNode.childNodes)):
+                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp)
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
-def mapToXml(parentNode,appName,imgH):
+def mapToXml(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH)
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp)
     return
 
-def mapToXmlAsIs(parentNode,appName,imgH):
+def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layoutAsIs'):
             os.makedirs(Constants.DIRECTORY+'/layoutAsIs') 
     fTo=open(Constants.DIRECTORY+'/layoutAsIs/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH)
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp)
     return
     
-def generateXml(boxes,texts,predictedComponents,img,appName):
+def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     parentNode,parentNodeAsIs=buildHierarchy(boxes,texts,predictedComponents,img)
-    mapToXml(parentNode,appName,img.shape[0])
-    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0])
+    mapToXml(parentNode,appName,img.shape[0],actionBarOp)
+    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],actionBarOp)
     # To test.
     printHierarchy(parentNode,appName)
     return

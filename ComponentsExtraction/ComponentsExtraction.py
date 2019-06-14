@@ -5,9 +5,14 @@ import ComponentsExtraction.TextExtraction as TextExtraction
 import ModelClassification.Model as Model
 from PIL import Image
 import Utils
+import numpy 
 
-heightThrshold = 20
+heightThrshold1 = 20
+heightThrshold2 = 50
 margin = 10
+
+
+
 # Extract the boxes and text from given image -extracted components- and predict them.
 def extractComponentsAndPredict(image,imageCopy,model,invVocab):
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
@@ -67,6 +72,19 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
             return False
     else:
         return False
+    
+# Case added manually edit text classified wrong.
+# Try to find another solution as (7sah mtaif)
+def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imgW):
+    if predictedComponentsInBacket[0] == 'android.widget.EditText':
+        if boxesInBacket[0][2] < 0.2*imgW: # To handle fatafet :D
+            return False
+        for i in range(1,len(predictedComponentsInBacket)):
+            if (predictedComponentsInBacket[i] == 'android.widget.ImageButton'):
+                return False
+        return True
+    else:
+        return True
 
 def checkPredictionBeforeAppendWithDefferentMargin(box,text,predictedComponent,imageCopy,model,invVocab):
     '''
@@ -117,32 +135,47 @@ def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,text
 def checkSeekProgress(boxesInBacket,imageCopy):
     croppedImage = imageCopy[max(0,boxesInBacket[0][1] - margin):min(imageCopy.shape[0],boxesInBacket[0][1] + boxesInBacket[0][3] + margin), max(boxesInBacket[0][0] - margin,0):min(imageCopy.shape[1],boxesInBacket[0][0] + boxesInBacket[0][2] + margin)]
     colors = Image.fromarray(croppedImage).convert('RGB').getcolors()
-    for i in range(len(colors)):  # Gray above (192,192,192)
-        if colors[i][1][0] < 192 or colors[i][1][1] < 192 or colors[i][1][2] < 192:
-            return True
+    if colors != None:
+        for i in range(len(colors)):  # Gray above (192,192,192)
+            if colors[i][1][0] < 192 or colors[i][1][1] < 192 or colors[i][1][2] < 192:
+                return True
     return False
 
 def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     # Case very thin image.
-    if boxesInBacket[0][3]<heightThrshold and \
-    predictedComponentsInBacket[0] == 'android.widget.ImageView':
+    if (boxesInBacket[0][3]<heightThrshold1 or\
+        (boxesInBacket[0][3]<heightThrshold2 and boxesInBacket[0][2]>imageCopy.shape[1]*0.6)) \
+        and predictedComponentsInBacket[0] == 'android.widget.ImageView':
         return True
     # Case wrong line classified as SeekBar or ProgressBar.
     if (predictedComponentsInBacket[0] == 'android.widget.SeekBar' \
-    or predictedComponentsInBacket[0] == 'android.widget.ProgressBarHorizontal') and \
-          not checkSeekProgress(boxesInBacket,imageCopy):
+        and not checkSeekProgress(boxesInBacket,imageCopy)):
         return True
     # Case textView that don't have text so wrong classification.
     if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
         textsInBacket[0] == '':
         return True
+    ''' # may be uncommented if needed
+    croppedImage = imageCopy[boxesInBacket[0][1]:boxesInBacket[0][1] + boxesInBacket[0][3] , boxesInBacket[0][0]:boxesInBacket[0][0] + boxesInBacket[0][2]]
+    numTotalPixel = croppedImage.shape[0] * croppedImage.shape[1]
+    # Case 7dod same color.
+    numWhitePixel=0
+    valueToCompare = numpy.sum(croppedImage[0][0])
+    for i in range(croppedImage.shape[1]):
+        for j in range(croppedImage.shape[0]):
+            if numpy.sum(croppedImage[j][i]) == valueToCompare:
+                numWhitePixel+=1
+    if numWhitePixel/numTotalPixel >= 1 and boxesInBacket[0][3]+2*margin<heightThrshold2 \
+     and predictedComponentsInBacket[0] != 'android.widget.SeekBar' and boxesInBacket[0][2]+2*margin>imageCopy.shape[0]*0.6:
+        return True
+    '''
     return False
-    
     
 def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
                  boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
     if (predictedComponentsInBacket[0] != 'android.widget.ImageView' \
-    and predictedComponentsInBacket[0] != 'android.widget.TextView')\
+    and predictedComponentsInBacket[0] != 'android.widget.TextView'\
+    and specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy.shape[1]))\
     or specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) \
     or len(predictedComponentsInBacket)==1:
         # For RadioButton and CheckBox Cases.

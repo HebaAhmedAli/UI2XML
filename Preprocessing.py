@@ -17,3 +17,4 @@ def imageReadAndPreprocessingClassification(image=None,imgPath=None):
         img = np.array(img,dtype='float32')  
         img /= 255.
         return img
+    
