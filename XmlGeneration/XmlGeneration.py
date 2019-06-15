@@ -2,6 +2,7 @@ import sys
 sys.path.append('../')
 import Utils
 import Constants
+import XmlGeneration.JavaGeneration as JavaGeneration
 import os
 import cv2
 import operator
@@ -9,6 +10,7 @@ import re
 
 class node:
     def __init__(self):
+        self.id = -1
         self.nodeType = ""  # ex: Button , TextView , ... , LinearLayoutHorizontal, LinearLayoutVertical
         self.x = 0
         self.y = 0
@@ -230,15 +232,16 @@ def buildHierarchy(boxes,texts,predictedComponents,img):
     rootNodeAsIs = createRoot(parentNodes,img.shape[0],True)
     return rootNode,rootNodeAsIs
 
-def getTypeAndOriAndID(nodeType,tabsString):
-    if nodeType == 'LinearLayoutVertical':
+def getTypeAndOriAndID(parentNode,tabsString):
+    if parentNode.nodeType == 'LinearLayoutVertical':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t'
-    elif nodeType == 'LinearLayoutHorizontal':
+    elif parentNode.nodeType == 'LinearLayoutHorizontal':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t'
-    toReturn = nodeType[15:len(nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+nodeType[15:len(nodeType)]+str(Constants.ID) \
-                +'"\n'+tabsString+'\t'
+    parentNode.id =  Constants.ID
+    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+str(parentNode.id) \
+                +'"\n'+tabsString+'\t'                
     Constants.ID += 1         
     return toReturn
        
@@ -291,7 +294,7 @@ def printSpecialCase(parentNode,tabsString,imgH):
         attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
         
     if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
-         attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID)+'"'+'\n'+tabsString+'\t'
+         attributeString += "android:onClick = "+'"'+"clickMe"+str(Constants.ID-1)+'"'+'\n'+tabsString+'\t'
          
     if parentNode.nodeType == 'android.widget.Button':
         attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
@@ -315,7 +318,7 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH):
     for i in range(tabs):
         tabsString+='\t'
     returnString=""
-    returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
+    returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCaseListView(parentNode,tabsString,imgH)+'>\n'                                  
@@ -339,7 +342,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):
                   +'\t'+'android:orientation = "vertical"\n'
                   +'\t'+'tools:context = "'+'.'+myParentType.capitalize()+'Activity"'+'>\n')
     else:
-        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode.nodeType,tabsString)+\
+        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCase(parentNode,tabsString,imgH)+'>\n')
@@ -400,7 +403,8 @@ def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     parentNode,parentNodeAsIs=buildHierarchy(boxes,texts,predictedComponents,img)
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
-    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],actionBarOp)
+    JavaGeneration.generateJava(parentNode,appName,actionBarOp)
+    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],'N')
     # To test.
     printHierarchy(parentNode,appName)
     return

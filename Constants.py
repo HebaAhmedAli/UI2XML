@@ -18,3 +18,4 @@ IMAGE_SIZE_CLASSIFICATION = 150
 DIRECTORY = 'data/ScreenShots/output'
 ID = 0
 ACTION_BAR_EXIST = 0
+PACKAGE = 'feryal'
