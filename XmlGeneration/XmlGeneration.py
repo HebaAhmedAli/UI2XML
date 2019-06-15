@@ -22,8 +22,8 @@ class node:
         self.backgroundColor = "white"
         self.textColor = "black"
         self.imagePath = ""
-        self.height = "" # ex: fixed no , wrap_content ,match_parent
-        self.width = "" # ex: fixed no , wrap_content ,match_parent
+        self.height = ""  # ex: fixed no , wrap_content ,match_parent
+        self.width = ""   # ex: fixed no , wrap_content ,match_parent
         self.childNodes = []
     
 def getFirstUnvisitedIndex(visited):
