@@ -97,7 +97,10 @@ def createLeafNode(box,text,predictedComponent,img):
         cropImg = img[leafNode.y:leafNode.y+leafNode.height, leafNode.x:leafNode.x+leafNode.width]
         cv2.imwrite(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png',cropImg)
         leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
-    # TODO: set Color.
+    if predictedComponent == 'android.widget.TextView' or predictedComponent == 'android.widget.Button':
+        firstColor,secondColor = Utils.getMostAndSecondMostColors()
+        leafNode.backgroundColor = firstColor
+        leafNode.textColor = secondColor
     return leafNode
 
 
@@ -406,7 +409,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],'N')
     # To test.
-    printHierarchy(parentNode,appName)
+    # printHierarchy(parentNode,appName)
     return
 
 def groupListViewAndRadio(groupedNodes,imgH):

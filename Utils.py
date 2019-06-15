@@ -2,15 +2,10 @@ import sys
 sys.path.append('../')
 import Constants as Constants
 from collections import Counter 
-import numpy as np
-
-from keras.preprocessing import image
-
 from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
-
-
+import numpy as np
 
 # Converts the sequnce  into a list of integers representing the positions of the
 # input sequence's strings in the "vocab"
