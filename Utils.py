@@ -112,7 +112,7 @@ def getMostAndSecondMostColors(img,firstOnly):
     while deltaE <= 60:
         second = mostFrequentInList(dictt,ocuurences,level).lstrip('#')
         if second == "-1":
-            print(deltaE,level,'exit')
+            #print(deltaE,level,'exit')
             return '#'+first,'#'+maxDeltaSecond
         secondRgb = tuple(int(second[i:i+2], 16) for i in (0, 2, 4))
         
@@ -127,7 +127,7 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaE = deltaE
             maxDeltaSecond = second
         level += 1
-    print(deltaE,level)
+    #print(deltaE,level)
     return '#'+first,'#'+second
 
 # For Testing.
