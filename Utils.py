@@ -138,6 +138,7 @@ img /= 255.
     
 print(getMostAndSecondMostColors(img,False))
 '''
+# For test set slice.
 '''
 myList = [[[1.0,1.0,1.0],[1.0,1.0,1.0]],[[0.5,0.5,0.5],[0.5,0.5,0.5]],[[0.5,0.5,0.5],[1.0,0.784,0.2]]]
 B = np.array(myList) # convert to int
