@@ -25,8 +25,14 @@ def preProcess(image):
     return morph
 
 # Extract boxes from given image.
-def extractBoxes(img):
+def extractBoxes(img,texts, txtBoxes):
     allBoxes=[]
+    isText=[]
+
+    # Initialize isText and textBoxes
+    allBoxes = txtBoxes
+    isText = texts
+
     morph=preProcess(img)
     
     # Binarize.
@@ -40,7 +46,7 @@ def extractBoxes(img):
 
     # Size threshold.
     min_size = 200 # pixels
-    box = []
+
     for i in range(1, numcc + 1):
         py, px = np.nonzero(lbl == i)
         if len(py) < min_size:
@@ -51,8 +57,8 @@ def extractBoxes(img):
         randColor = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
         cv2.rectangle(img, (xmin,ymin), (xmax,ymax), randColor,2)
         allBoxes.append([xmin, ymin, xmax-xmin, ymax-ymin])
+        isText.append("")
 
-     
     filteredBoxes=filterBoxes(allBoxes)
     return filteredBoxes
 
