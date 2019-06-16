@@ -19,3 +19,6 @@ DIRECTORY = 'data/ScreenShots/output'
 ID = 0
 ACTION_BAR_EXIST = 0
 PACKAGE = 'feryal'
+
+x = 0 
+y = 0

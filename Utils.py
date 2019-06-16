@@ -6,6 +6,11 @@ from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 import numpy as np
+import copy
+from keras.preprocessing import image
+from PIL import Image
+import os
+
 
 # Converts the sequnce  into a list of integers representing the positions of the
 # input sequence's strings in the "vocab"
@@ -81,8 +86,17 @@ def mostFrequentInList(dictt,ocuurences,level):
             return key
 
 def getMostAndSecondMostColors(img,firstOnly):
-    img *= 255
-    B = img.astype(int)
+    B = copy.copy(img)
+    '''
+    if not os.path.exists(Constants.DIRECTORY+'/test2'):
+            os.makedirs(Constants.DIRECTORY+'/test2')
+    if not os.path.exists(Constants.DIRECTORY+'/test5'):
+            os.makedirs(Constants.DIRECTORY+'/test5')
+    Constants.x +=1
+    Constants.y +=1
+    '''
+    #B *= 255
+    B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
     rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
     hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
@@ -98,6 +112,7 @@ def getMostAndSecondMostColors(img,firstOnly):
     firstRgbs = sRGBColor(firstRgb[0]/255.0,firstRgb[1]/255.0,firstRgb[2]/255.0)
     color1Lab = convert_color(firstRgbs, LabColor)
     if firstOnly == True:
+        #Image.fromarray(img).save(Constants.DIRECTORY+'/test5/'+"pic_"+str(Constants.x)+'_'+str(Constants.y)+'_'+'#'+first+'.png')
         return '#'+first
     deltaE = 0
     maxDeltaE = 0
@@ -108,11 +123,11 @@ def getMostAndSecondMostColors(img,firstOnly):
         second = mostFrequentInList(dictt,ocuurences,level).lstrip('#')
         if second == "-1":
             #print(deltaE,level,'exit')
+            #Image.fromarray(img).save(Constants.DIRECTORY+'/test2/'+"pic_"+str(Constants.x)+'_'+str(Constants.y)+'_'+'#'+first+'#'+maxDeltaSecond+'.png')
             return '#'+first,'#'+maxDeltaSecond
         secondRgb = tuple(int(second[i:i+2], 16) for i in (0, 2, 4))
         
         secondRgbs = sRGBColor(secondRgb[0]/255.0,secondRgb[1]/255.0,secondRgb[2]/255.0)
-        # Convert from RGB to Lab Color Space
         # Convert from RGB to Lab Color Space
         color2Lab = convert_color(secondRgbs, LabColor)
         # Find the color difference
@@ -123,21 +138,21 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaSecond = second
         level += 1
     #print(deltaE,level)
+    #Image.fromarray(img).save(Constants.DIRECTORY+'/test2/'+"pic_"+str(Constants.x)+'_'+str(Constants.y)+'_'+'#'+first+'#'+second+'.png')
     return '#'+first,'#'+second
 
 # For Testing.
 '''
-img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/ourTest/compOutputsradio2A/0-android.widget.TextView.png')
-img = np.array(img,dtype='float32')  
-img /= 255.
-    
+img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/output/test4/pic_246_246.png')
+img = np.array(img)  
+
 print(getMostAndSecondMostColors(img,False))
 '''
 # For test set slice.
 '''
-myList = [[[1.0,1.0,1.0],[1.0,1.0,1.0]],[[0.5,0.5,0.5],[0.5,0.5,0.5]],[[0.5,0.5,0.5],[1.0,0.784,0.2]]]
-B = np.array(myList) # convert to int
-B[0:3,1:3]=np.array([-1,-1,-1])  # y , x
+myList = [[[1,1,1],[1,1,1]],[[1,1,1],[1,1,1]],[[1,1,1],[1,1,1]]]
+B = copy.copy(np.array(myList))
+B[0:3,1:3]=np.array([-255,-255,-255])  # y , x
 print(B)
-print(getMostAndSecondMostColors(B,False))
+print(getMostAndSecondMostColors(B,True))
 '''
