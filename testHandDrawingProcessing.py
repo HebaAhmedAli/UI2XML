@@ -5,6 +5,7 @@ import HandDrawingProcessing.ComponentsExtraction as ComponentsExtraction
 import cv2
 import os
 import copy
+import io
 
 # vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 # model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
@@ -12,10 +13,13 @@ import copy
 imagesPath='data/HandDrawn'
 
 def processSave(subdir, file):
-    img = cv2.imread(subdir+'/' +file)
+    path = subdir+'/' +file
+    img = cv2.imread(path)
     imgCopy = copy.copy(img)
+    with io.open(path, 'rb') as image_file:
+        img4Txt = image_file.read()
     file = file.replace('.jpeg','.jpg')
-    boxes, texts = ComponentsExtraction.extractComponents(img,imgCopy)
+    boxes, texts = ComponentsExtraction.extractComponents(img,img4Txt)
     margin = 10
     if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
         os.makedirs(subdir+'/compOutputs'+file[:-4])
@@ -32,7 +36,8 @@ def processSave(subdir, file):
         # pedictedComp=Model.makeAprediction(invVocab,subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]),model)
         # cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ pedictedComp + str(file[len(file)-4:len(file)]),crop_img)
         # fTo.write(str(j)+'- '+texts[j]+'\n')
-        j+=1     
+        #print(file[:-4]+"  "+str(j)+"  pos: "+str(x)+" "+str(y)+" "+str(w)+" "+str(h))
+        j+=1
     cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
 subdir, dirs, _= next(os.walk(imagesPath))
