@@ -39,7 +39,7 @@ def evaluateModel(xTest,yTest):
 def makeAprediction(invVocab,image=None,model=None,imgPath=None):
     if model==None:
         model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
-    inputImage = Preprocessing.imageReadAndPreprocessingClassification(image,imgPath)
+    inputImage = Preprocessing.imageReadAndPreprocessingClassification(imgPath,image)
     inputImage = np.expand_dims(inputImage, 0)
     output = model.predict(inputImage)
     outputIndex = np.argmax(output,axis=-1)
