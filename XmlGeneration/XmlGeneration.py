@@ -420,7 +420,7 @@ def groupListViewAndRadio(groupedNodes,imgH):
             if patternToSearch ==  'android.widget.RadioButton':
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup'))
                 i = lastIndex
-            elif lastIndex-i>=3 and patternToSearch.find('android.widget.TextView') != -1 and patternToSearch.find('android.widget.CheckBox') == -1:
+            elif lastIndex-i>=3 and patternToSearch.find('android.widget.TextView') != -1:
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.ListView'))
                 i = lastIndex
             else:
