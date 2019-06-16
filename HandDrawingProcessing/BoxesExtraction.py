@@ -19,40 +19,30 @@ cannyRatio = 2
 def preProcess(image):
     # convert the image to grayscale, blur it slightly, and threshold it
     im = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
     # Inner morphological gradient.
     morph = morphology.grey_dilation(im, (5, 5)) - im
     return morph
 
 # Extract boxes from given image.
 def extractBoxes(img,texts, txtBoxes):
-    allBoxes=[]
-    isText=[]
-
     # Initialize isText and textBoxes
     allBoxes = txtBoxes
     isText = texts
-
     morph=preProcess(img)
-    
     # Binarize.
     mean, std = morph.mean(), morph.std()
     t = mean + std
     morph[morph < t] = 0
     morph[morph >= t] = 1
-
     # Connected components.
     lbl, numcc = label(morph)
-
     # Size threshold.
     min_size = 200 # pixels
-
     for i in range(1, numcc + 1):
         py, px = np.nonzero(lbl == i)
         if len(py) < min_size:
             morph[lbl == i] = 0
             continue
-
         xmin, xmax, ymin, ymax = px.min(), px.max(), py.min(), py.max()
         randColor = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
         cv2.rectangle(img, (xmin,ymin), (xmax,ymax), randColor,2)

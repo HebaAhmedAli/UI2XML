@@ -5,14 +5,10 @@ import HandDrawingProcessing.TextExtraction as TextExtraction
 
 # Extract the boxes and text from given image -extracted components-.
 def extractComponents(image,image4Txt):
-    extractedText, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
+    # TODO: Uncomment after testing and comment the lines after this.
+    #extractedText, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
+    extractedText = []
+    textPositions = []
     extratctedBoxes = BoxesExtraction.extractBoxes(image, extractedText, textPositions)
-    # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
-    # margin = 10
-    # height=image.shape[0]
-    # width=image.shape[1]
-    # for x,y,w,h in extratctedBoxes:
-    #     croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-    #     extractedText.append(TextExtraction.extractText(croppedImage))
-
-    return extratctedBoxes,extractedText
+    predictedComonents = ["" for i in range(len((extratctedBoxes)))] # TODO: Get this.
+    return extratctedBoxes,extractedText,predictedComonents
