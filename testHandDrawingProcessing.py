@@ -2,6 +2,7 @@ import HandDrawingProcessing.ComponentsExtraction as ComponentsExtraction
 from keras.preprocessing import image
 import XmlGeneration.XmlGeneration as XmlGeneration
 import numpy as np
+import Constants
 import cv2
 import os
 import copy
@@ -11,6 +12,9 @@ import io
 imagesPath='data/HandDrawn'
 
 def processSave(subdir, file):
+    Constants.DIRECTORY = 'data/HandDrawn/output'
+    if not os.path.exists(Constants.DIRECTORY):
+        os.makedirs(Constants.DIRECTORY)
     path = subdir+'/' +file
     img = cv2.imread(path)
     imgCopy = copy.copy(img)
@@ -20,9 +24,9 @@ def processSave(subdir, file):
         img4Txt = image_file.read()
     file = file.replace('.jpeg','.jpg')
     # TODO: Remove last parameter after testing.
-    boxes, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,img4Txt,file)
-    myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3],myImageBox[0]:myImageBox[0]+myImageBox[2]]
-    #XmlGeneration.generateXml(boxes,texts,predictedComponents,myImage,file[:-5],file[len(file)-5])
+    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,img4Txt,file)
+    myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
+    XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-5],file[len(file)-5])
     margin = 10
     if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
         os.makedirs(subdir+'/compOutputs'+file[:-4])

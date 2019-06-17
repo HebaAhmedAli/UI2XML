@@ -115,6 +115,7 @@ def createLeafNode(box,text,predictedComponent,img):
         if not os.path.exists(Constants.DIRECTORY+'/drawable'):
             os.makedirs(Constants.DIRECTORY+'/drawable')
         cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
+        Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
         leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
     if predictedComponent == 'android.widget.TextView' or predictedComponent == 'android.widget.Button':
         cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]

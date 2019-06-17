@@ -41,7 +41,11 @@ def checkXrange(boxA,boxB):
         return True
     return False
 
-        
+def checkInsideRange(boxA,boxB):
+    if boxB[0]>=boxA[0] and boxB[0]+boxB[2] <= boxB[0]+boxB[2] \
+    and boxB[1]>=boxA[1] and boxB[1]+boxB[3] <= boxB[1]+boxB[3]:
+        return True
+    return False
 
 def isSliceList(s,l):
     for i in range(len(s)):

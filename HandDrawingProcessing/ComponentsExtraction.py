@@ -17,7 +17,7 @@ def filterComponentsAndPredict(allBoxes,texts):
     filteredTexts = []
     boxesInBackets,textsInBackets = backetOverlappingBoxes(allBoxes,texts)
     for i in range(len(boxesInBackets)):
-        if textsInBackets[i][0] != "" and (textsInBackets[i][0] != "x" or textsInBackets[i][0] != "X"):
+        if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" or textsInBackets[i][0] != "X":
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
             predictedComonents.append("android.widget.TextView")
@@ -32,10 +32,10 @@ def filterComponentsAndPredict(allBoxes,texts):
             text,textAreaRatio,textIndex = getFirstTextBoxAndRatio(boxesInBackets[i],textsInBackets[i])
             filteredTexts.append(text)
             #print(text,textAreaRatio)
-            if textAreaRatio < 0.9 and text != "" and (text != "x" or text != "X"):
+            if textAreaRatio < 0.9 and text != "" and text != "x" or text != "X":
                 predictedComonents.append("android.widget.Button")
                 filteredBoxes.append(boxesInBackets[i][0])
-            elif text != "" and (text != "x" or text != "X"):
+            elif text != "" and text != "x" and text != "X":
                 predictedComonents.append("android.widget.TextView")
                 filteredBoxes.append(boxesInBackets[i][textIndex])
             else: # A7tyaty ma7sltsh.
@@ -51,7 +51,18 @@ def extractComponents(image,image4Txt,appName): # TODO: Remove appName.
     extratctedBoxes,extractedTexts = BoxesExtraction.extractBoxes(image, extractedTexts, textPositions)
     myImageBox = extratctedBoxes[0]
     extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)])
-    return extratctedBoxes,extractedTexts,predictedComponents,myImageBox
+    # Translate x and y and handle outside range.
+    extratctedBoxesTranslated = []
+    i = 0
+    while i<len(extratctedBoxes):
+        if Utils.checkInsideRange(myImageBox,extratctedBoxes[i]):
+            extratctedBoxesTranslated.append([extratctedBoxes[i][0]-myImageBox[0],extratctedBoxes[i][1]-myImageBox[1],extratctedBoxes[i][2],extratctedBoxes[i][3]])
+            i += 1
+        else:
+            extratctedBoxes.pop(i)
+            extractedTexts.pop(i)
+            predictedComponents.pop(i)
+    return extratctedBoxes,extratctedBoxesTranslated,extractedTexts,predictedComponents,myImageBox
 
 def getFirstUnvisitedIndex(visited):
     for i in range(len(visited)):
