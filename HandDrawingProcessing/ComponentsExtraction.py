@@ -81,7 +81,7 @@ def backetOverlappingBoxes(boxes,texts):
         backetTexts.append(texts[indexUnvisited])
         visited[indexUnvisited]=True
         for i in range(indexUnvisited+1,len(boxes)):
-            if visited[i] == False and Utils.iou(boxes[indexUnvisited],boxes[i])>0:
+            if visited[i] == False and Utils.iouSmall(boxes[indexUnvisited],boxes[i])>0.1:
                 visited[i] = True
                 backetBoxes.append(boxes[i])
                 backetTexts.append(texts[i])

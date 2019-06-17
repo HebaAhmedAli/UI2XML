@@ -25,6 +25,22 @@ def iou(boxA, boxB):
     else:
         return 0
     
+def iouSmall(boxA, boxB):
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2]+boxA[0], boxB[2]+boxB[0])
+    yB = min(boxA[3]+boxA[1], boxB[3]+boxB[1])
+
+    #boxAArea = (boxA[2]) * (boxA[3])
+    boxBArea = (boxB[2]) * (boxB[3])
+    interArea = (xB - xA) * (yB - yA)
+    # compute the area of intersection rectangle
+    if yB>=yA and xB >= xA:
+        return interArea / float(boxBArea)
+    else:
+        return 0
+    
 def checkYrange(boxA,boxB):
     if (boxA[1]>=boxB[1] and boxA[1]<(boxB[1]+boxB[3])) or \
     ((boxA[1]+boxA[3])>boxB[1] and (boxA[1]+boxA[3])<(boxB[1]+boxB[3])) or \
@@ -42,8 +58,8 @@ def checkXrange(boxA,boxB):
     return False
 
 def checkInsideRange(boxA,boxB):
-    if boxB[0]>=boxA[0] and boxB[0]+boxB[2] <= boxB[0]+boxB[2] \
-    and boxB[1]>=boxA[1] and boxB[1]+boxB[3] <= boxB[1]+boxB[3]:
+    if boxB[0]>=boxA[0] and boxB[0]+boxB[2] <= boxA[0]+boxA[2] \
+    and boxB[1]>=boxA[1] and boxB[1]+boxB[3] <= boxA[1]+boxA[3]:
         return True
     return False
 
