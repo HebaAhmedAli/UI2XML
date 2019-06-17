@@ -16,9 +16,12 @@ def iou(boxA, boxB):
     xB = min(boxA[2]+boxA[0], boxB[2]+boxB[0])
     yB = min(boxA[3]+boxA[1], boxB[3]+boxB[1])
 
+    boxAArea = (boxA[2]) * (boxA[3])
+    #boxBArea = (boxB[2]) * (boxB[3])
+    interArea = (xB - xA) * (yB - yA)
     # compute the area of intersection rectangle
     if yB>=yA and xB >= xA:
-        return (xB - xA) * (yB - yA)
+        return interArea / float(boxAArea)
     else:
         return 0
     
