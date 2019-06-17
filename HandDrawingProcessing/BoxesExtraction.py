@@ -63,7 +63,7 @@ def mergeTextBoxsForSameWord(txtBoxes,texts,imgW):
             startJ = j
             minY = groupedBoxs[i][startJ][1]
             maxY =  groupedBoxs[i][startJ][3]+groupedBoxs[i][startJ][1]
-            while j+1 < len(groupedBoxs[i]) and (groupedBoxs[i][j+1][0]-(groupedBoxs[i][j][0]+groupedBoxs[i][j][2]))/imgW < 0.1:
+            while j+1 < len(groupedBoxs[i]) and (groupedBoxs[i][j+1][0]-(groupedBoxs[i][j][0]+groupedBoxs[i][j][2]))/imgW < 0.07:
                 j+=1
                 minY = min(minY,groupedBoxs[i][j][1])
                 maxY = max(maxY,groupedBoxs[i][j][3]+groupedBoxs[i][j][1])
