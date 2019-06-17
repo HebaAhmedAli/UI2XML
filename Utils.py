@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../')
 from collections import Counter 
+from keras.preprocessing import image
 from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
@@ -91,7 +92,8 @@ def getMostAndSecondMostColors(img,firstOnly):
     hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
     # Convert given list into dictionary 
     # it's output will be like {'ccc':1,'aaa':3,'bbb':2}
-    dictt = Counter(np.array(hexArr)) 
+    dictt = Counter(np.array(hexArr))
+    print(len(dictt))
     if "#-ff-ff-ff" in dictt:
         dictt.pop("#-ff-ff-ff", None)
     # Get the list of all values and sort it in ascending order 
@@ -124,4 +126,10 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaSecond = second
         level += 1
     return '#'+first,'#'+second
+'''
+# For Testing.
 
+img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/ourTest/compOutputsface1A/5-android.widget.EditText.jpg')
+img = np.array(img)  
+print(getMostAndSecondMostColors(img,False))
+'''
