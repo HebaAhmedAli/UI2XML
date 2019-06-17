@@ -8,7 +8,6 @@ import os
 import copy
 import io
 
-
 imagesPath='data/HandDrawn'
 
 def processSave(subdir, file):
