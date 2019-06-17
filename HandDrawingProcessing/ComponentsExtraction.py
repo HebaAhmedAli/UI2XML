@@ -32,7 +32,7 @@ def filterComponentsAndPredict(allBoxes,texts):
             text,textAreaRatio,textIndex = getFirstTextBoxAndRatio(boxesInBackets[i],textsInBackets[i])
             filteredTexts.append(text)
             #print(text,textAreaRatio)
-            if textAreaRatio < 0.9 and text != "" and text != "x" or text != "X":
+            if textAreaRatio < 0.9 and text != "" and text != "x" and text != "X":
                 predictedComonents.append("android.widget.Button")
                 filteredBoxes.append(boxesInBackets[i][0])
             elif text != "" and text != "x" and text != "X":
