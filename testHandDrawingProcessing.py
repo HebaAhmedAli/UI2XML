@@ -1,15 +1,19 @@
 import HandDrawingProcessing.ComponentsExtraction as ComponentsExtraction
 from keras.preprocessing import image
+import XmlGeneration.XmlGeneration as XmlGeneration
 import numpy as np
+import Constants
 import cv2
 import os
 import copy
 import io
 
-
 imagesPath='data/HandDrawn'
 
 def processSave(subdir, file):
+    Constants.DIRECTORY = 'data/HandDrawn/output'
+    if not os.path.exists(Constants.DIRECTORY):
+        os.makedirs(Constants.DIRECTORY)
     path = subdir+'/' +file
     img = cv2.imread(path)
     imgCopy = copy.copy(img)
@@ -18,7 +22,10 @@ def processSave(subdir, file):
     with io.open(path, 'rb') as image_file:
         img4Txt = image_file.read()
     file = file.replace('.jpeg','.jpg')
-    boxes, texts, predictedComonents = ComponentsExtraction.extractComponents(img,img4Txt)
+    # TODO: Remove last parameter after testing.
+    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,img4Txt,file)
+    myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
+    XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-5],file[len(file)-5])
     margin = 10
     if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
         os.makedirs(subdir+'/compOutputs'+file[:-4])
@@ -32,7 +39,7 @@ def processSave(subdir, file):
         # testing: print the cropped in folder
         crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         #cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]),crop_img)
-        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComonents[j] + str(file[len(file)-4:len(file)]),crop_img)
+        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
         fTo.write(str(j)+'- '+texts[j]+'\n')
         j+=1
     cv2.imwrite(subdir+"/boxOutputs/"+file,img)
