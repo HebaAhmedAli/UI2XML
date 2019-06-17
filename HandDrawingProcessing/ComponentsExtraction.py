@@ -17,7 +17,7 @@ def filterComponentsAndPredict(allBoxes,texts):
     filteredTexts = []
     boxesInBackets,textsInBackets = backetOverlappingBoxes(allBoxes,texts)
     for i in range(len(boxesInBackets)):
-        if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" or textsInBackets[i][0] != "X":
+        if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X":
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
             predictedComonents.append("android.widget.TextView")
@@ -31,7 +31,6 @@ def filterComponentsAndPredict(allBoxes,texts):
         else:
             text,textAreaRatio,textIndex = getFirstTextBoxAndRatio(boxesInBackets[i],textsInBackets[i])
             filteredTexts.append(text)
-            #print(text,textAreaRatio)
             if textAreaRatio < 0.9 and text != "" and text != "x" and text != "X":
                 predictedComonents.append("android.widget.Button")
                 filteredBoxes.append(boxesInBackets[i][0])
