@@ -6,3 +6,6 @@ DIRECTORY = 'data/ScreenShots/output'
 ID = 0
 PACKAGE = 'feryal'
 DEBUG_MODE = 0
+HAND_DRAWN = False
+AS_IS = False
+SMART = True

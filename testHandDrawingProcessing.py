@@ -6,12 +6,17 @@ import Constants
 import cv2
 import os
 import copy
+import Utils
 import io
+from PIL import Image
 
 imagesPath='data/HandDrawn'
 
 def processSave(subdir, file):
     Constants.DIRECTORY = 'data/HandDrawn/output'
+    Constants.HAND_DRAWN = True
+    xImage = np.array(Utils.genTable(300,300))
+    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_x.png")
     if not os.path.exists(Constants.DIRECTORY):
         os.makedirs(Constants.DIRECTORY)
     path = subdir+'/' +file

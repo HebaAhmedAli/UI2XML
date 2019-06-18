@@ -35,8 +35,6 @@ class node:
 def clearInnerBoxes(parentNode,childNodes,img):
     cropImg = copy.copy(img)
     cropImg = cropImg[max(0,parentNode.y):min(parentNode.y+parentNode.height,img.shape[0]), max(0,parentNode.x):min(parentNode.x+parentNode.width,img.shape[1])]
-    if not os.path.exists(Constants.DIRECTORY+'/test4'):
-            os.makedirs(Constants.DIRECTORY+'/test4')
     for i in range(len(childNodes)):
         startY = max(0,max(0,childNodes[i].y)-max(0,parentNode.y))
         startX = max(0,max(0,childNodes[i].x)-max(0,parentNode.x))
@@ -95,8 +93,11 @@ def setWeights(groupedNodes,sortAttr,screenDim,root,img=None,notLeafChilds=None)
             if notLeafChilds:
                 groupedNodes[i].x = 0  
                 groupedNodes[i].width = img.shape[1]
-            imgClean = clearInnerBoxes(groupedNodes[i],groupedNodes[i].childNodes,img)
-            groupedNodes[i].backgroundColor = Utils.getMostAndSecondMostColors(imgClean,True)
+            if not Constants.HAND_DRAWN:
+                imgClean = clearInnerBoxes(groupedNodes[i],groupedNodes[i].childNodes,img)
+                groupedNodes[i].backgroundColor = Utils.getMostAndSecondMostColors(imgClean,True)
+            else:
+                groupedNodes[i].backgroundColor = "#ffffff"
         groupedNodes[i].weight = weight
     return groupedNodes
 
@@ -112,14 +113,20 @@ def createLeafNode(box,text,predictedComponent,img):
     leafNode.text = finalText
     leafNode.nodeType = predictedComponent
     if predictedComponent == 'android.widget.ImageView' or predictedComponent == 'android.widget.ImageButton':
-        if not os.path.exists(Constants.DIRECTORY+'/drawable'):
-            os.makedirs(Constants.DIRECTORY+'/drawable')
-        cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
-        Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
-        leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
+        if not Constants.HAND_DRAWN:
+            if not os.path.exists(Constants.DIRECTORY+'/drawable'):
+                os.makedirs(Constants.DIRECTORY+'/drawable')
+            cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
+            Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
+            leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
+        else:
+            leafNode.imagePath = "pic_x"
     if predictedComponent == 'android.widget.TextView' or predictedComponent == 'android.widget.Button':
         cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
-        firstColor,secondColor = Utils.getMostAndSecondMostColors(cropImg,False)
+        if not Constants.HAND_DRAWN:
+            firstColor,secondColor = Utils.getMostAndSecondMostColors(cropImg,False)
+        else:
+            firstColor,secondColor = "#808080","#ffffff"
         leafNode.backgroundColor = firstColor
         leafNode.textColor = secondColor
     return leafNode
@@ -429,9 +436,11 @@ def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
     
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     parentNode,parentNodeAsIs=buildHierarchy(boxes,texts,predictedComponents,img)
-    mapToXml(parentNode,appName,img.shape[0],actionBarOp)
-    JavaGeneration.generateJava(parentNode,appName,actionBarOp)
-    mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],'N')
+    if Constants.SMART:
+        mapToXml(parentNode,appName,img.shape[0],actionBarOp)
+        JavaGeneration.generateJava(parentNode,appName,actionBarOp)
+    if Constants.AS_IS:
+        mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],'N')
     # To test.
     # printHierarchy(parentNode,appName)
     return

@@ -8,7 +8,25 @@ from colormath.color_diff import delta_e_cie2000
 import numpy as np
 import copy
 
-
+def genTable (rows, columns):
+        matrix = [[[255,255,255]] * columns for _i in range(rows)]
+        #Indexes of first diagonal
+        diag1 = [(i, i) for i in range(rows)]
+        #Indexes of second diagonal
+        diag2 = [(rows-i-1, i) for i in range(rows)]
+        #Iterate over the indexes from diag1 and diag2 and modify matrix
+        for i, j in diag1 + diag2:
+            matrix[i][j] = [0,0,0]
+            if i+1<rows:
+                matrix[i+1][j] = [0,0,0]
+            if j+1<columns:
+                matrix[i][j+1] = [0,0,0]
+            if i-1<rows:
+                matrix[i-1][j] = [0,0,0]
+            if j-1 < columns:
+                matrix[i][j-1] = [0,0,0]
+        return matrix
+    
 # box = x,y,w,h
 def iou(boxA, boxB):
     # determine the (x, y)-coordinates of the intersection rectangle
@@ -93,9 +111,13 @@ def getMostAndSecondMostColors(img,firstOnly):
     # Convert given list into dictionary 
     # it's output will be like {'ccc':1,'aaa':3,'bbb':2}
     dictt = Counter(np.array(hexArr))
-    print(len(dictt))
     if "#-ff-ff-ff" in dictt:
         dictt.pop("#-ff-ff-ff", None)
+    if len(dictt) == 0:
+        if firstOnly:
+            return "#ffffff"
+        else:
+            return "#ffffff","#000000"
     # Get the list of all values and sort it in ascending order 
     ocuurences = sorted(dictt.values(), reverse=True)
     first = mostFrequentInList(dictt,ocuurences,0).lstrip('#')
