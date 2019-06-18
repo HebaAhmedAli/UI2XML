@@ -137,9 +137,9 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName):
         listViewBean += "\t\t"+viewType[leavesType[i]]+" "+ varName[leavesType[i]]+str(i)+";\n"
         holderItems+= "\t\t\tholder."+varName[leavesType[i]]+str(i)+" = ("+viewType[leavesType[i]]+") view.findViewById(R.id."+viewType[leavesType[i]]+str(listView.childNodes[0].childNodes[i].id)+");\n"
         setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+"."+setter[leavesType[i]]+"(mListenerList.get(position)."+getter[leavesType[i]]+str(i)+"());\n"
-        if leavesType[i] == 'android.widget.ImageButton' or leavesType[i] == 'android.widget.Button':
-            setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
-            "\t\t\t\t@Override\n\t\t\t\tpublic void onClick(View v) {\n\t\t\t\t\t// onClick logic \t\t\t\t}\n\t\t\t});\n"
+        #if leavesType[i] == 'android.widget.ImageButton' or leavesType[i] == 'android.widget.Button':
+        #    setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
+        #   "\t\t\t\t@Override\n\t\t\t\tpublic void onClick(View v) {\n\t\t\t\t\t// onClick logic \t\t\t\t}\n\t\t\t});\n"
     
     listViewBean+= "\t}\n\t@Override\n\tpublic int getCount() {\n\t\treturn mListenerList.size();\n\t}\n"+\
         "\t@Override\n\tpublic Object getItem(int position) {\n\t\treturn mListenerList.get(position);\n\t}\n"+\
