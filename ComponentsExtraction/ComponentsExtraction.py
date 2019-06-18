@@ -5,7 +5,6 @@ import ComponentsExtraction.TextExtraction as TextExtraction
 import ModelClassification.Model as Model
 from PIL import Image
 import Utils
-import numpy 
 
 heightThrshold1 = 20
 heightThrshold2 = 40
@@ -86,18 +85,6 @@ def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBac
     else:
         return True
 
-def checkPredictionBeforeAppendWithDefferentMargin(box,text,predictedComponent,imageCopy,model,invVocab):
-    '''
-    margin = 5
-    x,y,w,h=box
-    height = imageCopy.shape[0]
-    width = imageCopy.shape[1]
-    croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-    if predictedComponent == 'android.widget.ImageView' or (predictedComponent == 'android.widget.TextView' and text == ''):
-        return Model.makeAprediction(invVocab,croppedImage,model)
-    else:
-        '''
-    return predictedComponent
     
 def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
     keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']
@@ -182,9 +169,6 @@ def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
     and specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy.shape[1]))\
     or specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) \
     or len(predictedComponentsInBacket)==1:
-        # For RadioButton and CheckBox Cases.
-        predictedComponentsInBacket[0]= \
-        checkPredictionBeforeAppendWithDefferentMargin(boxesInBacket[0],textsInBacket[0],predictedComponentsInBacket[0],imageCopy,model,invVocab)
         if not neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
             boxesFiltered.append(boxesInBacket[0])
             textsFiltered.append(textsInBacket[0])

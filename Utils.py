@@ -1,38 +1,13 @@
 import sys
 sys.path.append('../')
-import Constants as Constants
 from collections import Counter 
-import numpy as np
-
 from keras.preprocessing import image
-
 from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
+import numpy as np
+import copy
 
-
-
-# Converts the sequnce  into a list of integers representing the positions of the
-# input sequence's strings in the "vocab"
-def sequenceToIndices(sequence, vocab):
-    keyStrings = sequence.split()  
-    keyStrings = ['\t'] + keyStrings + ['\n']
-    if len(keyStrings) > Constants.MAX_SEQUENCE_LENGTH:
-        keyStrings = keyStrings[:Constants.MAX_SEQUENCE_LENGTH]       
-    indices = list(map(lambda x: vocab.get(x), keyStrings))
-    if len(keyStrings) < Constants.MAX_SEQUENCE_LENGTH:
-        indices += [vocab['<pad>']] * (Constants.MAX_SEQUENCE_LENGTH - len(keyStrings))   
-    for i in range(len(indices)):
-        if indices[i] == None:
-            indices.pop(i)
-            indices.append(vocab['<pad>'])
-    return indices
-
-# Converts the list of indices into list of coresspnding keyStrings.
-def indicesToSequence(indices, invVocab):
-    keyStrings = [invVocab[i] for i in indices]
-    sequence = ' '.join(keyStrings)
-    return sequence
 
 # box = x,y,w,h
 def iou(boxA, boxB):
@@ -42,9 +17,28 @@ def iou(boxA, boxB):
     xB = min(boxA[2]+boxA[0], boxB[2]+boxB[0])
     yB = min(boxA[3]+boxA[1], boxB[3]+boxB[1])
 
+    boxAArea = (boxA[2]) * (boxA[3])
+    #boxBArea = (boxB[2]) * (boxB[3])
+    interArea = (xB - xA) * (yB - yA)
     # compute the area of intersection rectangle
     if yB>=yA and xB >= xA:
-        return (xB - xA) * (yB - yA)
+        return interArea / float(boxAArea)
+    else:
+        return 0
+    
+def iouSmall(boxA, boxB):
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2]+boxA[0], boxB[2]+boxB[0])
+    yB = min(boxA[3]+boxA[1], boxB[3]+boxB[1])
+
+    #boxAArea = (boxA[2]) * (boxA[3])
+    boxBArea = (boxB[2]) * (boxB[3])
+    interArea = (xB - xA) * (yB - yA)
+    # compute the area of intersection rectangle
+    if yB>=yA and xB >= xA:
+        return interArea / float(boxBArea)
     else:
         return 0
     
@@ -64,7 +58,11 @@ def checkXrange(boxA,boxB):
         return True
     return False
 
-        
+def checkInsideRange(boxA,boxB):
+    if boxB[0]>=boxA[0] and boxB[0]+boxB[2] <= boxA[0]+boxA[2] \
+    and boxB[1]>=boxA[1] and boxB[1]+boxB[3] <= boxA[1]+boxA[3]:
+        return True
+    return False
 
 def isSliceList(s,l):
     for i in range(len(s)):
@@ -86,14 +84,16 @@ def mostFrequentInList(dictt,ocuurences,level):
             return key
 
 def getMostAndSecondMostColors(img,firstOnly):
-    img *= 255
-    B = img.astype(int)
+    B = copy.copy(img)
+    #B *= 255
+    B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
     rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
     hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
     # Convert given list into dictionary 
     # it's output will be like {'ccc':1,'aaa':3,'bbb':2}
-    dictt = Counter(np.array(hexArr)) 
+    dictt = Counter(np.array(hexArr))
+    print(len(dictt))
     if "#-ff-ff-ff" in dictt:
         dictt.pop("#-ff-ff-ff", None)
     # Get the list of all values and sort it in ascending order 
@@ -112,12 +112,10 @@ def getMostAndSecondMostColors(img,firstOnly):
     while deltaE <= 60:
         second = mostFrequentInList(dictt,ocuurences,level).lstrip('#')
         if second == "-1":
-            #print(deltaE,level,'exit')
             return '#'+first,'#'+maxDeltaSecond
         secondRgb = tuple(int(second[i:i+2], 16) for i in (0, 2, 4))
         
         secondRgbs = sRGBColor(secondRgb[0]/255.0,secondRgb[1]/255.0,secondRgb[2]/255.0)
-        # Convert from RGB to Lab Color Space
         # Convert from RGB to Lab Color Space
         color2Lab = convert_color(secondRgbs, LabColor)
         # Find the color difference
@@ -127,22 +125,11 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaE = deltaE
             maxDeltaSecond = second
         level += 1
-    #print(deltaE,level)
     return '#'+first,'#'+second
-
+'''
 # For Testing.
-'''
-img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/ourTest/compOutputsradio2A/0-android.widget.TextView.png')
-img = np.array(img,dtype='float32')  
-img /= 255.
-    
+
+img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/ourTest/compOutputsface1A/5-android.widget.EditText.jpg')
+img = np.array(img)  
 print(getMostAndSecondMostColors(img,False))
-'''
-# For test set slice.
-'''
-myList = [[[1.0,1.0,1.0],[1.0,1.0,1.0]],[[0.5,0.5,0.5],[0.5,0.5,0.5]],[[0.5,0.5,0.5],[1.0,0.784,0.2]]]
-B = np.array(myList) # convert to int
-B[0:3,1:3]=np.array([-1,-1,-1])  # y , x
-print(B)
-print(getMostAndSecondMostColors(B,False))
 '''
