@@ -25,6 +25,27 @@ def genTable (rows, columns):
                 matrix[i-1][j] = [0,0,0]
             if j-1 < columns:
                 matrix[i][j-1] = [0,0,0]
+            if i+2<rows:
+                matrix[i+2][j] = [0,0,0]
+            if j+2<columns:
+                matrix[i][j+2] = [0,0,0]
+            if i-2<rows:
+                matrix[i-2][j] = [0,0,0]
+            if j-2 < columns:
+                matrix[i][j-2] = [0,0,0]
+        for i in range(columns):
+            matrix[i][0] = [0,0,0]
+            matrix[i][1] = [0,0,0]
+            matrix[i][2] = [0,0,0]
+            matrix[0][i] = [0,0,0]
+            matrix[1][i] = [0,0,0]
+            matrix[2][i] = [0,0,0]
+            matrix[i][columns-1] = [0,0,0]
+            matrix[i][columns-2] = [0,0,0]
+            matrix[i][columns-3] = [0,0,0]
+            matrix[columns-1][i] = [0,0,0]
+            matrix[columns-2][i] = [0,0,0]
+            matrix[columns-3][i] = [0,0,0]
         return matrix
     
 # box = x,y,w,h
