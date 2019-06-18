@@ -4,7 +4,7 @@ from delButton import delButton
 
 
 class imageBox(QWidget):
-    def __init__(self):
+    def __init__(self, index):
         super(imageBox, self).__init__()
         self.groupBox = QGroupBox()
         self.layout = QVBoxLayout()
@@ -16,6 +16,8 @@ class imageBox(QWidget):
         self.checked = False
         self.row = 0
         self.col = 0
+        print(index)
+        self.index = index
         #self.button.clicked.connect(self.deletebutton)
 
     def setImage (self, image, label, row, col):

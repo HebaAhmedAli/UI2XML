@@ -16,6 +16,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:&quot;grey&quot;;</string>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -23,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -113,15 +116,59 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockDesign">
+   <property name="font">
+    <font>
+     <family>URW Gothic L</family>
+     <pointsize>14</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+color: &quot;white&quot;;</string>
+   </property>
    <property name="windowTitle">
     <string>Design</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents"/>
+   <widget class="QWidget" name="dockWidgetContents">
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>321</width>
+       <height>531</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: &quot;white&quot;;
+color: rgb(156,156,156);
+border: 5px solid  rgb(66, 138, 255);
+border-radius: 20%;</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dockPictuers">
+   <property name="font">
+    <font>
+     <family>URW Gothic L</family>
+     <pointsize>14</pointsize>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 5px solid  rgb(66, 138, 255);
+border-radius: 20%;
+background-color: &quot;white&quot;;
+color: &quot;white&quot;;</string>
+   </property>
    <property name="windowTitle">
     <string>Project</string>
    </property>
@@ -132,11 +179,16 @@
     <widget class="QTreeView" name="treeView">
      <property name="geometry">
       <rect>
-       <x>-20</x>
-       <y>80</y>
-       <width>256</width>
-       <height>192</height>
+       <x>10</x>
+       <y>20</y>
+       <width>171</width>
+       <height>131</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 2px solid  rgb(156,156,156);
+border-radius: 20%;
+background-color: &quot;white&quot;;</string>
      </property>
     </widget>
    </widget>

@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'try.ui'
 #
-# Created: Sun Mar  3 05:57:37 2019
-#      by: PyQt4 UI code generator 4.11.1
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -28,11 +27,12 @@ class Ui_mainWindow(object):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
         mainWindow.resize(800, 600)
         mainWindow.setAcceptDrops(True)
+        mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
         self.centralwidget = QtGui.QWidget(mainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         mainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(mainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -57,17 +57,46 @@ class Ui_mainWindow(object):
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         mainWindow.setStatusBar(self.statusbar)
         self.dockDesign = QtGui.QDockWidget(mainWindow)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("URW Gothic L"))
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dockDesign.setFont(font)
+        self.dockDesign.setStyleSheet(_fromUtf8("\n"
+"color: \"white\";"))
         self.dockDesign.setObjectName(_fromUtf8("dockDesign"))
         self.dockWidgetContents = QtGui.QWidget()
         self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
+        self.textBrowser = QtGui.QTextBrowser(self.dockWidgetContents)
+        self.textBrowser.setGeometry(QtCore.QRect(10, 0, 321, 531))
+        self.textBrowser.setStyleSheet(_fromUtf8("background-color: \"white\";\n"
+"color: rgb(156,156,156);\n"
+"border: 5px solid  rgb(66, 138, 255);\n"
+"border-radius: 20%;"))
+        self.textBrowser.setObjectName(_fromUtf8("textBrowser"))
         self.dockDesign.setWidget(self.dockWidgetContents)
         mainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.dockDesign)
         self.dockPictuers = QtGui.QDockWidget(mainWindow)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("URW Gothic L"))
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setItalic(False)
+        font.setWeight(75)
+        self.dockPictuers.setFont(font)
+        self.dockPictuers.setStyleSheet(_fromUtf8("border: 5px solid  rgb(66, 138, 255);\n"
+"border-radius: 20%;\n"
+"background-color: \"white\";\n"
+"color: \"white\";"))
         self.dockPictuers.setObjectName(_fromUtf8("dockPictuers"))
         self.dockWidgetContents_2 = QtGui.QWidget()
         self.dockWidgetContents_2.setObjectName(_fromUtf8("dockWidgetContents_2"))
         self.treeView = QtGui.QTreeView(self.dockWidgetContents_2)
-        #self.treeView.setGeometry(QtCore.QRect(-20, 80, 256, 192))
+        self.treeView.setGeometry(QtCore.QRect(10, 20, 171, 131))
+        self.treeView.setStyleSheet(_fromUtf8("border: 2px solid  rgb(156,156,156);\n"
+"border-radius: 20%;\n"
+"background-color: \"white\";"))
         self.treeView.setObjectName(_fromUtf8("treeView"))
         self.dockPictuers.setWidget(self.dockWidgetContents_2)
         mainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockPictuers)

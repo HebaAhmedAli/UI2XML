@@ -6,6 +6,7 @@ class delButton(QPushButton):
         super(delButton, self).__init__(parent)
         self.setText("Delete me!")
         self.clicked.connect(self.deleteImageBox)
+
     def deleteImageBox(self):
         print("iam deleting")
         self.parent.setParent(None)

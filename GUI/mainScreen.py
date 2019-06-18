@@ -19,6 +19,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.Layout.setAlignment(Qt.AlignTop)
         self.horizontalLayouts = []
         self.gridData.setLayout(self.Layout)
+        self.numOfImages = 0
 
         # Upload Area scrollable
         self.scrollarea = QScrollArea()
@@ -43,7 +44,9 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         lay.addWidget(self.scrollarea)
 
         self.dockPictuers.setMinimumWidth(200)
-        self.dockDesign.setMinimumWidth(200)
+        self.dockDesign.setMinimumWidth(350)
+        text = open('activity_twitter.xml').read()
+        self.textBrowser.setPlainText(text)   
 
     def setDirectory(self,url):
         self.directory= url
@@ -102,13 +105,15 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
 
     def pictureDropped(self, l):
         for url in l:
+            # TODO: Restrict uploads to images only
             if os.path.exists(url):
                 startI = url.rfind('/', 0, len(url)) + 1
                 endI = url.rfind('.', 0, len(url))
                 s = url[startI: endI]
                 self.GroupBox = QGroupBox()
                 numOfHLayouts = len(self.horizontalLayouts)
-                newimage = imageBox()
+                newimage = imageBox(self.numOfImages)
+                self.numOfImages = self.numOfImages+1
 
                 if (self.horizontalLayouts[numOfHLayouts -1]).count() < self.maxRowSize -1 :
                     imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
