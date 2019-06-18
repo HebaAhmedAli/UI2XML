@@ -2,6 +2,7 @@ import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
 import XmlGeneration.XmlGeneration as XmlGeneration
 from keras.models import load_model
 import LoadDataClassification
+import Constants
 import cv2
 import os
 import copy
@@ -29,34 +30,40 @@ def processSave(subdir, file):
     file = file.replace('.jpeg','.jpg')
     boxes, texts ,addedManuallyBool ,predictedComponents= ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,model,invVocab)
     margin = 10
-    if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
-        os.makedirs(subdir+'/compOutputsAll'+file[:-4])
-    if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
-        os.makedirs(subdir+'/compOutputs'+file[:-4])    
-    if not os.path.exists(subdir+'/boxOutputs'):
-        os.makedirs(subdir+'/boxOutputs')
-    j = 0
+    if Constants.DEBUG_MODE == 1 :
+        if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
+            os.makedirs(subdir+'/compOutputsAll'+file[:-4])
+        if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
+            os.makedirs(subdir+'/compOutputs'+file[:-4])    
+        if not os.path.exists(subdir+'/boxOutputs'):
+            os.makedirs(subdir+'/boxOutputs')
+
     height= img.shape[0]
     width= img.shape[1]
-    fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
+    
+    if Constants.DEBUG_MODE == 1 :
+        fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
     boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
     XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-5],file[len(file)-5])
-    for x,y,w,h in boxes:
-        # testing: print the cropped in folder
-        crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        cv2.imwrite(subdir + "/compOutputsAll"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
-        fTo.write(str(j)+'- '+texts[j]+'\n')
-        j+=1    
-    fTo.close()
-    fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
-    j=0
-    for x,y,w,h in boxesFiltered:
-        # testing: print the cropped in folder
-        crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
-        fTo.write(str(j)+'- '+textsFiltered[j]+'\n')
-        j+=1  
-    cv2.imwrite(subdir+"/boxOutputs/"+file,img)
+    
+    if Constants.DEBUG_MODE == 1 :
+        j = 0
+        for x,y,w,h in boxes:
+            # testing: print the cropped in folder
+            crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+            cv2.imwrite(subdir + "/compOutputsAll"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
+            fTo.write(str(j)+'- '+texts[j]+'\n')
+            j+=1    
+        fTo.close()
+        fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
+        j=0
+        for x,y,w,h in boxesFiltered:
+            # testing: print the cropped in folder
+            crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+            cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
+            fTo.write(str(j)+'- '+textsFiltered[j]+'\n')
+            j+=1  
+        cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
 subdir, dirs, _= next(os.walk(imagesPath))
 for direc in dirs:
