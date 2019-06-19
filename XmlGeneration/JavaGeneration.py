@@ -78,8 +78,11 @@ def printAddingItems(listViewId,selectedVarNames,idx,appName):
     
 def printListViewBean(leavesType,idx,appName):
     listViewBean = ""
-    fTo=open(Constants.DIRECTORY+'/java/'+appName.capitalize()+"ListViewBean"+str(idx)+'.java', 'w+')
-    
+    if Constants.PACKAGE != '':
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBean"+str(idx)+'.java', 'w+')
+    else:
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBean"+str(idx)+'.java', 'w+')
+
     varType = {'android.widget.ImageButton': 'int' ,'android.widget.ImageView': 'int',\
               'android.widget.TextView': 'String', 'android.widget.Button': 'String'}
     varName = {'android.widget.ImageButton': 'icon' ,'android.widget.ImageView': 'image',\
@@ -103,14 +106,18 @@ def printListViewBean(leavesType,idx,appName):
     "\tpublic "+appName.capitalize()+"ListViewBean"+str(idx)+"("+params+") {\n"+\
     "\t\tsuper();\n"+constructor + "\t}\n" +  getterAndSetter+"}\n"
         
-    fTo.write("package com.example."+Constants.PACKAGE+"."+appName+";\n"+listViewBean)    
+    fTo.write("package com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME+";\n"+listViewBean)    
     
     return
     
     
 def printListViewBaseAdapter(listView,leavesType,idx,appName):
     listViewBean = ""
-    fTo=open(Constants.DIRECTORY+'/java/'+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+'.java', 'w+')
+    if Constants.PACKAGE != '':
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+'.java', 'w+')
+    else:
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+'.java', 'w+')
+
     imports = "import android.content.Context;\nimport android.view.LayoutInflater;\nimport android.view.View;\n"+\
     "import android.view.ViewGroup;\nimport android.widget.BaseAdapter;\nimport java.util.ArrayList;\nimport java.util.List;\n"
     
@@ -151,7 +158,7 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName):
         "\t\telse {\n\t\t\tholder = (ViewHolder) view.getTag();\n\t\t}\n\t\ttry {\n"+\
         setHolderItems+"\t\t} catch (Exception ex){\n\t\t}\n\t\treturn view;\n\t}\n}"
     
-    fTo.write("package com.example."+Constants.PACKAGE+"."+appName+";\n"+imports+listViewBean)
+    fTo.write("package com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME+";\n"+imports+listViewBean)
     return listViewBean
        
   
@@ -166,21 +173,32 @@ def findButtons(rootNode,buttonsIds):
 def printButtons(buttonsId):
     onClick = ""
     for buttonId in  buttonsId:
-        onClick += "\tpublic void clickMe"+str(buttonId)+"(View view){\n\t// onClick logic\n\t}\n"
+        onClick += "\tpublic void clickMe"+str(buttonId)+"(View view){\n\t// onClick logic\n"+\
+        "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+str(buttonId)+'"'+",Toast.LENGTH_SHORT).show();\n"+\
+        "\t}\n"
     return onClick
     
 def generateJava(rootNode,appName,actionBarOp):
-    if not os.path.exists(Constants.DIRECTORY+'/java'):
-            os.makedirs(Constants.DIRECTORY+'/java') 
-    fTo=open(Constants.DIRECTORY+'/java/'+appName.capitalize()+"Activity"+'.java', 'w+')
-    
-    package = "com.example."+Constants.PACKAGE+"."+appName
-    imports = "import android.os.Bundle;\n"+\
-    "import android.view.View;\n"
-    if Constants.PACKAGE == '':
-        "import androidx.appcompat.app.AppCompatActivity;\n"
+    if Constants.PACKAGE != '':
+        if not os.path.exists(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"):
+                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/") 
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"Activity"+'.java', 'w+')
     else:
-        "import android.support.v7.app.AppCompatActivity;\n"
+        if not os.path.exists(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"):
+                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/") 
+        fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+appName.capitalize()+"Activity"+'.java', 'w+')
+   
+    package = "com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME
+    if Constants.PACKAGE == '':
+        package = "com.example."+Constants.PROJECT_NAME
+    imports = "import android.os.Bundle;\n"+\
+    "import android.view.View;\n"+\
+    "import android.widget.Toast;\n" 
+    
+    if Constants.PACKAGE == '':
+        imports+= "import androidx.appcompat.app.AppCompatActivity;\n"
+    else:
+        imports+="import android.support.v7.app.AppCompatActivity;\n"
     
     classBody =""
     classBody += "\npublic class "+appName.capitalize()+"Activity"+" extends AppCompatActivity {\n\n"
@@ -191,7 +209,6 @@ def generateJava(rootNode,appName,actionBarOp):
     classBody+= printArrayList(len(listViews),appName)
     addedListItems=""
     for i in range(len(listViews)):
-        imports += "import "+package+"."+"ListViewBean"+str(i)+';\n'
         listItems,leavesType,selectedVarNames= printListItems(listViews[i],i)
         classBody+=listItems
         addedListItems = printAddingItems(listViews[i].id,selectedVarNames,i,appName)

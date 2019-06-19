@@ -32,7 +32,7 @@ def processSave(subdir, file):
     myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
     XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-5],file[len(file)-5])
     margin = 10
-    if Constants.DEBUG_MODE == 1 :
+    if Constants.DEBUG_MODE == True :
         
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
             os.makedirs(subdir+'/compOutputs'+file[:-4])
@@ -40,7 +40,7 @@ def processSave(subdir, file):
             os.makedirs(subdir+'/boxOutputs')
     height= img.shape[0]
     width= img.shape[1]
-    if Constants.DEBUG_MODE == 1 :
+    if Constants.DEBUG_MODE == True :
         j = 0
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
         for x,y,w,h in boxes:
