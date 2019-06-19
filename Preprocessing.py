@@ -13,3 +13,8 @@ def imageReadAndPreprocessingClassification(imgPath=None,imagee=None):
         img = np.array(img,dtype='float32')  
         img /= 255.
         return img
+
+def imageReadColors(imgPath=None):
+    img = image.load_img(imgPath)
+    img = np.array(img,dtype='float32')  
+    return img

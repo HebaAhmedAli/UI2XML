@@ -7,7 +7,7 @@ import os
 import copy
 import numpy as np
 from keras.preprocessing import image
-
+import time
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
@@ -58,10 +58,14 @@ def processSave(subdir, file):
         j+=1  
     cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
+startTime = time.time()
 subdir, dirs, _= next(os.walk(imagesPath))
 for direc in dirs:
     _,_, files= next(os.walk(subdir+'/'+direc))
     for file in files:
         imgPath = os.path.join(subdir, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
+            startTimeI = time.time()
             processSave(subdir+'/'+direc, file)
+            print(time.time()-startTimeI)
+print(time.time()-startTime)
