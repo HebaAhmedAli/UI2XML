@@ -5,6 +5,9 @@ import ComponentsExtraction.TextExtraction as TextExtraction
 import ModelClassification.Model as Model
 from PIL import Image
 import Utils
+import Preprocessing
+import numpy as np
+import cv2
 
 heightThrshold1 = 20
 heightThrshold2 = 40
@@ -14,7 +17,7 @@ margin = 10
 
 # Extract the boxes and text from given image -extracted components- and predict them.
 def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
-    extratctedBoxes,addedManuallyBool,shapeFeature=BoxesExtraction.extractBoxes(image)
+    extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
@@ -22,18 +25,29 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     height=image.shape[0]
     width=image.shape[1]
     for x,y,w,h in extratctedBoxes:
+        features = []
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
-        noOfColors = Utils.getNoOfColors(croppedImageColor)
+        noOfColorsNorm = Utils.getNoOfColors(croppedImageColor)
         text = TextExtraction.extractText(croppedImage)
         textFeature = 0
         if text != "":
             textFeature = 1
-        pedictedComponents.append(Model.makeAprediction(invVocab,shapeFeature,textFeature,noOfColors,croppedImage,model))
+        features.append(noOfColorsNorm)
+        features.append(textFeature)
+        features += extractShapeFeatures(croppedImage)
+        pedictedComponents.append(Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model))
         extractedText.append(TextExtraction.extractText(croppedImage))
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 
+
+def extractShapeFeatures(img):
+    edges=Preprocessing.preProcessEdges(img)
+    (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
+    c = max(contours, key = cv2.contourArea)
+    shapeFeature=Utils.detectShapeAndFeature(c)
+    return shapeFeature
         
 def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \

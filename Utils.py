@@ -127,7 +127,6 @@ def mostFrequentInList(dictt,ocuurences,level):
 def detectShapeAndFeature(cnt):
     M = cv2.moments(cnt)
     shape = 'unknown'
-    feature = 0
     if M['m00'] > 0:
         # calculate perimeter using
         peri = cv2.arcLength(cnt, True)
@@ -139,25 +138,32 @@ def detectShapeAndFeature(cnt):
         aspectRatio = float(width) / height
         if len(vertices) == 4 and aspectRatio >= 0.95 and aspectRatio <= 1.05:
             shape = "square"
-            feature = 1
         elif len(vertices) > 5 and circularity >= 0.7:
             shape = "circle"
-            feature = circularity
         else:
             shape = "unknown"
         # return the name of the shape
-    return (shape,feature)
+    features = []
+    if shape == "square":
+        features.append(1)
+    else:
+        features.append(0)
+    if shape == "circle":
+        features.append(circularity)
+    else:
+        features.append(0)
+    return features
 
 def getNoOfColors(img):
+    dictMean = 
+    dictStd = 
     B = copy.copy(img)
     B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
     rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
     hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
-    # Convert given list into dictionary 
-    # it's output will be like {'ccc':1,'aaa':3,'bbb':2}
     dictt = Counter(np.array(hexArr))
-    return len(dictt)
+    return (len(dictt)-dictMean)/dictStd
 
 def getMostAndSecondMostColors(img,firstOnly):
     B = copy.copy(img)
