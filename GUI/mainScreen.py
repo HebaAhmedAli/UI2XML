@@ -43,10 +43,15 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         lay = QVBoxLayout(self.centralwidget)
         lay.addWidget(self.scrollarea)
 
-        self.dockPictuers.setMinimumWidth(200)
+        self.dockPictuers.setMinimumWidth(350)
         self.dockDesign.setMinimumWidth(350)
         text = open('activity_twitter.xml').read()
-        self.textBrowser.setPlainText(text)   
+        self.textBrowser.setPlainText(text)
+        path = "../data"
+        model = QFileSystemModel()
+        model.setRootPath((QDir.rootPath()))
+        self.treeView.setModel(model)
+        self.treeView.setRootIndex(model.index(path))
 
     def setDirectory(self,url):
         self.directory= url

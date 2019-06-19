@@ -179,16 +179,20 @@ color: &quot;white&quot;;</string>
     <widget class="QTreeView" name="treeView">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>20</y>
-       <width>171</width>
-       <height>131</height>
+       <width>271</width>
+       <height>161</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">border: 2px solid  rgb(156,156,156);
 border-radius: 20%;
-background-color: &quot;white&quot;;</string>
+background-color: &quot;white&quot;;
+color:&quot;gray&quot;;</string>
+     </property>
+     <property name="allColumnsShowFocus">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>

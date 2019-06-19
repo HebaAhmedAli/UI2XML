@@ -93,10 +93,12 @@ class Ui_mainWindow(object):
         self.dockWidgetContents_2 = QtGui.QWidget()
         self.dockWidgetContents_2.setObjectName(_fromUtf8("dockWidgetContents_2"))
         self.treeView = QtGui.QTreeView(self.dockWidgetContents_2)
-        self.treeView.setGeometry(QtCore.QRect(10, 20, 171, 131))
+        self.treeView.setGeometry(QtCore.QRect(30, 20, 271, 161))
         self.treeView.setStyleSheet(_fromUtf8("border: 2px solid  rgb(156,156,156);\n"
 "border-radius: 20%;\n"
-"background-color: \"white\";"))
+"background-color: \"white\";\n"
+"color:\"gray\";"))
+        self.treeView.setAllColumnsShowFocus(False)
         self.treeView.setObjectName(_fromUtf8("treeView"))
         self.dockPictuers.setWidget(self.dockWidgetContents_2)
         mainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockPictuers)
