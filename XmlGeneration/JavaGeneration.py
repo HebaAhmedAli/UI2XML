@@ -76,7 +76,7 @@ def printAddingItems(listViewId,selectedVarNames,idx,appName):
     
     return items
     
-def printListViewBean(leavesType,idx,appName):
+def printListViewBean(leavesType,idx,appName,package):
     listViewBean = ""
     if Constants.PACKAGE != '':
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBean"+str(idx)+'.java', 'w+')
@@ -106,12 +106,12 @@ def printListViewBean(leavesType,idx,appName):
     "\tpublic "+appName.capitalize()+"ListViewBean"+str(idx)+"("+params+") {\n"+\
     "\t\tsuper();\n"+constructor + "\t}\n" +  getterAndSetter+"}\n"
         
-    fTo.write("package com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME+";\n"+listViewBean)    
+    fTo.write("package "+package+";\n"+listViewBean)    
     
     return
     
     
-def printListViewBaseAdapter(listView,leavesType,idx,appName):
+def printListViewBaseAdapter(listView,leavesType,idx,appName,package):
     listViewBean = ""
     if Constants.PACKAGE != '':
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+'.java', 'w+')
@@ -158,7 +158,7 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName):
         "\t\telse {\n\t\t\tholder = (ViewHolder) view.getTag();\n\t\t}\n\t\ttry {\n"+\
         setHolderItems+"\t\t} catch (Exception ex){\n\t\t}\n\t\treturn view;\n\t}\n}"
     
-    fTo.write("package com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME+";\n"+imports+listViewBean)
+    fTo.write("package com.example."+package+";\n"+imports+listViewBean)
     return listViewBean
        
   
@@ -212,8 +212,8 @@ def generateJava(rootNode,appName,actionBarOp):
         listItems,leavesType,selectedVarNames= printListItems(listViews[i],i)
         classBody+=listItems
         addedListItems = printAddingItems(listViews[i].id,selectedVarNames,i,appName)
-        printListViewBean(leavesType,i,appName)
-        printListViewBaseAdapter(listViews[i],leavesType,i,appName)        
+        printListViewBean(leavesType,i,appName,package)
+        printListViewBaseAdapter(listViews[i],leavesType,i,appName,package)        
         
     
     classBody+= "\t@Override\n"+\
