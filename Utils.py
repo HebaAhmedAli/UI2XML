@@ -6,8 +6,9 @@ from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 import numpy as np
+import cv2
 import copy
-
+import math
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
         #Indexes of first diagonal
@@ -121,10 +122,45 @@ def mostFrequentInList(dictt,ocuurences,level):
         if val == mostFreq: 
             dictt.pop(key, None)
             return key
+    return "-1"
+
+def detectShapeAndFeature(cnt):
+    M = cv2.moments(cnt)
+    shape = 'unknown'
+    feature = 0
+    if M['m00'] > 0:
+        # calculate perimeter using
+        peri = cv2.arcLength(cnt, True)
+        area = cv2.contourArea(cnt)
+        circularity  = 4*math.pi*(area/(peri*peri))
+        # apply contour approximation and store the result in vertices
+        vertices = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+        x, y, width, height = cv2.boundingRect(vertices)
+        aspectRatio = float(width) / height
+        if len(vertices) == 4 and aspectRatio >= 0.95 and aspectRatio <= 1.05:
+            shape = "square"
+            feature = 1
+        elif len(vertices) > 5 and circularity >= 0.7:
+            shape = "circle"
+            feature = circularity
+        else:
+            shape = "unknown"
+        # return the name of the shape
+    return (shape,feature)
+
+def getNoOfColors(img):
+    B = copy.copy(img)
+    B = B.astype(int)
+    B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
+    rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
+    hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
+    # Convert given list into dictionary 
+    # it's output will be like {'ccc':1,'aaa':3,'bbb':2}
+    dictt = Counter(np.array(hexArr))
+    return len(dictt)
 
 def getMostAndSecondMostColors(img,firstOnly):
     B = copy.copy(img)
-    #B *= 255
     B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
     rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
@@ -169,10 +205,25 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaSecond = second
         level += 1
     return '#'+first,'#'+second
-'''
-# For Testing.
 
-img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/ScreenShots/ourTest/compOutputsface1A/5-android.widget.EditText.jpg')
+# For Testing.
+'''
+img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/17-android.widget.ImageView.jpg')
 img = np.array(img)  
-print(getMostAndSecondMostColors(img,False))
+print(getNoOfColors(img[10:img.shape[0]-10,10:img.shape[1]-10]))
+'''
+'''
+first = "000000"
+firstRgb = tuple(int(first[i:i+2], 16) for i in (0, 2, 4))
+firstRgbs = sRGBColor(firstRgb[0]/255.0,firstRgb[1]/255.0,firstRgb[2]/255.0)
+color1Lab = convert_color(firstRgbs, LabColor)
+second = "556b2f"
+secondRgb = tuple(int(second[i:i+2], 16) for i in (0, 2, 4))
+
+secondRgbs = sRGBColor(secondRgb[0]/255.0,secondRgb[1]/255.0,secondRgb[2]/255.0)
+# Convert from RGB to Lab Color Space
+color2Lab = convert_color(secondRgbs, LabColor)
+# Find the color difference
+deltaE = delta_e_cie2000(color1Lab, color2Lab)
+print(deltaE)
 '''

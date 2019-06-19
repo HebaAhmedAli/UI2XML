@@ -28,7 +28,7 @@ def processSave(subdir, file):
     #img = np.copy(imgXML)
     #imgCopy = np.copy(imgXML)
     file = file.replace('.jpeg','.jpg')
-    boxes, texts ,addedManuallyBool ,predictedComponents= ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,model,invVocab)
+    boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
     margin = 10
     if Constants.DEBUG_MODE == 1 :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):

@@ -13,8 +13,8 @@ margin = 10
 
 
 # Extract the boxes and text from given image -extracted components- and predict them.
-def extractComponentsAndPredict(image,imageCopy,model,invVocab):
-    extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
+def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
+    extratctedBoxes,addedManuallyBool,shapeFeature=BoxesExtraction.extractBoxes(image)
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
@@ -23,7 +23,13 @@ def extractComponentsAndPredict(image,imageCopy,model,invVocab):
     width=image.shape[1]
     for x,y,w,h in extratctedBoxes:
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        pedictedComponents.append(Model.makeAprediction(invVocab,croppedImage,model))
+        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
+        noOfColors = Utils.getNoOfColors(croppedImageColor)
+        text = TextExtraction.extractText(croppedImage)
+        textFeature = 0
+        if text != "":
+            textFeature = 1
+        pedictedComponents.append(Model.makeAprediction(invVocab,shapeFeature,textFeature,noOfColors,croppedImage,model))
         extractedText.append(TextExtraction.extractText(croppedImage))
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 

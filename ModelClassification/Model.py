@@ -36,7 +36,7 @@ def evaluateModel(xTest,yTest):
     print(model.metrics_names)
     print ("Evaluation = " + str(evaluate))
     
-def makeAprediction(invVocab,image=None,model=None,imgPath=None):
+def makeAprediction(invVocab,shapeFeature,textFeature,noOfColors,image=None,model=None,imgPath=None):
     if model==None:
         model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5')
     inputImage = Preprocessing.imageReadAndPreprocessingClassification(imgPath,image)
