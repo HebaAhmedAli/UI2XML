@@ -176,8 +176,11 @@ def generateJava(rootNode,appName,actionBarOp):
     
     package = "com.example."+Constants.PACKAGE+"."+appName
     imports = "import android.os.Bundle;\n"+\
-    "import android.support.v7.app.AppCompatActivity;\n"+\
     "import android.view.View;\n"
+    if Constants.PACKAGE == '':
+        "import androidx.appcompat.app.AppCompatActivity;\n"
+    else:
+        "import android.support.v7.app.AppCompatActivity;\n"
     
     classBody =""
     classBody += "\npublic class "+appName.capitalize()+"Activity"+" extends AppCompatActivity {\n\n"
@@ -203,7 +206,10 @@ def generateJava(rootNode,appName,actionBarOp):
     "\t\tsetContentView(R.layout.activity_"+appName+");\n"
     
     if(actionBarOp == 'A'):
-        imports+= "import android.support.v7.app.ActionBar;\n"
+        if Constants.PACKAGE == '':
+            imports+= "import androidx.appcompat.app.ActionBar;\n"
+        else:    
+            imports+= "import android.support.v7.app.ActionBar;\n"
         onCreateBody+= printActionBar(appName)   
     
     onCreateBody+= addedListItems
