@@ -30,7 +30,7 @@ def processSave(subdir, file):
     file = file.replace('.jpeg','.jpg')
     boxes, texts ,addedManuallyBool ,predictedComponents= ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,model,invVocab)
     margin = 10
-    if Constants.DEBUG_MODE == 1 :
+    if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
             os.makedirs(subdir+'/compOutputsAll'+file[:-4])
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
