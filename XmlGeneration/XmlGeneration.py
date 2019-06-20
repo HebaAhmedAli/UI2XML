@@ -90,14 +90,6 @@ def setWeights(groupedNodes,sortAttr,screenDim,root,img=None,notLeafChilds=None)
                 nextY = groupedNodes[i+1].y
             ratio = (nextY - (groupedNodes[i].y)) / screenDim
             weight = getWeightFromRatio(ratio,0.15)
-            if notLeafChilds:
-                groupedNodes[i].x = 0  
-                groupedNodes[i].width = img.shape[1]
-            if not Constants.HAND_DRAWN:
-                imgClean = clearInnerBoxes(groupedNodes[i],groupedNodes[i].childNodes,img)
-                groupedNodes[i].backgroundColor = Utils.getMostAndSecondMostColors(imgClean,True)
-            else:
-                groupedNodes[i].backgroundColor = "#ffffff"
         groupedNodes[i].weight = weight
     return groupedNodes
 
@@ -206,37 +198,43 @@ def createParentNodeVertical(groupedNodes,imgH,parentType,img,notLeafChilds):
     parentNode.childNodes = groupedNodes
     return parentNode
  
-def createParentNodeHorizontal(groupedNodes,imgW):
+def createParentNodeHorizontal(groupedNodes,imgW,img):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutHorizontal"
     #parentNode.width = "match_parent"
-    minX=1000000
-    maxX=0
     minY=1000000
     maxY=0
     for i in range(len(groupedNodes)):
-        minX=min(minX,groupedNodes[i].x)
-        maxX=max(maxX,groupedNodes[i].x+int(groupedNodes[i].width))
         minY=min(minY,groupedNodes[i].y)
         maxY=max(maxY,groupedNodes[i].y+int(groupedNodes[i].height))
-    parentNode.x = minX
-    parentNode.width = maxX - minX
+    parentNode.x = 0 
+    parentNode.width = imgW
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
         if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 30:
             parentNode.gravity = "center"
         parentNode.childNodes = groupedNodes
+        if not Constants.HAND_DRAWN:
+            imgClean = clearInnerBoxes(parentNode,parentNode.childNodes,img)
+            parentNode.backgroundColor = Utils.getMostAndSecondMostColors(imgClean,True)
+        else:
+            parentNode.backgroundColor = "#ffffff"
         return parentNode
     groupedNodes = setWeights(groupedNodes,'x',imgW,False)
     parentNode.childNodes = groupedNodes
+    if not Constants.HAND_DRAWN:
+        imgClean = clearInnerBoxes(parentNode,parentNode.childNodes,img)
+        parentNode.backgroundColor = Utils.getMostAndSecondMostColors(imgClean,True)
+    else:
+        parentNode.backgroundColor = "#ffffff"
     return parentNode
 
 def createLeavesParents(groupedNodes,img):
     parentNodes = []
     for i in range(len(groupedNodes)):
         groupedNodesVertical = groupVerticalLeafNodes(groupedNodes[i],img.shape[0],img)
-        parentNode = createParentNodeHorizontal(groupedNodesVertical,img.shape[1])
+        parentNode = createParentNodeHorizontal(groupedNodesVertical,img.shape[1],img)
         parentNodes.append(parentNode)
     return parentNodes
     
