@@ -419,7 +419,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                 printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+str(0)+str(i))
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
-            idd = 0
+            idd = 1
             for i in range(1,len(parentNode.childNodes)):
                 if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadioGroup':
                     printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd),idd)
