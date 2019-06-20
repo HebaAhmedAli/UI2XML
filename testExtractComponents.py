@@ -44,8 +44,9 @@ def processSave(subdir, file):
     if Constants.DEBUG_MODE == True :
         fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
     boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
-    XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-5],file[len(file)-5])
-    
+    parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-5],file[len(file)-5])
+    #print(Constants.boxToGui,Constants.idToGui)
+    XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42],[19, 201, 502, 64]],['android.widget.'+"ImageButton",'android.widget.'+"ImageView"],['ImageView_0_0_0','EditText_0_2_0'],imgXML,file[:-5],file[len(file)-5])
     if Constants.DEBUG_MODE == True :
         j = 0
         for x,y,w,h in boxes:
