@@ -380,7 +380,11 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCase(parentNode,tabsString,imgH)+'>\n')
     if len(parentNode.childNodes)==0:
-        fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
+        typeOfNode = getType(parentNode.nodeType)
+        fTo.write(tabsString+"</"+ typeOfNode+'>'+'\n')
+        Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
+        Constants.idToGui.append(parentNode.id)
+        Constants.predictedToGui.append(typeOfNode)
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
@@ -451,9 +455,15 @@ def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     parentNode,parentNodeAsIs=buildHierarchy(boxes,texts,predictedComponents,img)
     if Constants.SMART:
+        Constants.boxToGui = []
+        Constants.predictedToGui = []
+        Constants.idToGui = []
         mapToXml(parentNode,appName,img.shape[0],actionBarOp)
         JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     if Constants.AS_IS:
+        Constants.boxToGui = []
+        Constants.predictedToGui = []
+        Constants.idToGui = []
         mapToXmlAsIs(parentNodeAsIs,appName,img.shape[0],'N')
     # To test.
     # printHierarchy(parentNode,appName)

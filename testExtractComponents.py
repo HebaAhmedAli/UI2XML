@@ -41,12 +41,12 @@ def processSave(subdir, file):
     height= img.shape[0]
     width= img.shape[1]
     
-    if Constants.DEBUG_MODE == 1 :
+    if Constants.DEBUG_MODE == True :
         fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
     boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
     XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-5],file[len(file)-5])
     
-    if Constants.DEBUG_MODE == 1 :
+    if Constants.DEBUG_MODE == True :
         j = 0
         for x,y,w,h in boxes:
             # testing: print the cropped in folder
