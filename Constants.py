@@ -8,5 +8,5 @@ PACKAGE = 'feryal'
 PROJECT_NAME = "hello"
 DEBUG_MODE = False
 HAND_DRAWN = False
-AS_IS = False
+AS_IS = True
 SMART = True

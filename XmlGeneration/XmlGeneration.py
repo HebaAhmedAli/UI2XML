@@ -272,7 +272,7 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
     parentNode.id = myIndex
-    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+'_'+str(parentNode.id) \
+    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+'_'+parentNode.id \
                 +'"\n'+tabsString+'\t' + \
                 'android:padding="5dp"'+'\n'+tabsString+'\t' 
     Constants.ID += 1         
@@ -361,7 +361,7 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
                                     
     return returnString
 
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -393,10 +393,12 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex):
         +'\t'+'android:layout_height = "match_parent"\n'\
         +'\t'+'android:orientation = "vertical"'+'>\n'
         fToListView.write(fileOuput)            
-        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex+str(0)))
+        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex+str(0+specialId)))
         fToListView.write("</LinearLayout>"+'\n')    
         fToListView.close()    
-        
+    elif parentNode.nodeType == 'android.widget.RadioGroup':
+        for i in range(len(parentNode.childNodes)):
+            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex,myIndex+str(i+specialId))
     else:
         if actionBarOp == 'A' and tabs == 0:
             fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
@@ -416,22 +418,28 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex):
             for i in range(1,len(parentNode.childNodes)):
                 printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(i))
         else:
+            idd= 0
             for i in range(len(parentNode.childNodes)):
-                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(i))
+                if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadiGroup':
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex,idd)
+                    idd += len(parentNode.childNodes[i].childNodes)
+                else:
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd))
+                    idd += 1
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"-1")
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
     return
 
 def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layoutAsIs'):
             os.makedirs(Constants.DIRECTORY+'/layoutAsIs') 
     fTo=open(Constants.DIRECTORY+'/layoutAsIs/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"-1")
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
     return
     
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
