@@ -19,7 +19,32 @@
   <property name="styleSheet">
    <string notr="true">background-color:&quot;grey&quot;;</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>9</y>
+      <width>361</width>
+      <height>421</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QListWidget" name="listWidget"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -114,7 +139,6 @@
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockDesign">
    <property name="font">
     <font>
@@ -153,50 +177,7 @@ border-radius: 20%;</string>
     </widget>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockPictuers">
-   <property name="font">
-    <font>
-     <family>URW Gothic L</family>
-     <pointsize>14</pointsize>
-     <weight>75</weight>
-     <italic>false</italic>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border: 5px solid  rgb(66, 138, 255);
-border-radius: 20%;
-background-color: &quot;white&quot;;
-color: &quot;white&quot;;</string>
-   </property>
-   <property name="windowTitle">
-    <string>Project</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <widget class="QTreeView" name="treeView">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>271</width>
-       <height>161</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">border: 2px solid  rgb(156,156,156);
-border-radius: 20%;
-background-color: &quot;white&quot;;
-color:&quot;gray&quot;;</string>
-     </property>
-     <property name="allColumnsShowFocus">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </widget>
-  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
    <property name="text">
     <string>New</string>

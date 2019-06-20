@@ -12,7 +12,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         # Placement of the uploaded image
         self.indexColumn = 0
         self.indexRow = 0
-        self.maxRowSize = 6
+        self.maxRowSize = 1
 
         self.gridData = QWidget()
         self.Layout = QVBoxLayout()
@@ -31,27 +31,23 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         newLine = QHBoxLayout()
         self.horizontalLayouts.append(newLine)
         self.Layout.addLayout(self.horizontalLayouts[0])
+        self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
 
         self.statusbarwindow = QStatusBar()
         self.statusbarwindow.setSizeGripEnabled(False)
 
-        stylesheet = \
-            "QLabel {\n" \
-            + "color: red;\n" \
-            + "}"
-        self.statusbarwindow.setStyleSheet(stylesheet)
         lay = QVBoxLayout(self.centralwidget)
         lay.addWidget(self.scrollarea)
 
-        self.dockPictuers.setMinimumWidth(350)
+        # self.dockPictuers.setMinimumWidth(350)
         self.dockDesign.setMinimumWidth(350)
-        text = open('activity_twitter.xml').read()
-        self.textBrowser.setPlainText(text)
-        path = "../data"
-        model = QFileSystemModel()
-        model.setRootPath((QDir.rootPath()))
-        self.treeView.setModel(model)
-        self.treeView.setRootIndex(model.index(path))
+        # text = open('activity_twitter.xml').read()
+        # self.textBrowser.setPlainText(text)
+        # path = "../data"
+        # model = QFileSystemModel()
+        # model.setRootPath((QDir.rootPath()))
+        # self.treeView.setModel(model)
+        # self.treeView.setRootIndex(model.index(path))
 
     def setDirectory(self,url):
         self.directory= url
@@ -119,14 +115,13 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 numOfHLayouts = len(self.horizontalLayouts)
                 newimage = imageBox(self.numOfImages)
                 self.numOfImages = self.numOfImages+1
+                imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
+                self.horizontalLayouts[self.indexRow].addWidget(imagebox)
 
                 if (self.horizontalLayouts[numOfHLayouts -1]).count() < self.maxRowSize -1 :
-                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
-                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
                     self.indexColumn = self.indexColumn + 1
                 else:
                     imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
-                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
                     self.indexColumn = 0
                     self.indexRow = self.indexRow + 1
 
@@ -134,3 +129,8 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                     self.horizontalLayouts.append(newLine)
                     self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
                     self.Layout.addLayout(self.horizontalLayouts[self.indexRow])
+
+    # @pyqtSlot(int)
+    # def on_deleteButton_clicked(self, index):
+        # self.horizontalLayouts[index/self.maxRowSize][index%self.maxRowSize].
+        
