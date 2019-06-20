@@ -8,7 +8,7 @@ import Utils
 import Preprocessing
 import numpy as np
 import cv2
-
+import Constants
 heightThrshold1 = 20
 heightThrshold2 = 40
 margin = 10
@@ -45,6 +45,10 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
 def extractShapeFeatures(img):
     edges=Preprocessing.preProcessEdges(img)
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
+    if len(contours) == 0:
+      Constants.noContors+=1
+      print("noContors: ",str(Constants.noContors))
+      return [0,0]
     c = max(contours, key = cv2.contourArea)
     shapeFeature=Utils.detectShapeAndFeature(c)
     return shapeFeature

@@ -10,3 +10,4 @@ DEBUG_MODE = False
 HAND_DRAWN = False
 AS_IS = False
 SMART = True
+noContors = 0
