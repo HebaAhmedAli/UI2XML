@@ -155,8 +155,8 @@ def detectShapeAndFeature(cnt):
     return features
 
 def getNoOfColors(img):
-    dictMean = 
-    dictStd = 
+    dictMean = 3122.3086264194926
+    dictStd = 20159.43 
     B = copy.copy(img)
     B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))
