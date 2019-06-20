@@ -29,7 +29,6 @@ def preProcess(image):
 def extractBoxes(img):
     allBoxes=[]
     addedManuallyBool=[]
-    shapeFeatures = []
     morph,edges=preProcess(img)
     #finding the contours
     (_, contours , _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
@@ -38,14 +37,12 @@ def extractBoxes(img):
         cv2.rectangle(img,(x,y),(x+w,y+h),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),2)
         allBoxes.append([x, y, w, h])
         addedManuallyBool.append(False)
-        shapeFeatures.append(Utils.detectShapeAndFeature(cnt))
         if h <= editTextThresholdHeight:
             #cv2.rectangle(img,(x,y-editTextThresholdAddedHeight),(x+w,y+h+editTextThresholdAddedHeight),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),2)
             allBoxes.append([x, y-editTextThresholdAddedHeight, w, h+editTextThresholdAddedHeight])
             addedManuallyBool.append(True)
-            shapeFeatures.append([0,0])
     allBoxes,addedManuallyBool = zip(*sorted(zip(allBoxes,addedManuallyBool), key=lambda x: boxArea(x),reverse=True))
-    return allBoxes,addedManuallyBool,shapeFeatures
+    return allBoxes,addedManuallyBool
 
 def boxArea(x):
     return x[0][2]*x[0][3]

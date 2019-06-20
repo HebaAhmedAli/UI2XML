@@ -263,7 +263,7 @@ def buildHierarchy(boxes,texts,predictedComponents,img):
     rootNodeAsIs = createRoot(parentNodes,img.shape[0],True,img)
     return rootNode,rootNodeAsIs
 
-def getTypeAndOriAndID(parentNode,tabsString):
+def getTypeAndOriAndID(parentNode,tabsString,myIndex):
     if parentNode.nodeType == 'LinearLayoutVertical':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t' 
@@ -271,8 +271,8 @@ def getTypeAndOriAndID(parentNode,tabsString):
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
-    parentNode.id =  Constants.ID
-    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+str(parentNode.id) \
+    parentNode.id = myIndex
+    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+'_'+str(parentNode.id) \
                 +'"\n'+tabsString+'\t' + \
                 'android:padding="5dp"'+'\n'+tabsString+'\t' 
     Constants.ID += 1         
@@ -346,22 +346,22 @@ def printSpecialCaseListView(parentNode,tabsString,imgH):
       
     return attributeString
 
-def printListViewChildNode(parentNode,myParentType,tabs,imgH):
+def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
     returnString=""
-    returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString)+\
+    returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCaseListView(parentNode,tabsString,imgH)+'>\n'                                  
     for i in range(len(parentNode.childNodes)) :                                   
-        returnString += printListViewChildNode(parentNode.childNodes[i],parentNode.nodeType,2,imgH)
+        returnString += printListViewChildNode(parentNode.childNodes[i],parentNode.nodeType,2,imgH,myIndex+str(i))
     returnString+= tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n'
                                     
     return returnString
 
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -375,7 +375,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):
                   +'\t'+'android:orientation = "vertical"\n'
                   +'\t'+'tools:context = "'+'.'+myParentType.capitalize()+'Activity"'+'>\n')
     else:
-        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString)+\
+        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCase(parentNode,tabsString,imgH)+'>\n')
@@ -393,7 +393,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):
         +'\t'+'android:layout_height = "match_parent"\n'\
         +'\t'+'android:orientation = "vertical"'+'>\n'
         fToListView.write(fileOuput)            
-        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH))
+        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex+str(0)))
         fToListView.write("</LinearLayout>"+'\n')    
         fToListView.close()    
         
@@ -410,28 +410,28 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp):
                 +'\t'+'android:orientation = "horizontal"'+'>\n'
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
-                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp)
+                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+str(0)+str(i))
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
             for i in range(1,len(parentNode.childNodes)):
-                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp)
+                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(i))
         else:
             for i in range(len(parentNode.childNodes)):
-                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp)
+                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(i))
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp)
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"-1")
     return
 
 def mapToXmlAsIs(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layoutAsIs'):
             os.makedirs(Constants.DIRECTORY+'/layoutAsIs') 
     fTo=open(Constants.DIRECTORY+'/layoutAsIs/'+'activity_'+appName+'.xml', 'w+')
-    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp)
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"-1")
     return
     
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):

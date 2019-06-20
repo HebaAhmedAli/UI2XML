@@ -8,6 +8,6 @@ PACKAGE = ''
 PROJECT_NAME = "gp"
 DEBUG_MODE = False
 HAND_DRAWN = False
-AS_IS = False
+AS_IS = True
 SMART = True
 noContors = 0
