@@ -86,7 +86,10 @@ def extractBoxes(img,texts, txtBoxes):
     # Size threshold.
     min_size = 200 # pixels
     biggestBoxArea = []
-    maxArea = 0
+    minxBox = 10000000
+    maxxBox = 0
+    minyBox = 10000000
+    maxyBox = 0
     for i in range(1, numcc + 1):
         py, px = np.nonzero(lbl == i)
         if len(py) < min_size:
@@ -97,13 +100,22 @@ def extractBoxes(img,texts, txtBoxes):
         cv2.rectangle(img, (xmin,ymin), (xmax,ymax), randColor,2)
         allBoxes.append([xmin, ymin, xmax-xmin, ymax-ymin])
         isText.append("")
-        if (xmax-xmin)*(ymax-ymin) > maxArea:
-            maxArea = (xmax-xmin)*(ymax-ymin)
-            biggestBoxArea = [xmin, ymin, xmax-xmin, ymax-ymin]
-    txtBoxes,texts = mergeTextBoxsForSameWord(txtBoxes,texts,biggestBoxArea[2])
+        minxBox = min(xmin,minxBox)
+        maxxBox = max(xmax,maxxBox)
+        minyBox = min(ymin,minyBox)
+        maxyBox = max(ymax,maxyBox)
+    txtBoxes,texts = mergeTextBoxsForSameWord(txtBoxes,texts,maxxBox-minxBox)
+    for i in range(len(txtBoxes)):
+        minxBox = min(txtBoxes[i][0],minxBox)
+        maxxBox = max(txtBoxes[i][0]+txtBoxes[i][2],maxxBox)
+        minyBox = min(txtBoxes[i][1],minyBox)
+        maxyBox = max(txtBoxes[i][1]+txtBoxes[i][3],maxyBox)
+    biggestBoxArea.append([minxBox, minyBox, maxxBox-minxBox, maxyBox-minyBox])
     # Add isText and textBoxes
     allBoxes += txtBoxes
     isText += texts
     allBoxes,isText = zip(*sorted(zip(allBoxes,isText), key=lambda x: boxArea(x),reverse=True))
+    biggestBoxArea+=allBoxes[1:len(allBoxes)]
+    allBoxes = biggestBoxArea
     return allBoxes,isText
 
