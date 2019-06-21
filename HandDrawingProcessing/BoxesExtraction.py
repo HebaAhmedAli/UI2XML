@@ -34,6 +34,8 @@ def getFirstUnvisitedIndex(visited):
 def groupHorizontalTexts(boxes,texts):
     groupedTexts = []
     groupedBoxs = []
+    if (len(boxes)) == 0:
+        return boxes,texts
     visited = [False for i in range(len(boxes))]
     indexUnvisited = 0
     while(indexUnvisited!=-1):
