@@ -2,7 +2,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 class delButton(QPushButton):
-    delete = pyqtSignal(int)
+    deleted = pyqtSignal(int)
     def __init__(self, parent, imageIndex):
         super(delButton, self).__init__(parent)
         self.setText("Delete me!")
@@ -11,8 +11,8 @@ class delButton(QPushButton):
 
     def deleteImageBox(self):
         print("iam deleting")
-        self.delete.emit(self.index)
-        self.parent.setParent(None)
+        self.deleted.emit(self.index)
+        # self.parent.setParent(None)
 
 class convertButton(QPushButton):
     def __init__(self, parent):

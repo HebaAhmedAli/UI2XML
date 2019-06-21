@@ -114,6 +114,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 self.GroupBox = QGroupBox()
                 numOfHLayouts = len(self.horizontalLayouts)
                 newimage = imageBox(self.numOfImages)
+                newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
                 self.numOfImages = self.numOfImages+1
                 imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
                 self.horizontalLayouts[self.indexRow].addWidget(imagebox)
@@ -121,7 +122,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 if (self.horizontalLayouts[numOfHLayouts -1]).count() < self.maxRowSize -1 :
                     self.indexColumn = self.indexColumn + 1
                 else:
-                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
                     self.indexColumn = 0
                     self.indexRow = self.indexRow + 1
 
@@ -129,8 +129,9 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                     self.horizontalLayouts.append(newLine)
                     self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
                     self.Layout.addLayout(self.horizontalLayouts[self.indexRow])
+                
 
-    # @pyqtSlot(int)
-    # def on_deleteButton_clicked(self, index):
-        # self.horizontalLayouts[index/self.maxRowSize][index%self.maxRowSize].
+    @pyqtSlot(int)
+    def on_deleteButton_clicked(self, index):
+        print("Deleting from parent")
         
