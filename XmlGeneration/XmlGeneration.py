@@ -384,7 +384,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
-        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+str(Constants.ID-1)+'.xml', 'w+')
+        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+myIndex+'.xml', 'w+')
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
         +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
@@ -393,12 +393,12 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         +'\t'+'android:layout_height = "match_parent"\n'\
         +'\t'+'android:orientation = "vertical"'+'>\n'
         fToListView.write(fileOuput)            
-        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex+str(0+specialId)))
+        fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex[:-1]+str(0+specialId)))
         fToListView.write("</LinearLayout>"+'\n')    
         fToListView.close()    
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
-            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex,myIndex+str(i+specialId))
+            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex,myIndex[:-1]+str(i+specialId))
     else:
         if actionBarOp == 'A' and tabs == 0:
             fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
@@ -415,13 +415,19 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                 printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+str(0)+str(i))
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
+            idd = 0
             for i in range(1,len(parentNode.childNodes)):
-                printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(i))
+                if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadioGroup':
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd),idd)
+                    idd += len(parentNode.childNodes[i].childNodes)
+                else:
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd))
+                    idd += 1
         else:
             idd= 0
             for i in range(len(parentNode.childNodes)):
-                if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadiGroup':
-                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex,idd)
+                if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadioGroup':
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd),idd)
                     idd += len(parentNode.childNodes[i].childNodes)
                 else:
                     printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+str(idd))
