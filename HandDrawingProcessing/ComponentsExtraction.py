@@ -17,31 +17,42 @@ def filterComponentsAndPredict(allBoxes,texts):
     filteredTexts = []
     boxesInBackets,textsInBackets = backetOverlappingBoxes(allBoxes,texts)
     for i in range(len(boxesInBackets)):
-        if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X":
+        if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X"\
+            and textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O":
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
             predictedComonents.append("android.widget.TextView")
         elif len(boxesInBackets[i])==1:
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
-            if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4:
+            if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X":
                 predictedComonents.append("android.widget.EditText")
+            elif textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O":
+                if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or textsInBackets[i][0] == "x" or textsInBackets[i][0] == "X":
+                    predictedComonents.append("android.widget.ImageView")
+                else:
+                    predictedComonents.append("android.widget.CheckBox")
             else:
-                predictedComonents.append("android.widget.ImageView")
+                predictedComonents.append("android.widget.RadioButton")
         else:
             text,textAreaRatio,textIndex = getFirstTextBoxAndRatio(boxesInBackets[i],textsInBackets[i])
             filteredTexts.append(text)
-            if textAreaRatio < 0.9 and text != "" and text != "x" and text != "X":
+            if textAreaRatio < 0.9 and text != "" and text != "x" and text != "X" and text != "o" and text != "O":
                 predictedComonents.append("android.widget.Button")
                 filteredBoxes.append(boxesInBackets[i][0])
-            elif text != "" and text != "x" and text != "X":
+            elif text != "" and text != "x" and text != "X" and text != "o" and text != "O":
                 predictedComonents.append("android.widget.TextView")
                 filteredBoxes.append(boxesInBackets[i][textIndex])
             else: # A7tyaty ma7sltsh.
-                if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and text != "x" and text != "X":
+                if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and text != "x" and text != "X" and text != "o" and text != "O":
                     predictedComonents.append("android.widget.EditText")
+                elif text != "o" and text != "O":
+                    if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or text == "x" or text == "X":
+                        predictedComonents.append("android.widget.ImageView")
+                    else:
+                        predictedComonents.append("android.widget.CheckBox")
                 else:
-                    predictedComonents.append("android.widget.ImageView")
+                    predictedComonents.append("android.widget.RadioButton")
                 filteredBoxes.append(boxesInBackets[i][0])
     return filteredBoxes,filteredTexts,predictedComonents
 
