@@ -28,7 +28,8 @@ def filterComponentsAndPredict(allBoxes,texts):
             if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X":
                 predictedComonents.append("android.widget.EditText")
             elif textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O":
-                if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or textsInBackets[i][0] == "x" or textsInBackets[i][0] == "X":
+                #print(boxesInBackets[i][0][3]*boxesInBackets[i][0][2])
+                if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>3000 or textsInBackets[i][0] == "x" or textsInBackets[i][0] == "X":
                     predictedComonents.append("android.widget.ImageView")
                 else:
                     predictedComonents.append("android.widget.CheckBox")
@@ -47,7 +48,8 @@ def filterComponentsAndPredict(allBoxes,texts):
                 if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and text != "x" and text != "X" and text != "o" and text != "O":
                     predictedComonents.append("android.widget.EditText")
                 elif text != "o" and text != "O":
-                    if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or text == "x" or text == "X":
+                    #print(boxesInBackets[i][0][3]*boxesInBackets[i][0][2])
+                    if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>3000 or text == "x" or text == "X":
                         predictedComonents.append("android.widget.ImageView")
                     else:
                         predictedComonents.append("android.widget.CheckBox")
