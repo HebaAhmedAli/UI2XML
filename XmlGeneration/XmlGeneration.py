@@ -522,9 +522,9 @@ def extractPatternOfNode(parentNode):
         pattern += parentNode.childNodes[i].nodeType
         if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
             countChildRadio +=1
-            pattern =  parentNode.childNodes[i].nodeType
     if countChildRadio > 1:
         radioHorizontal = True
+        pattern =  'android.widget.RadioButton'
     return pattern,radioHorizontal
         
 def getLastPatternIndex(firstIndex,groupedNodes,pattern):
