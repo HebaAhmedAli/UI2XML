@@ -473,7 +473,12 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
     groupedNodesNew = []
     i = 0
     while i<len(groupedNodes):
-        patternToSearch = extractPatternOfNode(groupedNodes[i])
+        patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
+        if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
+            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i].childNodes,imgH,'android.widget.RadioGroup',img,True))
+            i+=1
+            continue
+            
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
         if lastIndex != i:
             childs = groupedNodes[i:lastIndex+1]
@@ -494,7 +499,11 @@ def groupRadio(groupedNodes,imgH,img):
     groupedNodesNew = []
     i = 0
     while i<len(groupedNodes):
-        patternToSearch = extractPatternOfNode(groupedNodes[i])
+        patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
+        if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
+            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i].childNodes,imgH,'android.widget.RadioGroup',img,True))
+            i+=1
+            continue        
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
         if lastIndex != i and patternToSearch ==  'android.widget.RadioButton':
             childs = groupedNodes[i:lastIndex+1]
@@ -507,15 +516,21 @@ def groupRadio(groupedNodes,imgH,img):
 
 def extractPatternOfNode(parentNode):
     pattern = ""
+    countChildRadio  = 0
+    radioHorizontal = False
     for i in range(len(parentNode.childNodes)):
         pattern += parentNode.childNodes[i].nodeType
         if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
-            return parentNode.childNodes[i].nodeType
-    return pattern
+            countChildRadio +=1
+            pattern =  parentNode.childNodes[i].nodeType
+    if countChildRadio > 1:
+        radioHorizontal = True
+    return pattern,radioHorizontal
         
 def getLastPatternIndex(firstIndex,groupedNodes,pattern):
     for i in range(firstIndex+1,len(groupedNodes)):
-        if extractPatternOfNode(groupedNodes[i]) != pattern:
+        foundPattern,radioHorizontal = extractPatternOfNode(groupedNodes[i])
+        if foundPattern != pattern or radioHorizontal:
             return i-1
     return len(groupedNodes)-1
 
