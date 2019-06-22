@@ -11,7 +11,7 @@ from keras.preprocessing import image
 import time
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
+model = load_model('data/ourModel/UI2XMLclassification_Features.h5') # 150 * 150
 # UI2XMLclassification_224_245000_99_93
 # UI2XMLclassificationAlex_224_245000_99_92 adam with 224 * 224
 # UI2XMLclassification245000_98_91 decay with 150 * 150

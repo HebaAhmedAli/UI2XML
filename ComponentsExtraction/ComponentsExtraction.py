@@ -66,7 +66,8 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
                          boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
-    if 'android.widget.Button' not in predictedComponentsFiltered \
+    if ('android.widget.Button' not in predictedComponentsFiltered \
+       and 'android.widget.ImageButton' not in predictedComponentsFiltered) \
     and 'android.widget.EditText' in predictedComponentsFiltered:
         changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)    
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered\
