@@ -1,13 +1,10 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import sip
-
 import os
 from imageBox import imageBox
 import skeleton
 
 class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
-
     def __init__(self, width, height):
         super(mainScreen, self).__init__()
         self.state = "INS_PIC"
@@ -94,7 +91,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         groupBox.setLayout(layout)
         return groupBox
 
-
     def dragEnterEvent(self, event):
         if event.mimeData().hasImage:
             event.accept()
@@ -132,7 +128,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
                 self.numOfImages = self.numOfImages + 1
 
-
                 if (self.horizontalLayouts[HLayoutCnt -1]).count() < self.maxRowSize  :
                     imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn, self.imageBox_W,
                                                  self.imageBox_H, self.IsGrid)
@@ -140,8 +135,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                     self.horizontalLayouts[self.indexRow].addWidget(imagebox)
 
                     self.indexColumn = self.indexColumn + 1
-                    #print("here", self.horizontalLayouts[HLayoutCnt -1].count(),"  ", self.maxRowSize )
-
                 else:
                     self.indexColumn = 0
                     self.indexRow = self.indexRow + 1
@@ -169,7 +162,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         # print(imageBox_W)
         imageBox_H = int(imageBox_W * 4 / 3)  # 268
 
-        # start formation
         indexRow = 0
         indexCol = 0
         newIndexRow = 0
@@ -178,10 +170,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         newLine = QHBoxLayout()
         newHorLayouts.append(newLine)
         newHorLayouts[0].setAlignment(Qt.AlignLeft)
-        #self.Layout.addLayout(self.newHorLayouts[0])
 
-        #self.Layout.addLayout(newHorLayouts[0])
-        # print("no of images ", len(self.images))
         for i in self.images:
             i.delimg()
 
@@ -198,7 +187,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 newHorLayouts[newIndexRow].setAlignment(Qt.AlignLeft)
                 #self.Layout.addLayout(newHorLayouts[newIndexRow])
 
-
             #self.horizontalLayouts[indexRow].setParent(None)
             newHorLayouts[newIndexRow].addWidget(imagebox)
             indexCol = indexCol + 1
@@ -213,6 +201,8 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.imageBox_H = imageBox_H
         self.indexColumn = newIndexCol
         self.indexRow = newIndexRow
+
+
     @pyqtSlot(int)
     def on_deleteButton_clicked(self, index):
         self.images[index].delimg()

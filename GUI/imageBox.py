@@ -42,6 +42,7 @@ class imageBox(QWidget):
         self.layout.addLayout(self.Hor)
         self.groupBox.setLayout(self.layout)
         return self.groupBox
+
     def resizeImg (self,index, row, col, width, height, isGrid =0 ):
         self.index = index
         self.deleteImage.setindex(index)
@@ -50,5 +51,6 @@ class imageBox(QWidget):
         pixmapimage = QPixmap(self.path).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         return self.groupBox
+
     def delimg(self):
         self.groupBox.setParent(None)

@@ -13,6 +13,7 @@ class delButton(QPushButton):
         print("iam deleting")
         self.deleted.emit(self.index)
         # self.parent.setParent(None)
+
     def setindex(self, index):
         self.index = index
 
