@@ -26,7 +26,11 @@ class createProjectDialog(QDialog, createDialog.Ui_Dialog):
         if(len(str(self.packageNameLine.text()).strip())==0):
             self.warningLbl.setText("Insert Package Name, please!")
             return
+        if(len(str(self.projectDirectoryL.text()).strip())==0):
+            self.warningLbl.setText("Insert project Directory, please!")
+            return
         projCreationDetails.append(str(self.projectNameLine.text()).strip())
         projCreationDetails.append(str(self.packageNameLine.text()).strip())
         projCreationDetails.append(str(self.designComboBox.currentText()))
+        projCreationDetails.append(str(self.projectDirectoryL.curDir))
         self.started.emit(projCreationDetails)

@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import os
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -27,7 +28,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(400, 274)
         self.verticalLayoutWidget = QtGui.QWidget(Dialog)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 20, 111, 161))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 20, 160, 161))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
@@ -37,6 +38,9 @@ class Ui_Dialog(object):
         self.label_3 = QtGui.QLabel(self.verticalLayoutWidget)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.verticalLayout.addWidget(self.label_3)
+        self.label_5 = QtGui.QLabel(self.verticalLayoutWidget)
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+        self.verticalLayout.addWidget(self.label_5)
         self.label = QtGui.QLabel(self.verticalLayoutWidget)
         self.label.setObjectName(_fromUtf8("label"))
         self.verticalLayout.addWidget(self.label)
@@ -51,6 +55,10 @@ class Ui_Dialog(object):
         self.packageNameLine = QtGui.QLineEdit(self.verticalLayoutWidget_2)
         self.packageNameLine.setObjectName(_fromUtf8("lineEdit"))
         self.verticalLayout_2.addWidget(self.packageNameLine)
+        self.projectDirectoryL = ClickableLineEdit(self.verticalLayoutWidget_2)
+        self.projectDirectoryL.setObjectName(_fromUtf8("projectDirectoryL"))
+        # self.projectDirectoryL.mousePressEvent.connect(self.clearAndChooseDir)
+        self.verticalLayout_2.addWidget(self.projectDirectoryL)
         self.designComboBox = QtGui.QComboBox(self.verticalLayoutWidget_2)
         self.designComboBox.setObjectName(_fromUtf8("comboBox"))
         designModes = ("Hand Darwing", "Screenshot", "PSD File")
@@ -75,6 +83,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
         self.label_2.setText(_translate("Dialog", "Project Name:", None))
+        self.label_5.setText(_translate("Dialog", "Project Directory:", None))
         self.label_3.setText(_translate("Dialog", "Package Name:", None))
         self.label.setText(_translate("Dialog", "Design Type", None))
         self.closeAllBtn.setText(_translate("Dialog", "Close", None))
@@ -89,4 +98,22 @@ class Ui_Dialog(object):
         for count in range(self.designComboBox.count()):
             print self.designComboBox.itemText(count)
         print "Current index",i,"selection changed ",self.designComboBox.currentText()
-	
+    
+class ClickableLineEdit(QtGui.QLineEdit):
+    
+    # clicked = QtCore.Signal()
+
+    def mousePressEvent(self, event):
+        super(ClickableLineEdit, self).mousePressEvent(event)
+        self.clearAndChooseDir()
+        # self.clicked.emit()
+
+    def clearAndChooseDir(self):
+        self.setText("")
+        path = os.path.dirname(os.path.realpath(__file__))
+        file_path = str(QtGui.QFileDialog.getExistingDirectory(self, 
+                    caption='Select Directory', directory=path,
+                    options=QtGui.QFileDialog.ShowDirsOnly))
+        self.setText(file_path)
+        self.curDir = file_path
+ 
