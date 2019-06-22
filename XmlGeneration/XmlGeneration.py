@@ -475,7 +475,7 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
-            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i].childNodes,imgH,'android.widget.RadioGroup',img,True))
+            groupedNodesNew.append(createParentNodeVertical([groupedNodes[i]],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue
             
@@ -501,7 +501,7 @@ def groupRadio(groupedNodes,imgH,img):
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
-            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i].childNodes,imgH,'android.widget.RadioGroup',img,True))
+            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue        
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
