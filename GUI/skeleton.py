@@ -25,6 +25,7 @@ except AttributeError:
 class Ui_mainWindow(object):
     def setupUi(self, mainWindow):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
+
         mainWindow.resize(800, 600)
         mainWindow.setAcceptDrops(True)
         mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
@@ -77,7 +78,7 @@ class Ui_mainWindow(object):
         self.dockWidgetContents = QtGui.QWidget()
         self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
         self.textBrowser = QtGui.QTextBrowser(self.dockWidgetContents)
-        self.textBrowser.setGeometry(QtCore.QRect(10, 0, 321, 531))
+        self.textBrowser.setGeometry(QtCore.QRect(10, 0, 320, 531))
         self.textBrowser.setStyleSheet(_fromUtf8("background-color: \"white\";\n"
 "color: rgb(156,156,156);\n"
 "border: 5px solid  rgb(66, 138, 255);\n"

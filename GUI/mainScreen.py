@@ -6,15 +6,24 @@ from createProjectDialog import createProjectDialog
 import skeleton
 
 class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
-
-    def __init__(self):
+    def __init__(self, width, height):
         super(mainScreen, self).__init__()
+        self.state = "INS_PIC"
         self.setupUi(self)
         # Placement of the uploaded image
+        self.screenW = width
+        self.screenH = height
+        self.IsGrid = 1
         self.indexColumn = 0
         self.indexRow = 0
-        self.maxRowSize = 1
+        self.maxRowSize = 7
 
+        self.imageBox_W = (width - 440 - 7* self.maxRowSize)/self.maxRowSize - 20         #201
+        if self.imageBox_W < 180:
+            self.imageBox_W = 180
+            self.maxRowSize = 7
+        # print(self.imageBox_W)
+        self.imageBox_H = int(self.imageBox_W *4/3)    #268
         self.gridData = QWidget()
         self.Layout = QVBoxLayout()
         self.Layout.setAlignment(Qt.AlignTop)
@@ -22,6 +31,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.gridData.setLayout(self.Layout)
         self.numOfImages = 0
         self.projectDetails=[]
+        self.images = []
 
         # Upload Area scrollable
         self.scrollarea = QScrollArea()
@@ -32,8 +42,9 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
 
         newLine = QHBoxLayout()
         self.horizontalLayouts.append(newLine)
+        self.horizontalLayouts[0].setAlignment(Qt.AlignLeft)
         self.Layout.addLayout(self.horizontalLayouts[0])
-        self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
+        #self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
 
         self.statusbarwindow = QStatusBar()
         self.statusbarwindow.setSizeGripEnabled(False)
@@ -54,11 +65,12 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         # self.treeView.setModel(model)
         # self.treeView.setRootIndex(model.index(path))
 
-    def setDirectory(self,url):
+
+    def setDirectory(self, url):
         self.directory= url
 
 
-    def newImageLabel (self,image,label):
+    def newImageLabel (self, image, label):
 
         groupBox= QGroupBox()
         layout = QVBoxLayout()
@@ -83,7 +95,6 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         layout.addLayout(horizontalLay)
         groupBox.setLayout(layout)
         return groupBox
-
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasImage:
@@ -111,20 +122,23 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
 
     def pictureDropped(self, l):
         for url in l:
-            # TODO: Restrict uploads to images only
+            #TODO: Restrict uploads to images only
             if os.path.exists(url):
                 startI = url.rfind('/', 0, len(url)) + 1
                 endI = url.rfind('.', 0, len(url))
                 s = url[startI: endI]
                 self.GroupBox = QGroupBox()
-                numOfHLayouts = len(self.horizontalLayouts)
+                HLayoutCnt = len(self.horizontalLayouts)
                 newimage = imageBox(self.numOfImages)
                 newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
-                self.numOfImages = self.numOfImages+1
-                imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn)
-                self.horizontalLayouts[self.indexRow].addWidget(imagebox)
+                self.numOfImages = self.numOfImages + 1
 
-                if (self.horizontalLayouts[numOfHLayouts -1]).count() < self.maxRowSize -1 :
+                if (self.horizontalLayouts[HLayoutCnt -1]).count() < self.maxRowSize  :
+                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn, self.imageBox_W,
+                                                 self.imageBox_H, self.IsGrid)
+                    self.images.append(newimage)
+                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
+
                     self.indexColumn = self.indexColumn + 1
                 else:
                     self.indexColumn = 0
@@ -134,11 +148,74 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                     self.horizontalLayouts.append(newLine)
                     self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
                     self.Layout.addLayout(self.horizontalLayouts[self.indexRow])
-                
+                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn, self.imageBox_W,
+                                                 self.imageBox_H, self.IsGrid)
+                    self.images.append(newimage)
+                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
+                    self.indexColumn = self.indexColumn +1
+
+    def setImageDim (self, width, length):
+        self.imageBox_W = width
+        self.imageBox_W = length
+
+    def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
+        maxRowSize = noImgPerRow
+        imageBox_W = (self.screenW - 440 - 7 * noImgPerRow) / noImgPerRow - 20  # 201
+        if imageBox_W < 180:
+            imageBox_W = 180
+            maxRowSize = 7
+        # print(imageBox_W)
+        imageBox_H = int(imageBox_W * 4 / 3)  # 268
+
+        indexRow = 0
+        indexCol = 0
+        newIndexRow = 0
+        newIndexCol = 0
+        newHorLayouts = []
+        newLine = QHBoxLayout()
+        newHorLayouts.append(newLine)
+        newHorLayouts[0].setAlignment(Qt.AlignLeft)
+
+        for i in self.images:
+            i.delimg()
+
+        for i in range (0, self.numOfImages):
+            if i / (indexRow +1) >= self.maxRowSize:
+                indexRow = indexRow + 1
+                indexCol = 0
+            imagebox = self.images[i].resizeImg(i,  newIndexRow, newIndexCol, imageBox_W, imageBox_H)
+            if i / (newIndexRow +1) >= maxRowSize :
+                newIndexRow = newIndexRow + 1
+                newIndexCol = 0
+                newLine = QHBoxLayout()
+                newHorLayouts.append(newLine)
+                newHorLayouts[newIndexRow].setAlignment(Qt.AlignLeft)
+                #self.Layout.addLayout(newHorLayouts[newIndexRow])
+
+            #self.horizontalLayouts[indexRow].setParent(None)
+            newHorLayouts[newIndexRow].addWidget(imagebox)
+            indexCol = indexCol + 1
+            newIndexCol = newIndexCol + 1
+
+        self.horizontalLayouts = newHorLayouts
+        for i in range (0, len(self.horizontalLayouts)):
+            self.Layout.addLayout(self.horizontalLayouts[i])
+
+        self.maxRowSize = maxRowSize
+        self.imageBox_W = imageBox_W
+        self.imageBox_H = imageBox_H
+        self.indexColumn = newIndexCol
+        self.indexRow = newIndexRow
+
 
     @pyqtSlot(int)
     def on_deleteButton_clicked(self, index):
         print("Deleting from parent")
+        self.images[index].delimg()
+        del self.images[index]
+        self.numOfImages = self.numOfImages -1
+        # print(len(self.images))
+        self.chanageGridSize(self.maxRowSize)
 
     @pyqtSlot(list)    
     def start_Pro(self,creationList):
@@ -146,4 +223,4 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.projectDetails = creationList
         self.mainDialoge.close()
 
-        
+
