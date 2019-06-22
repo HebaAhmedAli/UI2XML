@@ -22,6 +22,5 @@ class convertButton(QPushButton):
 
     def convertToXML(self):
         print("iam converting")
-        self.parent.setParent(None)
 
 

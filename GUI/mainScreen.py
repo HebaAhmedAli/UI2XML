@@ -2,6 +2,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
 from imageBox import imageBox
+from createProjectDialog import createProjectDialog
 import skeleton
 
 class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
@@ -20,6 +21,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.horizontalLayouts = []
         self.gridData.setLayout(self.Layout)
         self.numOfImages = 0
+        self.projectDetails=[]
 
         # Upload Area scrollable
         self.scrollarea = QScrollArea()
@@ -41,6 +43,9 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
 
         # self.dockPictuers.setMinimumWidth(350)
         self.dockDesign.setMinimumWidth(350)
+        self.mainDialoge = createProjectDialog()
+        self.mainDialoge.show()
+        self.mainDialoge.started.connect(self.start_Pro)
         # text = open('activity_twitter.xml').read()
         # self.textBrowser.setPlainText(text)
         # path = "../data"
@@ -134,4 +139,11 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
     @pyqtSlot(int)
     def on_deleteButton_clicked(self, index):
         print("Deleting from parent")
+
+    @pyqtSlot(list)    
+    def start_Pro(self,creationList):
+        print(creationList)
+        self.projectDetails = creationList
+        self.mainDialoge.close()
+
         
