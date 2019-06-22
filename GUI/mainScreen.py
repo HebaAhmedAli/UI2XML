@@ -65,10 +65,8 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         # self.treeView.setModel(model)
         # self.treeView.setRootIndex(model.index(path))
 
-
     def setDirectory(self, url):
         self.directory= url
-
 
     def newImageLabel (self, image, label):
 
@@ -120,13 +118,15 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         else:
             event.ignore()
 
-    def pictureDropped(self, l):
-        for url in l:
+    def pictureDropped(self, paths):
+        for filePath in paths:
             #TODO: Restrict uploads to images only
-            if os.path.exists(url):
-                startI = url.rfind('/', 0, len(url)) + 1
-                endI = url.rfind('.', 0, len(url))
-                s = url[startI: endI]
+            if os.path.exists(filePath):
+                startI = filePath.rfind('/', 0, len(filePath)) + 1
+                endI = filePath.rfind('.', 0, len(filePath))
+                fileName = filePath[startI: endI]
+                if(not self.matchFormat(filePath)):
+                    continue
                 self.GroupBox = QGroupBox()
                 HLayoutCnt = len(self.horizontalLayouts)
                 newimage = imageBox(self.numOfImages)
@@ -134,7 +134,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                 self.numOfImages = self.numOfImages + 1
 
                 if (self.horizontalLayouts[HLayoutCnt -1]).count() < self.maxRowSize  :
-                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn, self.imageBox_W,
+                    imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
                                                  self.imageBox_H, self.IsGrid)
                     self.images.append(newimage)
                     self.horizontalLayouts[self.indexRow].addWidget(imagebox)
@@ -148,7 +148,7 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
                     self.horizontalLayouts.append(newLine)
                     self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
                     self.Layout.addLayout(self.horizontalLayouts[self.indexRow])
-                    imagebox = newimage.setImage(url, s, self.indexRow, self.indexColumn, self.imageBox_W,
+                    imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
                                                  self.imageBox_H, self.IsGrid)
                     self.images.append(newimage)
                     self.horizontalLayouts[self.indexRow].addWidget(imagebox)
@@ -207,6 +207,27 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         self.indexColumn = newIndexCol
         self.indexRow = newIndexRow
 
+    def matchFormat(self, filePath):
+        endIdx = filePath.rfind('.', 0, len(filePath)) + 1
+        fileExten = filePath[endIdx:]
+        fileExten = fileExten.lower()
+        print(fileExten)
+        designType = self.projectDetails[2]
+        designModes = ("Hand Darwing", "Screenshot", "PSD File")
+        extensions = {"imgExten": ["jpg", "jpeg", "png"],"psdExten":["psd"]}
+        w = QWidget()
+        if(designType == designModes[0] or designType == designModes[1]):
+            if( not (fileExten in extensions["imgExten"])):
+                QMessageBox.critical(w, "Format Error",str(filePath) + " has inappropriate Image format." )
+                print("Inappropriate Image format")
+                return False
+        if(designType == designModes[2]):
+            if(not (fileExten in extensions["psdExten"])):
+                QMessageBox.critical(w, "Format Error",str(filePath) + " has inappropriate PSD format." )
+                print("Inappropriate PSD format")
+                return False
+        return True
+
 
     @pyqtSlot(int)
     def on_deleteButton_clicked(self, index):
@@ -222,5 +243,3 @@ class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
         print(creationList)
         self.projectDetails = creationList
         self.mainDialoge.close()
-
-
