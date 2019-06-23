@@ -1,5 +1,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PIL import Image
 import os
 from imageBox import imageBox
 from createProjectDialog import createProjectDialog
@@ -30,7 +31,6 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         self.horizontalLayouts = []
         self.gridData.setLayout(self.Layout)
         self.numOfImages = 0
-        self.projectDetails=[]
         self.images = []
 
         # Upload Area scrollable
@@ -44,7 +44,6 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         self.horizontalLayouts.append(newLine)
         self.horizontalLayouts[0].setAlignment(Qt.AlignLeft)
         self.Layout.addLayout(self.horizontalLayouts[0])
-        #self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
 
         self.statusbarwindow = QStatusBar()
         self.statusbarwindow.setSizeGripEnabled(False)
@@ -52,18 +51,12 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         lay = QVBoxLayout(self.centralwidget)
         lay.addWidget(self.scrollarea)
 
-        # self.dockPictuers.setMinimumWidth(350)
         self.dockDesign.setMinimumWidth(350)
+        self.dockDesign.setMaximumWidth(800)
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
         self.mainDialoge.started.connect(self.start_Pro)
-        # text = open('activity_twitter.xml').read()
-        # self.textBrowser.setPlainText(text)
-        # path = "../data"
-        # model = QFileSystemModel()
-        # model.setRootPath((QDir.rootPath()))
-        # self.treeView.setModel(model)
-        # self.treeView.setRootIndex(model.index(path))
+        self.actionRun.triggered.connect(self.convertFiles)
 
     def setDirectory(self, url):
         self.directory= url
@@ -122,8 +115,8 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         for filePath in paths:
             if os.path.exists(filePath):
                 startI = filePath.rfind('/', 0, len(filePath)) + 1
-                endI = filePath.rfind('.', 0, len(filePath))
-                fileName = filePath[startI: endI]
+                # endI = filePath.rfind('.', 0, len(filePath))
+                fileName = filePath[startI:]
                 if(not self.matchFormat(filePath)):
                     continue
                 self.GroupBox = QGroupBox()
@@ -132,14 +125,7 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                 newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
                 self.numOfImages = self.numOfImages + 1
 
-                if (self.horizontalLayouts[HLayoutCnt -1]).count() < self.maxRowSize  :
-                    imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
-                                                 self.imageBox_H, self.IsGrid)
-                    self.images.append(newimage)
-                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
-
-                    self.indexColumn = self.indexColumn + 1
-                else:
+                if (self.horizontalLayouts[HLayoutCnt -1]).count() >= self.maxRowSize  :
                     self.indexColumn = 0
                     self.indexRow = self.indexRow + 1
 
@@ -147,11 +133,12 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                     self.horizontalLayouts.append(newLine)
                     self.horizontalLayouts[self.indexRow].setAlignment(Qt.AlignLeft)
                     self.Layout.addLayout(self.horizontalLayouts[self.indexRow])
-                    imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
-                                                 self.imageBox_H, self.IsGrid)
-                    self.images.append(newimage)
-                    self.horizontalLayouts[self.indexRow].addWidget(imagebox)
-                    self.indexColumn = self.indexColumn +1
+
+                imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
+                                                self.imageBox_H, self.IsGrid)
+                self.images.append(newimage)
+                self.horizontalLayouts[self.indexRow].addWidget(imagebox)
+                self.indexColumn = self.indexColumn +1
 
     def setImageDim (self, width, length):
         self.imageBox_W = width
@@ -210,22 +197,62 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         endIdx = filePath.rfind('.', 0, len(filePath)) + 1
         fileExten = filePath[endIdx:]
         fileExten = fileExten.lower()
-        print(fileExten)
-        designType = self.projectDetails[2]
         designModes = ("Hand Darwing", "Screenshot", "PSD File")
         extensions = {"imgExten": ["jpg", "jpeg", "png"],"psdExten":["psd"]}
-        w = QWidget()
-        if(designType == designModes[0] or designType == designModes[1]):
+        windDialog = QWidget()
+        if( self.designMode == designModes[0] or self.designMode == designModes[1]):
             if( not (fileExten in extensions["imgExten"])):
-                QMessageBox.critical(w, "Format Error",str(filePath) + " has inappropriate Image format." )
+                QMessageBox.critical(windDialog, "Format Error",str(filePath) + " has inappropriate Image format." )
                 print("Inappropriate Image format")
                 return False
-        if(designType == designModes[2]):
+        if( self.designMode == designModes[2]):
             if(not (fileExten in extensions["psdExten"])):
-                QMessageBox.critical(w, "Format Error",str(filePath) + " has inappropriate PSD format." )
+                QMessageBox.critical(windDialog, "Format Error",str(filePath) + " has inappropriate PSD format." )
                 print("Inappropriate PSD format")
                 return False
         return True
+
+    def convertFiles(self):
+        names=[]
+        for image in self.images:
+            name = str(image.imageNameLine.text())
+            endI = name.rfind('.', 0, len(name))
+            if (not '.' in name):
+                windDialog = QWidget()
+                QMessageBox.critical(windDialog, "File name Error", name + " File name or extension not correct" )
+                print("No file marked as Main")
+                return
+            imgExten = ["jpg", "jpeg", "png"]
+            if(not name[endI+1:].lower() in imgExten):
+                windDialog = QWidget()
+                QMessageBox.critical(windDialog, "File extension Error", name + " File extension not correct" )
+                print("No file marked as Main")
+                return
+            names.append(name[:endI])
+        if(not "main" in names):
+            windDialog = QWidget()
+            QMessageBox.critical(windDialog, "Missing main", "Choose one of the files as your Main Activity" )
+            print("No file marked as Main")
+            return
+        
+        # Creating Input folder for recognition
+        dir = self.projectDir + "/" + self.projectName
+        print("Directory of project" + dir )
+        if(not os.path.exists(dir)):
+            os.mkdir(dir)
+        # TODO: make sure new names are valid with extensions
+        for image in self.images:
+            readImage = Image.open(image.srcPath)
+            imageName = str(image.imageNameLine.text())
+            endI = imageName.rfind('.', 0, len(imageName))
+            exten = imageName[endI:]
+            name = imageName[:endI]
+            if(image.hasActionBar.isChecked()):
+                name = name + "A"
+            else:
+                name = name + "N"
+            readImage.save(self.projectDir+ "/" + self.projectName+"/"+ name+exten)
+        # TODO: Call the recognition for this directory
 
 
     @pyqtSlot(int)
@@ -240,5 +267,8 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     @pyqtSlot(list)    
     def start_Pro(self,creationList):
         print(creationList)
-        self.projectDetails = creationList
+        self.projectName = creationList[0]
+        self.packageName = creationList[1]
+        self.designMode =  creationList[2]
+        self.projectDir =  creationList[3]
         self.mainDialoge.close()
