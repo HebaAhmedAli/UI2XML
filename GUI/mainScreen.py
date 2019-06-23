@@ -3,7 +3,7 @@ from PyQt4.QtGui import *
 from PIL import Image
 import os
 from imageBox import imageBox
-from createProjectDialog import createProjectDialog
+from createDialog import createProjectDialog 
 import skelMainscreen
 
 class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
