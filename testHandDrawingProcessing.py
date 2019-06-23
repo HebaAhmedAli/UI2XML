@@ -28,7 +28,7 @@ def processSave(subdir, file):
         img4Txt = image_file.read()
     file = file.replace('.jpeg','.jpg')
     # TODO: Remove last parameter after testing.
-    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,img4Txt,file)
+    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,imgCopy,img4Txt,file)
     myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
     XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-5],file[len(file)-5])
     margin = 10

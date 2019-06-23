@@ -3,6 +3,9 @@ sys.path.append('../')
 import HandDrawingProcessing.BoxesExtraction as BoxesExtraction
 import HandDrawingProcessing.TextExtraction as TextExtraction
 import Utils
+import Constants
+import os
+import cv2
 
 def getFirstTextBoxAndRatio(boxesInBacket,textsInBacket):
     text = ""
@@ -11,23 +14,27 @@ def getFirstTextBoxAndRatio(boxesInBacket,textsInBacket):
             return textsInBacket[i],Utils.iou(boxesInBacket[0],boxesInBacket[i]),i
     return text,1,0
 
-def filterComponentsAndPredict(allBoxes,texts):
+def filterComponentsAndPredict(allBoxes,texts,image):
+    margin = 10
     predictedComonents = []
     filteredBoxes = [] 
     filteredTexts = []
     boxesInBackets,textsInBackets = backetOverlappingBoxes(allBoxes,texts)
     for i in range(len(boxesInBackets)):
+        cropImg = image[max(0,boxesInBackets[i][0][1] - margin):min(image.shape[0],boxesInBackets[i][0][1] + boxesInBackets[i][0][3] + margin), max(boxesInBackets[i][0][0] - margin,0):min(image.shape[1],boxesInBackets[i][0][0] + boxesInBackets[i][0][2] + margin)]
+        isCircle = Utils.isCircle(cropImg)
         if textsInBackets[i][0] != "" and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X"\
-            and textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O":
+            and textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O" and not isCircle:
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
             predictedComonents.append("android.widget.TextView")
         elif len(boxesInBackets[i])==1:
             filteredBoxes.append(boxesInBackets[i][0])
             filteredTexts.append(textsInBackets[i][0])
-            if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X":
+            if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and textsInBackets[i][0] != "x" and textsInBackets[i][0] != "X" and textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O" and not isCircle:
                 predictedComonents.append("android.widget.EditText")
-            elif textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O":
+            elif textsInBackets[i][0] != "o" and textsInBackets[i][0] != "O" and not isCircle:
+                #print(boxesInBackets[i][0][3]*boxesInBackets[i][0][2])
                 if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or textsInBackets[i][0] == "x" or textsInBackets[i][0] == "X":
                     predictedComonents.append("android.widget.ImageView")
                 else:
@@ -46,7 +53,8 @@ def filterComponentsAndPredict(allBoxes,texts):
             else: # A7tyaty ma7sltsh.
                 if boxesInBackets[i][0][3]/boxesInBackets[i][0][2] < 0.4 and text != "x" and text != "X" and text != "o" and text != "O":
                     predictedComonents.append("android.widget.EditText")
-                elif text != "o" and text != "O":
+                elif text != "o" and text != "O" and not isCircle:
+                    #print(boxesInBackets[i][0][3]*boxesInBackets[i][0][2])
                     if boxesInBackets[i][0][3]*boxesInBackets[i][0][2]>4000 or text == "x" or text == "X":
                         predictedComonents.append("android.widget.ImageView")
                     else:
@@ -57,13 +65,13 @@ def filterComponentsAndPredict(allBoxes,texts):
     return filteredBoxes,filteredTexts,predictedComonents
 
 # Extract the boxes and text from given image -extracted components-.
-def extractComponents(image,image4Txt,appName): # TODO: Remove appName.
+def extractComponents(image,imgCopy,image4Txt,appName): # TODO: Remove appName.
     # TODO: Uncomment after testing and delete the line after this.
     #extractedText, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
     extractedTexts,textPositions = getFromAppName(appName)
     extratctedBoxes,extractedTexts = BoxesExtraction.extractBoxes(image, extractedTexts, textPositions)
     myImageBox = extratctedBoxes[0]
-    extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)])
+    extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)],imgCopy)
     # Translate x and y and handle outside range.
     extratctedBoxesTranslated = []
     i = 0
@@ -156,8 +164,9 @@ appDict = {
   "radioAndCheck2N.jpg":
 (['sign', 'up', 'login', 'Name', 'Email', 'I', 'agree', 'O', 'Play', 'good', 'Obad', 'Plot'],
 [[173, 236, 125, 71], [329, 244, 68, 52], [457, 206, 125, 86], [171, 376, 151, 55], [156, 562, 155, 67], [294, 755, 37, 66], [343, 768, 132, 60], [608, 860, 42, 72], [741, 864, 83, 66], [230, 866, 155, 72], [228, 926, 112, 52], [438, 1070, 114, 57]]),
- "verInHorN.jpg":
- ([],[]),
+ "maleFeemaleN.jpg":
+ (['Male', 'Female', 'O', 'male', 'O', 'Female', 'he', 'ba', 'Feryal', 'Farema', 'Sobhy'],
+[[413, 530, 221, 62], [1031, 512, 303, 41], [309, 736, 72, 88], [399, 743, 196, 67], [890, 723, 75, 82], [991, 720, 291, 47], [434, 1007, 81, 73], [535, 1008, 91, 61], [415, 1185, 235, 76], [408, 1360, 260, 51], [389, 1508, 229, 91]]),
  "radioHListN.jpg":
  ([],[])
  
