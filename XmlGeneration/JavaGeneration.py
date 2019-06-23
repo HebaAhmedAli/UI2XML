@@ -10,12 +10,15 @@ def printActionBar(appName):
 "\t\tgetSupportActionBar().setCustomView(R.layout.action_bar_"+appName+");\n"+\
 "\t\tView view = getSupportActionBar().getCustomView();\n"
 
-def findListView(rootNode,listViews):
+def findListViewAndRadioGroup(rootNode,listViews,radioGroups):
     if rootNode.nodeType == 'android.widget.ListView':
         listViews.append(rootNode)
         return
+    if rootNode.nodeType == 'android.widget.RadioGroup':
+        radioGroups.append(rootNode)
+        return 
     for childNode in rootNode.childNodes:
-        findListView(childNode,listViews)
+        findListViewAndRadioGroup(childNode,listViews,radioGroups)
 
 def printArrayList(noOfListViews,appName):
     arrayList = ""
@@ -177,7 +180,51 @@ def printButtons(buttonsId):
         "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+str(buttonId)+'"'+",Toast.LENGTH_SHORT).show();\n"+\
         "\t}\n"
     return onClick
+def setChecked(radioGroup,radioGroupIdx,radioIdx):
+    checkedString = "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioIdx)+".setChecked(true);\n"
+    for i in range(len(radioGroup.childNodes)):
+        if i != radioIdx:
+            checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(i)+".setChecked(false);\n"
     
+    return checkedString
+def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
+    radioButtons = "\tRadioButton "
+    findViews = ""
+    onClicks = ""
+    radioId = ""
+    if len(radioGroup.childNodes) > 1 : # Vertical RadioGroup
+        for i in range(len(radioGroup.childNodes)):
+            for child in radioGroup.childNodes[i].childNodes: 
+                if child.nodeType == "android.widget.RadioButton":
+                    radioId = child.id
+                    break
+            radioButtons+= "radioButton"+str(radioGroupIdx)+str(i)
+            if i < len(radioGroup.childNodes)-1 :
+                radioButtons+= ", "
+            findViews += "\t\tradioButton"+str(radioGroupIdx)+str(i)+" = "+"(RadioButton)findViewById(R.id.RadioButton_"+radioId+");\n"
+            onClicks+= "\t\tradioButton"+str(radioGroupIdx)+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
+            "\t\t\tpublic void onClick(View v) {\n"
+            onClicks+= setChecked(radioGroup,radioGroupIdx,i)
+            onClicks+="\t\t\t}\n\t\t});"
+        radioButtons+= ";\n"
+        
+    else: # Horizontal RadioGroup containing only one horizontal Linearlayout
+       radioButtonCount = 0
+       for i in range(len(radioGroup.childNodes[0].childNodes)):
+           if radioGroup.childNodes[0].childNodes[i].nodeType == "android.widget.RadioButton":
+                radioId = radioGroup.childNodes[0].childNodes[i].id
+                radioButtons+= "radioButton"+str(radioGroupIdx)+str(radioButtonCount)+", "
+                findViews += "\t\tradioButton"+str(radioGroupIdx)+str(radioButtonCount)+" = "+"(RadioButton)findViewById(R.id.RadioButton_"+radioId+");\n"
+                onClicks+= "\t\tradioButton"+str(radioGroupIdx)+str(radioButtonCount)+".setOnClickListener(new View.OnClickListener() {\n"+\
+                "\t\t\tpublic void onClick(View v) {\n"
+                onClicks+= setChecked(radioGroup.childNodes[0],radioGroupIdx,radioButtonCount)
+                onClicks+="\t\t\t}\n\t\t});"
+                radioButtonCount += 1
+       radioButtons = radioButtons[:-2]         
+       radioButtons+= ";\n"
+       
+    return radioButtons, findViews+onClicks
+
 def generateJava(rootNode,appName,actionBarOp):
     if Constants.PACKAGE != '':
         if not os.path.exists(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"):
@@ -202,8 +249,9 @@ def generateJava(rootNode,appName,actionBarOp):
     
     classBody =""
     classBody += "\npublic class "+appName.capitalize()+"Activity"+" extends AppCompatActivity {\n\n"
-    listViews = []    
-    findListView(rootNode,listViews)
+    listViews = []  
+    radioGroups = []
+    findListViewAndRadioGroup(rootNode,listViews,radioGroups)
     if len(listViews) >0:
         imports+= "import android.widget.ListView;\nimport java.util.ArrayList;\n"
     classBody+= printArrayList(len(listViews),appName)
@@ -214,7 +262,13 @@ def generateJava(rootNode,appName,actionBarOp):
         addedListItems = printAddingItems(listViews[i].id,selectedVarNames,i,appName)
         printListViewBean(leavesType,i,appName,package)
         printListViewBaseAdapter(listViews[i],leavesType,i,appName,package)        
-        
+     
+    if len(radioGroups)>0:
+        imports += "import android.widget.RadioButton;\n"
+    for i in range(len(radioGroups)):
+        radiosDef,radiosOnClick = printRadiosAndOnClicks(radioGroups[i],i)
+    
+    classBody += radiosDef
     
     classBody+= "\t@Override\n"+\
     "\tprotected void onCreate(Bundle savedInstanceState) {\n"
@@ -230,6 +284,7 @@ def generateJava(rootNode,appName,actionBarOp):
         onCreateBody+= printActionBar(appName)   
     
     onCreateBody+= addedListItems
+    onCreateBody+= radiosOnClick
     onCreateClose="\t}\n"
         
     buttonsId = []
