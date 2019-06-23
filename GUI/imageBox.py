@@ -7,37 +7,34 @@ from Buttons import delButton,convertButton
 class imageBox(QWidget):
     def __init__(self, index):
         super(imageBox, self).__init__()
-        self.path = ""
-        self.label =""
+        self.srcPath = ""
         self.groupBox = QGroupBox()
         self.layout = QVBoxLayout()
         self.Hor = QHBoxLayout()
         self.imageLabel = QLabel()
-        #self.imageLabel.minimumWidth = 50
-        self.text = QLabel()
-        self.checkbox = QCheckBox("Action Bar")
+
+        self.imageNameLine = QLineEdit()
+        self.hasActionBar = QCheckBox("Action Bar")
         self.deleteImage = delButton(self, index)
-        self.convetImage = convertButton(self)
-        self.checked = False
+        # self.checked = False
         self.row = 0
         self.col = 0
         print(index)
         self.index = index
-        #self.button.clicked.connect(self.deletebutton)
 
+    # TODO: row and column can be calculated from the index
     def setImage (self, image, label, row, col, width, height, isGrid =0):
         self.row = row
         self.col = col
-        self.path = image
-        self.label = label
-        pixmapimage = QPixmap(self.path ).scaled(width, height)
+        self.srcPath = image
+        pixmapimage = QPixmap(self.srcPath ).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
-        self.text.setText(self.label)
-        self.text.setAlignment(Qt.AlignHCenter)
+        self.imageNameLine.setText(label)
+        self.imageNameLine.setAlignment(Qt.AlignHCenter)
         self.imageLabel.setAlignment(Qt.AlignHCenter)
         self.layout.addWidget(self.imageLabel)
-        self.layout.addWidget(self.text)
-        self.Hor.addWidget(self.checkbox)
+        self.layout.addWidget(self.imageNameLine)
+        self.Hor.addWidget(self.hasActionBar)
         self.Hor.addWidget(self.deleteImage)
         self.layout.addLayout(self.Hor)
         self.groupBox.setLayout(self.layout)
@@ -48,7 +45,7 @@ class imageBox(QWidget):
         self.deleteImage.setindex(index)
         self.row = row
         self.col = col
-        pixmapimage = QPixmap(self.path).scaled(width, height)
+        pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         return self.groupBox
 
