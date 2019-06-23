@@ -8,9 +8,9 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import createDialog 
+import skelCreateDialog 
 
-class createProjectDialog(QDialog, createDialog.Ui_Dialog):
+class createProjectDialog(QDialog, skelCreateDialog.Ui_Dialog):
     started = pyqtSignal(list)
 
     def __init__(self):

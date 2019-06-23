@@ -3,9 +3,9 @@ from PyQt4.QtGui import *
 import os
 from imageBox import imageBox
 from createProjectDialog import createProjectDialog
-import skeleton
+import skelMainscreen
 
-class mainScreen (QMainWindow,  skeleton.Ui_mainWindow):
+class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     def __init__(self, width, height):
         super(mainScreen, self).__init__()
         self.state = "INS_PIC"
