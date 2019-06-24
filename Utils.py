@@ -218,6 +218,7 @@ def getLinesEdgesFeatures(edged):
     noOfLines = 0
     if lines is not None:
         noOfLines = len(lines)
+        slopedLines = slopedLines/noOfLines
         for line in lines:
             x1, y1, x2, y2 = line[0]
             if y2 - y1 == 0:
@@ -225,8 +226,8 @@ def getLinesEdgesFeatures(edged):
                 maxHorLen = max(maxHorLen,length)
             if (y2 - y1)/(x2 - x1) <= -0.9 and (y2 - y1)/(x2 - x1) >= -1.1:
                 slopedLines += 1
-    return [(noOfEdges-2306.345)/8900.044,(noOfLines-3.64957)/12.172,maxHorLen/Constants.IMAGE_SIZE_CLASSIFICATION,slopedLines/noOfLines]
-
+              
+    return [(noOfEdges-2306.345)/8900.044,(noOfLines-3.64957)/12.172,maxHorLen/Constants.IMAGE_SIZE_CLASSIFICATION,slopedLines]
 
 def getNoOfColorsAndBackGroundRGB(img):
     dictMean = 3122.3086264194926
