@@ -21,13 +21,26 @@ def isText(img):
 
 
 # Extract boxes from given image.
-def extractShapeFeatures(img):
-    edges=Preprocessing.preProcessEdges(img)
-    #finding the contours
-    (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
+def extractShapeFeatures(img,resizedImg):
+    allShapeFeatures = []
+    edges,_=Preprocessing.preProcessEdges(img)
+    edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
+    # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
+    allShapeFeatures += Utils.getLinesEdgesFeatures(edgesResized)
+    # widthResizingRatio, hightResizingRatio
+    allShapeFeatures += Utils.getResizeRatios(img)
+    # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
+    allShapeFeatures += Utils.describeLBP(grayImgResized)
+    allShapeFeatures += Utils.descripeHog(grayImgResized)
+    allShapeFeatures += Utils.describe5Gray(grayImgResized)
+    (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
+    if len(contours) == 0:
+      print("noContors: ")
+      return [0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
-    shapeFeature=Utils.detectShapeAndFeature(cnt)
-    return shapeFeature
+    # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
+    allShapeFeatures += Utils.detectShapeAndFeature(cnt)
+    return allShapeFeatures
   
 def imageReadColors(imgPath=None):
     img = image.load_img(imgPath)
@@ -56,14 +69,20 @@ def loadData(imagesPath,vocab,start,end):
             feature=[]
             index=file.find('-')
             y=file[index+1:-4]
-            Y.append(to_categorical(vocab[y], num_classes=len(vocab)))
             x=Preprocessing.imageReadAndPreprocessingClassification(imagesPath+file)
-            X.append(x)
             xColors=imageReadColors(imagesPath+file)
             xShapesAndText = cv2.imread(imagesPath+file)
-            feature.append(Utils.getNoOfColors(xColors))
+            try:
+              resizedImg = cv2.resize(xShapesAndText, (150,150))
+            except Exception as e:
+              continue
+            X.append(x)
+            Y.append(to_categorical(vocab[y], num_classes=len(vocab)))
+            xColors=imageReadColors(imagesPath+file)
+            xShapesAndText = cv2.imread(imagesPath+file)
+            feature+=Utils.getNoOfColorsAndBackGroundRGB(xColors)
             feature.append(isText(xShapesAndText))
-            feature+=extractShapeFeatures(xShapesAndText)
+            feature+=extractShapeFeatures(xShapesAndText,resizedImg)
             auxFeatures.append(np.array(feature,dtype='float32'))
         elif i>= end:
             break

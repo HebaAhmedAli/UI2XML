@@ -9,6 +9,9 @@ import numpy as np
 import cv2
 import copy
 import math
+from skimage.feature import hog,local_binary_pattern
+import Constants
+
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
         #Indexes of first diagonal
@@ -127,6 +130,10 @@ def mostFrequentInList(dictt,ocuurences,level):
 def detectShapeAndFeature(cnt):
     M = cv2.moments(cnt)
     shape = 'unknown'
+    noOfVer = 0
+    areaRatio = 0
+    perRatio = 0
+    aspectRatio = 0
     if M['m00'] > 0:
         # calculate perimeter using
         peri = cv2.arcLength(cnt, True)
@@ -134,8 +141,11 @@ def detectShapeAndFeature(cnt):
         circularity  = 4*math.pi*(area/(peri*peri))
         # apply contour approximation and store the result in vertices
         vertices = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+        noOfVer = len(vertices)/16
         x, y, width, height = cv2.boundingRect(vertices)
         aspectRatio = float(width) / height
+        areaRatio = float(area)/(width*height)
+        perRatio = float(peri)/(2*(width+height))
         if len(vertices) == 4 and aspectRatio >= 0.95 and aspectRatio <= 1.05:
             shape = "square"
         elif len(vertices) > 5 and circularity >= 0.7:
@@ -152,9 +162,73 @@ def detectShapeAndFeature(cnt):
         features.append(circularity)
     else:
         features.append(0)
+    features.append(noOfVer)
+    features.append(areaRatio)
+    features.append(perRatio)
+    features.append(aspectRatio)
     return features
 
-def getNoOfColors(img):
+# Take gray resized image.
+def describeLBP(gray,numPoints=8,radius=1,eps=1e-7):
+         # compute the Local Binary Pattern representation
+		# of the image, and then use the LBP representation
+		# to build the histogram of patterns
+        lbp = local_binary_pattern(gray, numPoints,radius, method="default")     
+        (hist, _) = np.histogram(lbp, bins=256, range=(0,256))	
+        #(hist, _) = np.histogram(lbp.ravel(),bins=np.arange(0, numPoints + 3),range=(0, numPoints + 2))
+		# normalize the histogram [np.where(lbp<255)]
+        hist = hist.astype("float")
+        hist /= (hist.sum())
+		# return the histogram of Local Binary Patterns
+        return hist.tolist()
+    
+# Take gray resized image.  
+def descripeHog(gray):
+    (H, hogImage) = hog(gray, orientations=8, pixels_per_cell=(150,150),
+                    cells_per_block=(1,1), visualize=True)
+    H = H.astype("float")
+    H /= (H.sum())
+    return H.tolist()
+
+# Take gray resized image.
+def describe5Gray(gray):
+    (hist5Gray, _) = np.histogram(gray, bins=5)
+    hist5Gray = hist5Gray.astype("float")
+    hist5Gray /= (hist5Gray.sum())
+    return hist5Gray.tolist()
+
+def getResizeRatios(img):
+    ratios = []
+    if img.shape[1]<Constants.IMAGE_SIZE_CLASSIFICATION:
+        ratios.append(img.shape[1]/Constants.IMAGE_SIZE_CLASSIFICATION)
+    else:
+        ratios.append(-1*(Constants.IMAGE_SIZE_CLASSIFICATION/img.shape[1]))
+    if img.shape[0]<Constants.IMAGE_SIZE_CLASSIFICATION:
+        ratios.append(img.shape[0]/Constants.IMAGE_SIZE_CLASSIFICATION)
+    else:
+        ratios.append(-1*(Constants.IMAGE_SIZE_CLASSIFICATION/img.shape[0]))
+    return ratios
+
+# Take edged resized image.
+def getLinesEdgesFeatures(edged):
+    noOfEdges = cv2.countNonZero(edged)
+    lines = cv2.HoughLinesP(edged, 1, np.pi/180, 20,minLineLength = 20)
+    maxHorLen = 0
+    slopedLines = 0
+    noOfLines = 0
+    if lines is not None:
+        noOfLines = len(lines)
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            if y2 - y1 == 0:
+                length = math.sqrt( ((x1-x2)**2)+((y1-y2)**2))
+                maxHorLen = max(maxHorLen,length)
+            if (y2 - y1)/(x2 - x1) <= -0.9 and (y2 - y1)/(x2 - x1) >= -1.1:
+                slopedLines += 1
+    return [(noOfEdges-2306.345)/8900.044,(noOfLines-3.64957)/12.172,maxHorLen/Constants.IMAGE_SIZE_CLASSIFICATION,slopedLines/noOfLines]
+
+
+def getNoOfColorsAndBackGroundRGB(img):
     dictMean = 3122.3086264194926
     dictStd = 20159.43 
     B = copy.copy(img)
@@ -163,7 +237,15 @@ def getNoOfColors(img):
     rgb2hex = lambda r,g,b: '#%02x%02x%02x' %(r,g,b)
     hexArr =[ rgb2hex(*B[i,:]) for i in range(B.shape[0])]
     dictt = Counter(np.array(hexArr))
-    return (len(dictt)-dictMean)/dictStd
+    if len(dictt) == 0:
+        return [0,-1.0,-1.0,-1.0]
+    # Get the list of all values and sort it in ascending order 
+    ocuurences = sorted(dictt.values(), reverse=True)
+    first = mostFrequentInList(dictt,ocuurences,0).lstrip('#')
+    if first == "-1":
+      return [(len(dictt)-dictMean)/dictStd,-1.0,-1.0,-1.0]
+    firstRgb = tuple(int(first[i:i+2], 16) for i in (0, 2, 4))
+    return [(len(dictt)-dictMean)/dictStd,firstRgb[0]/255.0,firstRgb[1]/255.0,firstRgb[2]/255.0]
 
 def getMostAndSecondMostColors(img,firstOnly):
     B = copy.copy(img)

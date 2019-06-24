@@ -27,31 +27,42 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     for x,y,w,h in extratctedBoxes:
         features = []
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+        resizedImg = cv2.resize(croppedImage, (150,150))
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
-        noOfColorsNorm = Utils.getNoOfColors(croppedImageColor)
         text = TextExtraction.extractText(croppedImage)
         textFeature = 0
         if text != "":
             textFeature = 1
-        features.append(noOfColorsNorm)
+        features.append(Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor))
         features.append(textFeature)
-        features += extractShapeFeatures(croppedImage)
+        features += extractShapeFeatures(croppedImage,resizedImg)
         pedictedComponents.append(Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model))
         extractedText.append(TextExtraction.extractText(croppedImage))
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 
 
-def extractShapeFeatures(img):
-    edges=Preprocessing.preProcessEdges(img)
-    (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
+def extractShapeFeatures(img,resizedImg):
+    allShapeFeatures = []
+    edges,_=Preprocessing.preProcessEdges(img)
+    edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
+    # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
+    allShapeFeatures += Utils.getLinesEdgesFeatures(edgesResized)
+    # widthResizingRatio, hightResizingRatio
+    allShapeFeatures += Utils.getResizeRatios(img)
+    # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
+    allShapeFeatures += Utils.describeLBP(grayImgResized)
+    allShapeFeatures += Utils.descripeHog(grayImgResized)
+    allShapeFeatures += Utils.describe5Gray(grayImgResized)
+    (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1
       print("noContors: ",str(Constants.noContors))
-      return [0,0]
-    c = max(contours, key = cv2.contourArea)
-    shapeFeature=Utils.detectShapeAndFeature(c)
-    return shapeFeature
+      return [0,0,0,0,0,0]
+    cnt = max(contours, key = cv2.contourArea)
+    # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
+    allShapeFeatures += Utils.detectShapeAndFeature(cnt)
+    return allShapeFeatures
         
 def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \

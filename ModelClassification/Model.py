@@ -22,7 +22,7 @@ def scheduler(epoch):
 
 def createAndTrainCNNModel(X,auxFeatures,Y):
     cnnInput=Input(shape=(Constants.IMAGE_SIZE_CLASSIFICATION,Constants.IMAGE_SIZE_CLASSIFICATION,3))
-    auxiliaryInput = Input(shape=(4,), name='aux_input')
+    auxiliaryInput = Input(shape=(Constants.featureSize,), name='aux_input')
     model=CNN.createCNNModel(cnnInput,auxiliaryInput)
     # from 0 to 50 epochs 
     opt=SGD(lr=0.001,momentum=0.9, decay=0.0, nesterov=True)

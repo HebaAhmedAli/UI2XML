@@ -11,3 +11,4 @@ HAND_DRAWN = False
 AS_IS = True
 SMART = True
 noContors = 0
+featureSize = 286
