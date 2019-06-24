@@ -14,7 +14,11 @@ def imageReadAndPreprocessingClassification(imgPath=None,imagee=None):
         img /= 255.
         return img
 
-def imageReadColors(imgPath=None):
-    img = image.load_img(imgPath)
-    img = np.array(img,dtype='float32')  
-    return img
+
+def preProcessEdges(image):
+    lowThreshold = 30 #30
+    highThreshold = 60 #60
+    grayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(grayImg, (3,3), 0)  
+    edges = cv2.Canny(blurred, lowThreshold, highThreshold)
+    return edges

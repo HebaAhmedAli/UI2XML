@@ -134,10 +134,12 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
         (boxesInBacket[0][3]<heightThrshold2 and boxesInBacket[0][2]>imageCopy.shape[1]*0.6)) \
         and predictedComponentsInBacket[0] == 'android.widget.ImageView':
         return True
+    '''
     # Case wrong line classified as SeekBar or ProgressBar.
     if (predictedComponentsInBacket[0] == 'android.widget.SeekBar' \
         and not checkSeekProgress(boxesInBacket,imageCopy)):
         return True
+    '''
     # Case textView that don't have text so wrong classification.
     if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
         textsInBacket[0] == '':
