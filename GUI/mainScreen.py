@@ -52,7 +52,6 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         lay.addWidget(self.scrollarea)
 
         self.dockDesign.setMinimumWidth(350)
-        self.dockDesign.setMaximumWidth(800)
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
         self.mainDialoge.started.connect(self.start_Pro)
@@ -240,7 +239,6 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         print("Directory of project" + dir )
         if(not os.path.exists(dir)):
             os.mkdir(dir)
-        # TODO: make sure new names are valid with extensions
         # TODO: Handle PSD
         for image in self.images:
             readImage = Image.open(image.srcPath)
@@ -253,7 +251,22 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
             else:
                 name = name + "N"
             readImage.save(self.projectDir+ "/" + self.projectName+"/"+ name+exten)
+            # image.setParent(None)
+            image.deleteImage.click()
         # TODO: Call the recognition for this directory
+        for horizontalLayout in self.horizontalLayouts:
+            horizontalLayout.setParent(None)
+            del horizontalLayout
+        del self.horizontalLayouts
+        # print(self.Layout.parent)
+        # self.Layout.setParent(None)
+        # del self.Layout
+        print(self.scrollarea.parent)
+        self.scrollarea.setParent(None)
+        del self.scrollarea
+        # print(self.gridData.parent)
+        # self.gridData.setParent(None)
+
 
 
     @pyqtSlot(int)
