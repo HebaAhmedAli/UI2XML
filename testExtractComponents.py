@@ -45,7 +45,8 @@ def processSave(subdir, file):
         fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
     boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-5],file[len(file)-5])
-    #print(Constants.boxToGui,Constants.idToGui)
+    Constants.mapToGui.update( {file[:-5] : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    print(Constants.mapToGui)
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42],[19, 201, 502, 64]],['android.widget.'+"ImageButton",'android.widget.'+"ImageView"],['ImageView_0_0_0','EditText_0_2_0'],imgXML,file[:-5],file[len(file)-5])
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -66,6 +67,7 @@ def processSave(subdir, file):
             j+=1  
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
+Constants.mapToGui = {}
 subdir, dirs, _= next(os.walk(imagesPath))
 for direc in dirs:
     _,_, files= next(os.walk(subdir+'/'+direc))

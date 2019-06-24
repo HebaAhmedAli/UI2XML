@@ -386,6 +386,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     
     if parentNode.nodeType == 'android.widget.ListView':
         fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+myIndex+'.xml', 'w+')
+        Constants.xmlFilesToGui.append('list_view_'+myIndex+'.xml')
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
         +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
@@ -403,6 +404,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     else:
         if actionBarOp == 'A' and tabs == 0:
             fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
+            Constants.xmlFilesToGui.append('action_bar_'+myParentType+'.xml')
             fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
                 '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
                 +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
@@ -439,6 +441,7 @@ def mapToXml(parentNode,appName,imgH,actionBarOp):
     if not os.path.exists(Constants.DIRECTORY+'/layout'):
             os.makedirs(Constants.DIRECTORY+'/layout') 
     fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
+    Constants.xmlFilesToGui.append('activity_'+appName+'.xml')
     printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
     return
 
@@ -447,6 +450,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     Constants.boxToGui = []
     Constants.predictedToGui = []
     Constants.idToGui = []
+    Constants.xmlFilesToGui = []
     parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img)        
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
@@ -456,6 +460,7 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
     Constants.boxToGui = []
     Constants.predictedToGui = []
     Constants.idToGui = []
+    Constants.xmlFilesToGui = []
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
@@ -485,7 +490,9 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
             if patternToSearch ==  'android.widget.RadioButton':
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup',img,True))
                 i = lastIndex
-            elif lastIndex-i>=2 and patternToSearch.find('android.widget.EditText') == -1:
+            elif lastIndex-i>=2 and patternToSearch.find('android.widget.EditText') == -1 and not(patternToSearch.find('android.widget.Button') != -1 and patternToSearch.find('android.widget.TextView') == -1)\
+            and not(patternToSearch.find('android.widget.CheckBox') != -1 and patternToSearch.find('android.widget.TextView') == -1):
+                print(patternToSearch,i,lastIndex)
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.ListView',img,True))
                 i = lastIndex
             else:
@@ -521,6 +528,7 @@ def extractPatternOfNode(parentNode):
     for i in range(len(parentNode.childNodes)):
         pattern += parentNode.childNodes[i].nodeType
         if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
+            pattern +=  'android.widget.RadioButton'
             countChildRadio +=1
     if countChildRadio > 1:
         radioHorizontal = True
@@ -532,6 +540,7 @@ def getLastPatternIndex(firstIndex,groupedNodes,pattern):
         foundPattern,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if foundPattern != pattern or radioHorizontal:
             return i-1
+    print(len(groupedNodes))
     return len(groupedNodes)-1
 
 # TO test.

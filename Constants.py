@@ -12,3 +12,5 @@ DYNAMIC = True
 boxToGui = []
 predictedToGui = []
 idToGui = []
+xmlFilesToGui = []
+mapToGui = {}

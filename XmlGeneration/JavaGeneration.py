@@ -263,6 +263,8 @@ def generateJava(rootNode,appName,actionBarOp):
         printListViewBean(leavesType,i,appName,package)
         printListViewBaseAdapter(listViews[i],leavesType,i,appName,package)        
      
+    radiosDef = "" 
+    radiosOnClick = ""
     if len(radioGroups)>0:
         imports += "import android.widget.RadioButton;\n"
     for i in range(len(radioGroups)):
