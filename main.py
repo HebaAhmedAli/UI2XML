@@ -6,7 +6,11 @@ from GUI.imageBox import imageBox
 from GUI.createDialog import createProjectDialog 
 import GUI.skelMainscreen as skelMainscreen
 from GUI.previewWind import previewWindow
-
+from keras.models import load_model
+import LoadDataClassification
+import HandDrawing
+import ScreenShots
+import Constants
 class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     def __init__(self, width, height):
         super(mainScreen, self).__init__()
@@ -236,10 +240,10 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
             return
         
         # Creating Input folder for recognition
-        dir = self.projectDir + "/" + self.projectName
-        print("Directory of project" + dir )
-        if(not os.path.exists(dir)):
-            os.mkdir(dir)
+        imagesPath = self.projectDir + "/" + self.projectName
+        print("Directory of project" + imagesPath )
+        if(not os.path.exists(imagesPath)):
+            os.mkdir(imagesPath)
         # TODO: Handle PSD
         for image in self.images:
             readImage = Image.open(image.srcPath)
@@ -255,9 +259,20 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                 name = name + "S"
             else:
                 name = name + "D"
-            readImage.save(self.projectDir + "/" + self.projectName + "/" + name + exten)
-            # image.setParent(None)
-        # TODO: Call the recognition for this directory
+            readImage.save(imagesPath + "/" + name + exten)
+        # Call the recognition for this directory
+        Constants.PROJECT_NAME = self.projectName
+        Constants.PACKAGE = self.packageName
+        if self.designMode == "Screenshot":
+            vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+            model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
+            ScreenShots.processAllImages(imagesPath,model,invVocab)
+        elif self.designMode == "Hand Darwing":
+            HandDrawing.processAllImages(imagesPath)
+        '''
+        else:    # TODO : Call psd.
+        '''
+        ##############################################
         for image in self.images:        
             image.deleteImage.click()
         for horizontalLayout in self.horizontalLayouts:

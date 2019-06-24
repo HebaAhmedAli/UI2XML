@@ -1,18 +1,25 @@
+import sys
+sys.path.append('../')
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
 import skelPreviewWind 
 from tabs import xmlTab
+import Constants
 
 class previewWindow(QDialog, skelPreviewWind.previewWindowSkel):
     def __init__(self, mainWindow):
         super(previewWindow, self).__init__(mainWindow)
         self.setupUi(self)
         # For testing
+        '''
         self.mp = {"main.png": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
                 ['ImageButton', 'ImageView', 'EditText', 'EditText'],
                 ["activity_twitter.xml", "activity_twitter1.xml"])}
+        '''
+        self.mp = Constants.mapToGui
+        print(self.mp)
         self.projDir = mainWindow.projectDir + "/" + mainWindow.projectName
         self.imgsNames = []
         self.imgsNames = self.addImageTabs()
