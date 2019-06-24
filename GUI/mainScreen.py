@@ -48,8 +48,8 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         self.statusbarwindow = QStatusBar()
         self.statusbarwindow.setSizeGripEnabled(False)
 
-        lay = QVBoxLayout(self.centralwidget)
-        lay.addWidget(self.scrollarea)
+        self.lay = QVBoxLayout(self.centralwidget)
+        self.lay.addWidget(self.scrollarea)
 
         self.dockDesign.setMinimumWidth(350)
         self.mainDialoge = createProjectDialog()
@@ -259,14 +259,9 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
             horizontalLayout.setParent(None)
             del horizontalLayout
         del self.horizontalLayouts
-        # print(self.Layout.parent)
-        # self.Layout.setParent(None)
-        # del self.Layout
         print(self.scrollarea.parent)
         self.scrollarea.setParent(None)
         del self.scrollarea
-        # print(self.gridData.parent)
-        # self.gridData.setParent(None)
 
 
 

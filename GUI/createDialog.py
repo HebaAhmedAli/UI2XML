@@ -20,6 +20,7 @@ class createProjectDialog(QDialog, skelCreateDialog.Ui_Dialog):
         self.activateWindow()
         path = os.path.dirname(os.path.realpath(__file__))
         self.projectDirectoryL.setText(str(path))
+        self.projectDirectoryL.curDir = path
 
     def startProject(self):
         projCreationDetails = []
