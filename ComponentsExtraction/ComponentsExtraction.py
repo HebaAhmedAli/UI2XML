@@ -58,7 +58,7 @@ def extractShapeFeatures(img,resizedImg):
     if len(contours) == 0:
       Constants.noContors+=1
       print("noContors: ",str(Constants.noContors))
-      return [0,0,0,0,0,0]
+      return allShapeFeatures+[0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
     allShapeFeatures += Utils.detectShapeAndFeature(cnt)

@@ -178,7 +178,8 @@ def describeLBP(gray,numPoints=8,radius=1,eps=1e-7):
         #(hist, _) = np.histogram(lbp.ravel(),bins=np.arange(0, numPoints + 3),range=(0, numPoints + 2))
 		# normalize the histogram [np.where(lbp<255)]
         hist = hist.astype("float")
-        hist /= (hist.sum())
+        if hist.sum()!=0:
+          hist /= (hist.sum())
 		# return the histogram of Local Binary Patterns
         return hist.tolist()
     
@@ -187,23 +188,31 @@ def descripeHog(gray):
     (H, hogImage) = hog(gray, orientations=8, pixels_per_cell=(150,150),
                     cells_per_block=(1,1), visualize=True)
     H = H.astype("float")
-    H /= (H.sum())
+    if H.sum()!=0.0:
+      H /= (H.sum())
     return H.tolist()
 
 # Take gray resized image.
 def describe5Gray(gray):
     (hist5Gray, _) = np.histogram(gray, bins=5)
     hist5Gray = hist5Gray.astype("float")
-    hist5Gray /= (hist5Gray.sum())
+    if hist5Gray.sum()!=0.0:
+      hist5Gray /= (hist5Gray.sum())
     return hist5Gray.tolist()
 
 def getResizeRatios(img):
     ratios = []
-    if img.shape[1]<Constants.IMAGE_SIZE_CLASSIFICATION:
+    if img.shape[1] == 0:
+      print("image 0 ratio")
+      ratios.append(0)
+    elif img.shape[1]<Constants.IMAGE_SIZE_CLASSIFICATION:
         ratios.append(img.shape[1]/Constants.IMAGE_SIZE_CLASSIFICATION)
     else:
         ratios.append(-1*(Constants.IMAGE_SIZE_CLASSIFICATION/img.shape[1]))
-    if img.shape[0]<Constants.IMAGE_SIZE_CLASSIFICATION:
+    if img.shape[0] == 0:
+      print("image 0 ratio")
+      ratios.append(0)
+    elif img.shape[0]<Constants.IMAGE_SIZE_CLASSIFICATION:
         ratios.append(img.shape[0]/Constants.IMAGE_SIZE_CLASSIFICATION)
     else:
         ratios.append(-1*(Constants.IMAGE_SIZE_CLASSIFICATION/img.shape[0]))
@@ -218,16 +227,19 @@ def getLinesEdgesFeatures(edged):
     noOfLines = 0
     if lines is not None:
         noOfLines = len(lines)
-        slopedLines = slopedLines/noOfLines
+        if noOfLines!=0:
+          slopedLines = slopedLines/noOfLines
         for line in lines:
             x1, y1, x2, y2 = line[0]
             if y2 - y1 == 0:
                 length = math.sqrt( ((x1-x2)**2)+((y1-y2)**2))
                 maxHorLen = max(maxHorLen,length)
-            if (y2 - y1)/(x2 - x1) <= -0.9 and (y2 - y1)/(x2 - x1) >= -1.1:
-                slopedLines += 1
+            if (x2 - x1) != 0:
+              if (y2 - y1)/(x2 - x1) <= -0.9 and (y2 - y1)/(x2 - x1) >= -1.1:
+                  slopedLines += 1
               
     return [(noOfEdges-2306.345)/8900.044,(noOfLines-3.64957)/12.172,maxHorLen/Constants.IMAGE_SIZE_CLASSIFICATION,slopedLines]
+
 
 def getNoOfColorsAndBackGroundRGB(img):
     dictMean = 3122.3086264194926

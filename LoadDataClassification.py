@@ -36,7 +36,7 @@ def extractShapeFeatures(img,resizedImg):
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       print("noContors: ")
-      return [0,0,0,0,0,0]
+      return allShapeFeatures+[0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
     allShapeFeatures += Utils.detectShapeAndFeature(cnt)
@@ -75,6 +75,7 @@ def loadData(imagesPath,vocab,start,end):
             try:
               resizedImg = cv2.resize(xShapesAndText, (150,150))
             except Exception as e:
+              i+=1
               continue
             X.append(x)
             Y.append(to_categorical(vocab[y], num_classes=len(vocab)))
