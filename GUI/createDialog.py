@@ -8,6 +8,7 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import os
 import skelCreateDialog 
 
 class createProjectDialog(QDialog, skelCreateDialog.Ui_Dialog):
@@ -17,6 +18,8 @@ class createProjectDialog(QDialog, skelCreateDialog.Ui_Dialog):
         super(createProjectDialog, self).__init__()
         self.setupUi(self)
         self.activateWindow()
+        path = os.path.dirname(os.path.realpath(__file__))
+        self.projectDirectoryL.setText(str(path))
 
     def startProject(self):
         projCreationDetails = []
@@ -28,6 +31,9 @@ class createProjectDialog(QDialog, skelCreateDialog.Ui_Dialog):
             return
         if(len(str(self.projectDirectoryL.text()).strip())==0):
             self.warningLbl.setText("Insert project Directory, please!")
+            return
+        if(not os.path.exists(self.projectDirectoryL.text())):
+            self.warningLbl.setText("Insert correct project Directory, please!")
             return
         projCreationDetails.append(str(self.projectNameLine.text()).strip())
         projCreationDetails.append(str(self.packageNameLine.text()).strip())

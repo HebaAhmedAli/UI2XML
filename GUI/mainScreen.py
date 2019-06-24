@@ -252,8 +252,9 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                 name = name + "N"
             readImage.save(self.projectDir+ "/" + self.projectName+"/"+ name+exten)
             # image.setParent(None)
-            image.deleteImage.click()
         # TODO: Call the recognition for this directory
+        for image in self.images:        
+            image.deleteImage.click()
         for horizontalLayout in self.horizontalLayouts:
             horizontalLayout.setParent(None)
             del horizontalLayout
