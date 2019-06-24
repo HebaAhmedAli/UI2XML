@@ -397,7 +397,14 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.write(fileOuput)            
         fToListView.write(printListViewChildNode(parentNode.childNodes[0],parentNode.nodeType,1,imgH,myIndex[:-2]+'_'+str(0+specialId)))
         fToListView.write("</LinearLayout>"+'\n')    
-        fToListView.close()    
+        fToListView.close()   
+        # Append the rest of chils.
+        for i in range(len(parentNode.childNodes)):
+            for j in range(len(parentNode.childNodes[i].childNodes)):
+                typeOfNode = getType(parentNode.childNodes[i].childNodes[j].nodeType)
+                Constants.boxToGui.append([int(parentNode.childNodes[i].childNodes[j].x),int(parentNode.childNodes[i].childNodes[j].y),int(parentNode.childNodes[i].childNodes[j].width),int(parentNode.childNodes[i].childNodes[j].height)])
+                Constants.idToGui.append(typeOfNode+'_'+myIndex[:-2]+'_'+str(i+specialId)+'_'+str(j))
+                Constants.predictedToGui.append(typeOfNode)
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
@@ -492,7 +499,6 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
                 i = lastIndex
             elif lastIndex-i>=2 and patternToSearch.find('android.widget.EditText') == -1 and not(patternToSearch.find('android.widget.Button') != -1 and patternToSearch.find('android.widget.TextView') == -1)\
             and not(patternToSearch.find('android.widget.CheckBox') != -1 and patternToSearch.find('android.widget.TextView') == -1):
-                print(patternToSearch,i,lastIndex)
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.ListView',img,True))
                 i = lastIndex
             else:
@@ -540,7 +546,6 @@ def getLastPatternIndex(firstIndex,groupedNodes,pattern):
         foundPattern,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if foundPattern != pattern or radioHorizontal:
             return i-1
-    print(len(groupedNodes))
     return len(groupedNodes)-1
 
 # TO test.

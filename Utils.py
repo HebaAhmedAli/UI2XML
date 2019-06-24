@@ -10,6 +10,7 @@ import Preprocessing
 import copy
 import cv2
 import math
+#import PyQt4
 
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
