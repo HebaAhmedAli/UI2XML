@@ -212,8 +212,10 @@ def createParentNodeHorizontal(groupedNodes,imgW,img):
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
-        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 30:
+        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 50:
             parentNode.gravity = "center"
+        elif groupedNodes[0].x/imgW > 0.5:
+            parentNode.gravity = "right"
         parentNode.childNodes = groupedNodes
         if not Constants.HAND_DRAWN:
             imgClean = clearInnerBoxes(parentNode,parentNode.childNodes,img)
@@ -534,7 +536,7 @@ def extractPatternOfNode(parentNode):
     for i in range(len(parentNode.childNodes)):
         pattern += parentNode.childNodes[i].nodeType
         if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
-            pattern +=  'android.widget.RadioButton'
+            pattern =  'android.widget.RadioButton'
             countChildRadio +=1
     if countChildRadio > 1:
         radioHorizontal = True
