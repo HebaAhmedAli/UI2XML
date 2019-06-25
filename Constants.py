@@ -14,3 +14,4 @@ predictedToGui = []
 idToGui = []
 xmlFilesToGui = []
 mapToGui = {}
+imagesPath = ""

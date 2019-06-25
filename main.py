@@ -6,10 +6,10 @@ from GUI.imageBox import imageBox
 from GUI.createDialog import createProjectDialog 
 import GUI.skelMainscreen as skelMainscreen
 from GUI.previewWind import previewWindow
-from keras.models import load_model
-import LoadDataClassification
-import HandDrawing
-import ScreenShots
+# from keras.models import load_model
+# import LoadDataClassification
+# import HandDrawing
+# import ScreenShots
 import Constants
 class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     def __init__(self, width, height):
@@ -241,7 +241,7 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         
         # Creating Input folder for recognition
         imagesPath = self.projectDir + "/" + self.projectName
-        print("Directory of project" + imagesPath )
+        print("Directory of project  " + imagesPath )
         if(not os.path.exists(imagesPath)):
             os.mkdir(imagesPath)
         # TODO: Handle PSD
@@ -263,12 +263,17 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         # Call the recognition for this directory
         Constants.PROJECT_NAME = self.projectName
         Constants.PACKAGE = self.packageName
+        Constants.imagesPath = imagesPath
+        print("Directory of project  " + Constants.imagesPath )
         if self.designMode == "Screenshot":
-            vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-            model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
-            ScreenShots.processAllImages(imagesPath,model,invVocab)
+            # vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+            # model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
+            # ScreenShots.processAllImages(imagesPath,model,invVocab)
+            os.system("python3 ScreenShots.py")
         elif self.designMode == "Hand Darwing":
-            HandDrawing.processAllImages(imagesPath)
+            # HandDrawing.processAllImages(imagesPath)
+            os.system("python3 HandDrawing.py")
+
         '''
         else:    # TODO : Call psd.
         '''

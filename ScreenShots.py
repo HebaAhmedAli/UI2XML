@@ -94,10 +94,9 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
-'''
+
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
-imagesPath='data/ScreenShots/ourTest'
-
-processAllImages(imagesPath,model,invVocab)
-'''
+# imagesPath='data/ScreenShots/ourTest'
+print("from screenshots   " + Constants.imagesPath)
+processAllImages(Constants.imagesPath,model,invVocab)
