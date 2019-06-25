@@ -27,7 +27,8 @@ class imageBox(QWidget):
         self.row = row
         self.col = col
         self.srcPath = image
-        pixmapimage = QPixmap(self.srcPath ).scaled(width, height)
+        print(self.srcPath)
+        pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageNameLine.setText(label)
         self.imageNameLine.setAlignment(Qt.AlignHCenter)

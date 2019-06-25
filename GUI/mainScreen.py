@@ -5,6 +5,7 @@ import os
 from imageBox import imageBox
 from createDialog import createProjectDialog 
 import skelMainscreen
+from previewWind import previewWindow
 
 class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     def __init__(self, width, height):
@@ -250,7 +251,7 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                 name = name + "A"
             else:
                 name = name + "N"
-            readImage.save(self.projectDir+ "/" + self.projectName+"/"+ name+exten)
+            readImage.save(self.projectDir + "/" + self.projectName + "/" + name + exten)
             # image.setParent(None)
         # TODO: Call the recognition for this directory
         for image in self.images:        
@@ -259,9 +260,11 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
             horizontalLayout.setParent(None)
             del horizontalLayout
         del self.horizontalLayouts
-        print(self.scrollarea.parent)
         self.scrollarea.setParent(None)
         del self.scrollarea
+        self.dockDesign.setParent(None)
+        del self.dockDesign
+        previewWindow(self)
 
 
 
