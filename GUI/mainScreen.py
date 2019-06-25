@@ -251,6 +251,10 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
                 name = name + "A"
             else:
                 name = name + "N"
+            if(image.staticList.isChecked()):
+                name = name + "S"
+            else:
+                name = name + "D"
             readImage.save(self.projectDir + "/" + self.projectName + "/" + name + exten)
             # image.setParent(None)
         # TODO: Call the recognition for this directory
