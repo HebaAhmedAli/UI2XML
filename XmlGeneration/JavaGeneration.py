@@ -63,6 +63,7 @@ def  printListItems(listView,idx):
         leafCount+=1            
     return items,selectedTypes,selectedNames
 def printAddingItems(listViewId,selectedVarNames,idx,appName):
+    print(appName)
     items = ""
     items+= "\t\tlv"+str(idx)+" = (ListView) findViewById(R.id.ListView"+str(listViewId)+");\n"\
     "\t\tarr_bean"+str(idx)+"=new ArrayList<>();\n"+\
