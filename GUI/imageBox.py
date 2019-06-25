@@ -10,12 +10,23 @@ class imageBox(QWidget):
         self.srcPath = ""
         self.groupBox = QGroupBox()
         self.layout = QVBoxLayout()
+        self.checkboxsLay = QWidget()
+        self.checkBoxs = QVBoxLayout()
         self.Hor = QHBoxLayout()
         self.imageLabel = QLabel()
 
+
         self.imageNameLine = QLineEdit()
         self.hasActionBar = QCheckBox("Action Bar")
+        self.dynamicList = QCheckBox("Static List")
+        self.checkBoxs.addWidget(self.hasActionBar)
+        self.checkBoxs.addWidget(self.dynamicList)
+
         self.deleteImage = delButton(self, index)
+        self.checkboxsLay.setLayout(self.checkBoxs)
+        self.Hor.addWidget(self.checkboxsLay)
+        self.Hor.addWidget(self.deleteImage)
+
         # self.checked = False
         self.row = 0
         self.col = 0
@@ -35,8 +46,7 @@ class imageBox(QWidget):
         self.imageLabel.setAlignment(Qt.AlignHCenter)
         self.layout.addWidget(self.imageLabel)
         self.layout.addWidget(self.imageNameLine)
-        self.Hor.addWidget(self.hasActionBar)
-        self.Hor.addWidget(self.deleteImage)
+
         self.layout.addLayout(self.Hor)
         self.groupBox.setLayout(self.layout)
         return self.groupBox
