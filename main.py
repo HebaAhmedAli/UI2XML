@@ -2,10 +2,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PIL import Image
 import os
-from imageBox import imageBox
-from createDialog import createProjectDialog 
-import skelMainscreen
-from previewWind import previewWindow
+from GUI.imageBox import imageBox
+from GUI.createDialog import createProjectDialog 
+import GUI.skelMainscreen as skelMainscreen
+from GUI.previewWind import previewWindow
 
 class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
     def __init__(self, width, height):
