@@ -9,16 +9,6 @@ import Constants
 import Preprocessing
 import numpy as np
 
-def scheduler(epoch): 
-    lrate =0.001
-    if epoch >= 1 and epoch<50:
-        lrate=0.001
-    elif epoch >=3 and epoch<75:
-        lrate=pow(10,-5)
-    elif epoch>=75:
-        lrate=pow(10,-6)
-    return lrate
-
 
 def createAndTrainCNNModel(X,auxFeatures,Y):
     cnnInput=Input(shape=(Constants.IMAGE_SIZE_CLASSIFICATION,Constants.IMAGE_SIZE_CLASSIFICATION,3))
@@ -32,12 +22,10 @@ def createAndTrainCNNModel(X,auxFeatures,Y):
     opt=SGD(lr=0.00001,momentum=0.9, decay=0.0, nesterov=True)
     model.compile(optimizer=opt, loss='categorical_crossentropy' , metrics=['categorical_accuracy'])
     model.fit(x=[X,auxFeatures], y=Y, batch_size=Constants.BATCH_SIZE, epochs=25,validation_split=0.2)
-    
     # from 75 to 100 epochs 
     opt=SGD(lr=0.000001,momentum=0.9, decay=0.0, nesterov=True)
     model.compile(optimizer=opt, loss='categorical_crossentropy' , metrics=['categorical_accuracy'])
-    model.fit(x=[X,auxFeatures], y=Y, batch_size=Constants.BATCH_SIZE, epochs=25,validation_split=0.2)
-    
+    model.fit(x=[X,auxFeatures], y=Y, batch_size=Constants.BATCH_SIZE, epochs=25,validation_split=0.2)  
     model.save('UI2XMLclassification.h5')
     return model
 
@@ -49,7 +37,7 @@ def evaluateModel(xTest,auxFeatures,yTest):
     
 def makeAprediction(invVocab,features,image=None,model=None,imgPath=None):
     if model==None:
-        model = load_model('data/ourModel/UI2XMLclassificationFeatures.h5')
+        model = load_model('data/ourModel/UI2XMLclassification_FeaturesAc_98_91_6.h5')
     inputImage = Preprocessing.imageReadAndPreprocessingClassification(imgPath,image)
     inputImage = np.expand_dims(inputImage, 0)
     features = np.expand_dims(features, 0)

@@ -6,9 +6,11 @@ from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 import numpy as np
-import cv2
+import Preprocessing
 import copy
+import cv2
 import math
+
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
         #Indexes of first diagonal
@@ -211,6 +213,29 @@ def getMostAndSecondMostColors(img,firstOnly):
             maxDeltaSecond = second
         level += 1
     return '#'+first,'#'+second
+
+
+def isCircle(imageCrop):
+    edged = Preprocessing.preProcessEdges(imageCrop)
+    (_, cnts, _) = cv2.findContours(edged,
+                                cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if len(cnts) == 0:
+        return False
+    cnt = max(cnts, key = cv2.contourArea)
+    M = cv2.moments(cnt)
+    circle = False
+    if M['m00'] > 0:
+        # calculate perimeter using
+        peri = cv2.arcLength(cnt, True)
+        area = cv2.contourArea(cnt)
+        circularity  = 4*math.pi*(area/(peri*peri))
+        # apply contour approximation and store the result in vertices
+        vertices = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+        if (len(vertices) > 5 and circularity > 0.7) or len(vertices) == 5:
+            circle = True
+        # return the name of the shape
+    return circle
+
 
 # For Testing.
 '''
