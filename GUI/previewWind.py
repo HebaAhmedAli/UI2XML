@@ -7,7 +7,7 @@ from tabs import xmlTab, imageTab
 class previewWindow(QDialog, skelPreviewWind.previewWindowSkel):
     def __init__(self, mainWindow):
         super(previewWindow, self).__init__(mainWindow)
-        self.setupUi(self, mainWindow)
+        self.setupUi(self)
         # For testing
         self.mp = {"mainN": {"boxes":[[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
                 "ids":['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
@@ -40,7 +40,7 @@ class previewWindow(QDialog, skelPreviewWind.previewWindowSkel):
             self.imgBoxes = self.imgObj["boxes"]
             self.boxesPred = self.imgObj["predicted"]
             self.boxesIDs = self.imgObj["ids"]
-            self.imagetabs.addTab(imageTab(imgsDir+"/"+imgpath), imgName)
+            # self.imagetabs.addTab(imageTab(imgsDir+"/"+imgpath), imgName)
             self.imgsNames.append(imgName)
     
     def updateXMLTab(self):

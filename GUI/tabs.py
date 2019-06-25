@@ -2,15 +2,18 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
 
-class imageTab(QWidget):
+class imageObj(QWidget):
     def __init__(self, imagepath):
         super(imageTab, self).__init__()
-        vBoxlayout	= QVBoxLayout()
+        hBoxlayout	= QHBoxLayout()
         self.imageLabel = QLabel()
         pixmapimage = QPixmap(imagepath).scaled(400,650)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageLabel.setAlignment(Qt.AlignCenter)
-        vBoxlayout.addWidget(self.imageLabel)
+        hBoxlayout.addWidget(self.imageLabel)
+        self.labelName = QLabel("blue")
+        self.labelName.setAlignment(Qt.AlignCenter)
+        hBoxlayout.addWidget(self.labelName)        
         self.setLayout(vBoxlayout)
 
 class xmlTab(QWidget):
