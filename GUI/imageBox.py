@@ -18,9 +18,9 @@ class imageBox(QWidget):
 
         self.imageNameLine = QLineEdit()
         self.hasActionBar = QCheckBox("Action Bar")
-        self.dynamicList = QCheckBox("Static List")
+        self.staticList = QCheckBox("Static List")
         self.checkBoxs.addWidget(self.hasActionBar)
-        self.checkBoxs.addWidget(self.dynamicList)
+        self.checkBoxs.addWidget(self.staticList)
 
         self.deleteImage = delButton(self, index)
         self.checkboxsLay.setLayout(self.checkBoxs)

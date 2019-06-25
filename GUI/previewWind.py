@@ -2,7 +2,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
 import skelPreviewWind 
-from tabs import xmlTab, imageTab
+from tabs import xmlTab
 
 class previewWindow(QDialog, skelPreviewWind.previewWindowSkel):
     def __init__(self, mainWindow):
