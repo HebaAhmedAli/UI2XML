@@ -264,7 +264,8 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
         del self.scrollarea
         self.dockDesign.setParent(None)
         del self.dockDesign
-        previewWindow(self)
+        self.setAcceptDrops(False)
+        self.lay.addWidget(previewWindow(self))
 
 
 
