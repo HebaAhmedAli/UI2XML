@@ -94,7 +94,7 @@ def setWeights(groupedNodes,sortAttr,screenDim,root,img=None,notLeafChilds=None)
 
 
 # set nodeType , text , color , x, y , width , hight , imagePath here.
-def createLeafNode(box,text,predictedComponent,img):
+def createLeafNode(box,text,predictedComponent,img,weight = None):
     leafNode = node()
     leafNode.x = box[0]
     leafNode.y = box[1]
@@ -120,6 +120,8 @@ def createLeafNode(box,text,predictedComponent,img):
             firstColor,secondColor = "#808080","#ffffff"
         leafNode.backgroundColor = firstColor
         leafNode.textColor = secondColor
+    if weight != None:
+        leafNode.weight = weight
     return leafNode
 
 
@@ -323,14 +325,17 @@ def groupTextViewsOfSameWord(groupedNodesI,img):
         minY = groupedNodesI[startJ].y
         maxY =  groupedNodesI[startJ].height+groupedNodesI[startJ].y
         text = groupedNodesI[startJ].text
-        while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.07\
-        and groupedNodesI[j+1].nodeType == 'android.widget.TextView' and abs(groupedNodesI[j+1].y-groupedNodesI[j].y)<=0.5*(maxY-minY):
+        while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.1\
+        and groupedNodesI[j+1].nodeType == 'android.widget.TextView':
             text += (" "+groupedNodesI[j+1].text)
             j+=1
             minY = min(minY,groupedNodesI[j].y)
             maxY = max(maxY,groupedNodesI[j].height+groupedNodesI[j].y)
         box = [groupedNodesI[startJ].x,minY,groupedNodesI[j].x+groupedNodesI[j].width-groupedNodesI[startJ].x,maxY-minY]
-        groupedNodesNew.append(createLeafNode(box,text,'android.widget.TextView',img))
+        if startJ != j:
+            groupedNodesNew.append(createLeafNode(box,text,'android.widget.TextView',img))
+        else:
+            groupedNodesNew.append(groupedNodesI[startJ])
         j += 1
     return groupedNodesNew
         
@@ -591,23 +596,22 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])]
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)
         elif len(indices) == 5: # 5 horizontal vertical leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])]
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)
         else: # 6 horizontal vertical horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])]
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)   
     # Merge text views after update.
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
             parentNodesForGui[int(indices[2])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes,img)
         elif len(indices) == 6: # 6 horizontal vertical horizontal leaf
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img)
-
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img) 
     parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
-    mapToXml(parentNode,appName,img.shape[0],actionBarOp)
+    mapToXml(parentNode,appName,img.shape[0],actionBarOp) 
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 
