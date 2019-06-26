@@ -1,15 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from main import mainScreen
 import sys
+import qdarkstyle
+from PyQt5.QtWidgets import *
+from Main import mainScreen
 
+# create the application and the main window
 app = QApplication(sys.argv)
-screen_resolution = app.desktop().screenGeometry()
-width, height = screen_resolution.width(), screen_resolution.height()
+window = mainScreen()
 
-dialog = mainScreen(width, height)
-dialog.show()
-sys.exit(app.exec_())
+# setup stylesheet
+app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+
+# run
+window.show()
+app.exec_()
 
