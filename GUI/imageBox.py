@@ -9,7 +9,7 @@ class imageBox(QWidget):
         super(imageBox, self).__init__()
         self.srcPath = ""
         self.groupBox = QGroupBox()
-        self.layout = QVBoxLayout()
+        self.fullImageBoxLay = QVBoxLayout()
         self.checkboxsLay = QWidget()
         self.checkBoxs = QVBoxLayout()
         self.Hor = QHBoxLayout()
@@ -44,24 +44,22 @@ class imageBox(QWidget):
         self.imageNameLine.setText(label)
         self.imageNameLine.setAlignment(Qt.AlignHCenter)
         self.imageLabel.setAlignment(Qt.AlignHCenter)
-        self.layout.addWidget(self.imageLabel)
-        self.layout.addWidget(self.imageNameLine)
+        self.fullImageBoxLay.addWidget(self.imageLabel)
+        self.fullImageBoxLay.addWidget(self.imageNameLine)
 
-        self.layout.addLayout(self.Hor)
-        self.groupBox.setLayout(self.layout)
+        self.fullImageBoxLay.addLayout(self.Hor)
+        self.groupBox.setLayout(self.fullImageBoxLay)
         return self.groupBox
 
     def resizeImg (self,index, row, col, width, height, isGrid =0 ):
         self.index = index
-        self.deleteImage.setindex(index)
+        self.deleteImage.index=index
         self.row = row
         self.col = col
         pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         return self.groupBox
 
-    def delimg(self):
-        self.groupBox.setParent(None)
 
 class delButton(QPushButton):
     deleted = pyqtSignal(int)
@@ -74,6 +72,3 @@ class delButton(QPushButton):
     def deleteImageBox(self):
         print("iam deleting")
         self.deleted.emit(self.index)
-
-    def setindex(self, index):
-        self.index = index

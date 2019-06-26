@@ -104,7 +104,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
             self.GroupBox = QtWidgets.QGroupBox()
             HLayoutCnt = len(self.horizontalLayouts)
             newimage = imageBox(self.numOfImages)
-            # newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
+            newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
             self.numOfImages = self.numOfImages + 1
 
             if (self.horizontalLayouts[HLayoutCnt -1]).count() >= self.maxRowSize  :
@@ -121,4 +121,57 @@ class dragDropScroll(QtWidgets.QScrollArea):
             self.imageBoxes.append(newimage)
             self.horizontalLayouts[self.indexRow].addWidget(imagebox)
             self.indexColumn = self.indexColumn + 1
+    
 
+    def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
+        maxRowSize = noImgPerRow
+        imageBox_W = (self.screenW - 440 - 7 * noImgPerRow) / noImgPerRow - 20  # 201
+        if imageBox_W < 180:
+            imageBox_W = 180
+            maxRowSize = 7
+        imageBox_H = int(imageBox_W * 4 / 3)  # 268
+
+        indexRow = 0
+        indexCol = 0
+        newIndexRow = 0
+        newIndexCol = 0
+        newHorLayouts = []
+        newLine = QtWidgets.QHBoxLayout()
+        newHorLayouts.append(newLine)
+        newHorLayouts[0].setAlignment(QtCore.Qt.AlignLeft)
+
+        for imagebox in self.imageBoxes:
+            imagebox.groupBox.setParent(None)
+
+        for idx in range (0, self.numOfImages):
+            if idx / (indexRow +1) >= self.maxRowSize:
+                indexRow = indexRow + 1
+                indexCol = 0
+            imagebox = self.imageBoxes[idx].resizeImg(idx,  newIndexRow, newIndexCol, imageBox_W, imageBox_H)
+            if idx / (newIndexRow +1) >= maxRowSize :
+                newIndexRow = newIndexRow + 1
+                newIndexCol = 0
+                newLine = QtWidgets.QHBoxLayout()
+                newHorLayouts.append(newLine)
+                newHorLayouts[newIndexRow].setAlignment(QtCore.Qt.AlignLeft)
+
+            newHorLayouts[newIndexRow].addWidget(imagebox)
+            indexCol = indexCol + 1
+            newIndexCol = newIndexCol + 1
+
+        self.horizontalLayouts = newHorLayouts
+        for idx in range (0, len(self.horizontalLayouts)):
+            self.imgsHLayoutsContainer.addLayout(self.horizontalLayouts[idx])
+
+        self.maxRowSize = maxRowSize
+        self.imageBox_W = imageBox_W
+        self.imageBox_H = imageBox_H
+        self.indexColumn = newIndexCol
+        self.indexRow = newIndexRow
+
+    def on_deleteButton_clicked(self, index):
+        print("Deleting Image num " + str(index))
+        self.imageBoxes[index].groupBox.setParent(None)
+        del self.imageBoxes[index]
+        self.numOfImages = self.numOfImages -1
+        self.chanageGridSize(self.maxRowSize)
