@@ -28,6 +28,7 @@ class Ui_mainWindow(object):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
         mainWindow.resize(800, 600)
         mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
+        self.setAcceptDrops(True)
         self.centralwidget = QtWidgets.QWidget(mainWindow)
         self.centralwidget.setAcceptDrops(False)
         self.centralwidget.setAutoFillBackground(False)
