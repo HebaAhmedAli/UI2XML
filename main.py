@@ -15,5 +15,5 @@ class mainScreen (QMainWindow,  skelMainscreen.Ui_mainWindow):
 
     def createUploadUI(self):
         uploadWidget = uploadWindow.uploadWindow()
-        self.centralwidget.setLayout(uploadWidget.verticalLayout)
+        self.centralwidget.setLayout(uploadWidget.layoutScroll)
         self.addDockWidget(Qt.DockWidgetArea(2), uploadWidget.dockDesign)

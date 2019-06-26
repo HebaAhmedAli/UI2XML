@@ -5,6 +5,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from GUI.dragDropScrollArea import dragDropScroll
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -19,6 +20,7 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
+
 
 
 class Ui_uploadWindow(object):
@@ -40,15 +42,13 @@ class Ui_uploadWindow(object):
         self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
         self.dockDesign.setWidget(self.dockWidgetContents)
 
-        
-        self.gridData = QtWidgets.QWidget()
-        self.Layout = QtWidgets.QVBoxLayout()
-        self.Layout.setAlignment(QtCore.Qt.AlignTop)
-        self.gridData.setLayout(self.Layout)
+
         # Upload Area scrollable
-        self.scrollarea = QtWidgets.QScrollArea()
+        self.scrollarea = dragDropScroll()
         self.scrollarea.setWidgetResizable(True)
         self.scrollarea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.scrollarea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.scrollarea.setWidget(self.gridData)
+        self.scrollarea.setWidget(self.scrollarea.gridData)
 
+        self.layoutScroll = QtWidgets.QVBoxLayout()
+        self.layoutScroll.addWidget(self.scrollarea)
