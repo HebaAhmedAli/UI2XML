@@ -598,6 +598,14 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
         else: # 6 horizontal vertical horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])]
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+    # Merge text views after update.
+    for i in range(len(idUpdated)):
+        indices = idUpdated[i].split('_')
+        if len(indices) == 4: # horizontal leaf
+            parentNodesForGui[int(indices[2])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes,img)
+        elif len(indices) == 6: # 6 horizontal vertical horizontal leaf
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img)
+
     parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
