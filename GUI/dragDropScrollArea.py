@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from GUI.utils import alertUser
+import GUI.utils as utils
 from GUI.imageBox import imageBox
 import screeninfo
 import os
@@ -29,14 +29,14 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def createImgsArea(self):
         self.gridData = QtWidgets.QWidget()
-        self.imgsLayout = QtWidgets.QVBoxLayout()
-        self.imgsLayout.setAlignment(QtCore.Qt.AlignTop)
-        self.gridData.setLayout(self.imgsLayout)
+        self.imgsHLayoutsContainer = QtWidgets.QVBoxLayout()
+        self.imgsHLayoutsContainer.setAlignment(QtCore.Qt.AlignTop)
+        self.gridData.setLayout(self.imgsHLayoutsContainer)
 
         firstHLay = QtWidgets.QHBoxLayout()
         self.horizontalLayouts.append(firstHLay)
         self.horizontalLayouts[0].setAlignment(QtCore.Qt.AlignLeft)        
-        self.imgsLayout.addLayout(self.horizontalLayouts[0])
+        self.imgsHLayoutsContainer.addLayout(self.horizontalLayouts[0])
         
 
     def dragEnterEvent(self, event):
@@ -67,16 +67,15 @@ class dragDropScroll(QtWidgets.QScrollArea):
         endIdx = filePath.rfind('.', 0, len(filePath)) + 1
         fileExten = filePath[endIdx:]
         fileExten = fileExten.lower()
-        designModes = ("Hand Darwing", "Screenshot", "PSD File")
+        designModes = ("Hand Drawing", "Screenshots", "PSD File")
         extensions = {"imgExten": ["jpg", "jpeg", "png"],"psdExten":["psd"]}
-
-        if( self.designMode == designModes[0] or self.designMode == designModes[1]):
+        if( utils.designMode == designModes[0] or utils.designMode == designModes[1]):
             if( not (fileExten in extensions["imgExten"])):
-                alertUser("Format Error", str(filePath) + " has inappropriate Image format.")
+                utils.alertUser("Format Error", str(filePath) + " has inappropriate Image format.")
                 return False
-        if( self.designMode == designModes[2]):
+        if( utils.designMode == designModes[2]):
             if(not (fileExten in extensions["psdExten"])):
-                alertUser("Format Error", str(filePath) + " has inappropriate PSD format.")
+                utils.alertUser("Format Error", str(filePath) + " has inappropriate PSD format.")
                 return False
         return True
 
@@ -94,13 +93,13 @@ class dragDropScroll(QtWidgets.QScrollArea):
     def pictureDropped(self, paths):
         for filePath in paths:
             if not os.path.exists(filePath):
-                alertUser("File Error", str(filePath) + " path doesn't exist.")
+                utils.alertUser("File Error", str(filePath) + " path doesn't exist.")
                 continue
 
             startI = filePath.rfind('/', 0, len(filePath)) + 1
             fileName = filePath[startI:]
-            # if(not self.matchFormat(filePath)):
-            #     continue
+            if(not self.matchFormat(filePath)):
+                continue
 
             self.GroupBox = QtWidgets.QGroupBox()
             HLayoutCnt = len(self.horizontalLayouts)
@@ -115,11 +114,11 @@ class dragDropScroll(QtWidgets.QScrollArea):
                 newLine = QtWidgets.QHBoxLayout()
                 self.horizontalLayouts.append(newLine)
                 self.horizontalLayouts[self.indexRow].setAlignment(QtCore.Qt.AlignLeft)
-                self.imgsLayout.addLayout(self.horizontalLayouts[self.indexRow])
+                self.imgsHLayoutsContainer.addLayout(self.horizontalLayouts[self.indexRow])
 
             imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
                                             self.imageBox_H, self.IsGrid)
             self.imageBoxes.append(newimage)
             self.horizontalLayouts[self.indexRow].addWidget(imagebox)
-            self.indexColumn = self.indexColumn +1
+            self.indexColumn = self.indexColumn + 1
 
