@@ -11,7 +11,6 @@ import numpy as np
 import copy
 
 
-
 class node:
     def __init__(self):
         self.id = -1
@@ -68,7 +67,7 @@ def getWeightFromRatio(ratio,step):
     return weight 
   
 def setWeights(groupedNodes,sortAttr,screenDim,root,img=None,notLeafChilds=None):
-    if not root:
+    if not root and sortAttr != 'x':
         groupedNodes = sorted(groupedNodes, key=operator.attrgetter(sortAttr))
     ratio = 0
     weight = 0
@@ -124,7 +123,36 @@ def createLeafNode(box,text,predictedComponent,img):
     return leafNode
 
 
-def groupHorizontalLeafNodes(boxes,texts,predictedComponents,img):
+def groupHorizontalLeafNodes(groupedNodesI,imgH,img):
+    groupedNodesHorizontal = []
+    visited = [False for i in range(len(groupedNodesI))]
+    indexUnvisited = 0
+    while(indexUnvisited!=-1):
+        backetNodes=[]
+        backetNodes.append(groupedNodesI[indexUnvisited])
+        visited[indexUnvisited]=True
+        minY=100000
+        maxY=-1
+        minY = min(minY,groupedNodesI[indexUnvisited].y)
+        maxY = max(maxY,groupedNodesI[indexUnvisited].y+groupedNodesI[indexUnvisited].height)
+        boxNew = [groupedNodesI[indexUnvisited].x,minY,groupedNodesI[indexUnvisited].width,maxY-minY]
+        for i in range(indexUnvisited+1,len(groupedNodesI)):
+            boxI = [groupedNodesI[i].x,groupedNodesI[i].y,groupedNodesI[i].width,groupedNodesI[i].height]
+            if visited[i] == False and Utils.checkYrange(boxNew,boxI) == True:
+                minY = min(minY,groupedNodesI[i].y)
+                maxY = max(maxY,groupedNodesI[i].y+groupedNodesI[i].height)
+                boxNew = [groupedNodesI[i].x,minY,groupedNodesI[i].width,maxY-minY]
+                visited[i] = True
+                backetNodes.append(groupedNodesI[i])
+        if len(backetNodes) == 1:
+            groupedNodesHorizontal.append(backetNodes[0])
+        else:
+            backetNodes = groupTextViewsOfSameWord(backetNodes,img)
+            groupedNodesHorizontal.append(createParentNodeHorizontal(backetNodes,img,backetNodes[0].x,backetNodes[-1].x+backetNodes[-1].width-backetNodes[0].x))
+        indexUnvisited=getFirstUnvisitedIndex(visited)
+    return groupedNodesHorizontal
+
+def groupHorizontalLeafBoxes(boxes,texts,predictedComponents,img):
     groupedNodes = []
     visited = [False for i in range(len(boxes))]
     indexUnvisited = 0
@@ -150,6 +178,14 @@ def groupHorizontalLeafNodes(boxes,texts,predictedComponents,img):
         indexUnvisited=getFirstUnvisitedIndex(visited)
     return groupedNodes
 
+def specialRadioHandDrawn(groupedNodesIA,groupedNodesIB):
+    if Constants.HAND_DRAWN == False:
+        return False
+    if groupedNodesIA.nodeType == "android.widget.RadioButton" and groupedNodesIB.text != "" and (groupedNodesIB.text[0] == 'o' or groupedNodesIB.text[0] == 'O'):
+        return True
+    if groupedNodesIB.nodeType == "android.widget.RadioButton" and groupedNodesIA.text != "" and (groupedNodesIA.text[0] == 'o' or groupedNodesIA.text[0] == 'O'):
+        return True
+    
 def groupVerticalLeafNodes(groupedNodesI,imgH,img):
     groupedNodesVertical = []
     visited = [False for i in range(len(groupedNodesI))]
@@ -165,8 +201,8 @@ def groupVerticalLeafNodes(groupedNodesI,imgH,img):
         boxNew = [minX,groupedNodesI[indexUnvisited].y,maxX-minX,groupedNodesI[indexUnvisited].height]
         for i in range(indexUnvisited+1,len(groupedNodesI)):
             boxI = [groupedNodesI[i].x,groupedNodesI[i].y,groupedNodesI[i].width,groupedNodesI[i].height]
-            if visited[i] == False and Utils.checkXrange(boxNew,boxI) == True:
-                minX = min(minX,groupedNodesI[indexUnvisited].x)
+            if visited[i] == False and Utils.checkXrange(boxNew,boxI) == True and not specialRadioHandDrawn(groupedNodesI[indexUnvisited],groupedNodesI[i]):
+                minX = min(minX,groupedNodesI[i].x)
                 maxX = max(maxX,groupedNodesI[i].x+groupedNodesI[i].width)
                 boxNew = [minX,groupedNodesI[i].y,maxX-minX,groupedNodesI[i].height]
                 visited[i] = True
@@ -176,6 +212,49 @@ def groupVerticalLeafNodes(groupedNodesI,imgH,img):
         else:
             groupedNodesVertical.append(createParentNodeVertical(backetNodes,imgH,"LinearLayoutVertical",img,True))
         indexUnvisited=getFirstUnvisitedIndex(visited)
+    return groupedNodesVertical
+
+def packetVerticalLeafNodesNoParent(groupedNodesI,imgH,img):
+    groupedNodesVertical = []
+    visited = [False for i in range(len(groupedNodesI))]
+    indexUnvisited = 0
+    minX=100000
+    maxX=-1
+    oldPacket = []
+    while(indexUnvisited!=-1):
+        backetNodes=[]
+        backetNodes.append(groupedNodesI[indexUnvisited])
+        visited[indexUnvisited]=True
+        minX = min(minX,groupedNodesI[indexUnvisited].x)
+        maxX = max(maxX,groupedNodesI[indexUnvisited].x+groupedNodesI[indexUnvisited].width)
+        boxNew = [minX,groupedNodesI[indexUnvisited].y,maxX-minX,groupedNodesI[indexUnvisited].height]
+        for i in range(indexUnvisited+1,len(groupedNodesI)):
+            boxI = [groupedNodesI[i].x,groupedNodesI[i].y,groupedNodesI[i].width,groupedNodesI[i].height]
+            if visited[i] == False and Utils.checkXrange(boxNew,boxI) == True:
+                minX = min(minX,groupedNodesI[i].x)
+                maxX = max(maxX,groupedNodesI[i].x+groupedNodesI[i].width)
+                boxNew = [minX,groupedNodesI[i].y,maxX-minX,groupedNodesI[i].height]
+                visited[i] = True
+                backetNodes.append(groupedNodesI[i])
+            else:
+                break
+        if len(backetNodes) == 1:
+            if len(oldPacket) != 0:
+                if indexUnvisited==len(groupedNodesI)-1 and backetNodes[0].nodeType == 'android.widget.TextView':
+                    oldPacket.append(backetNodes[0])
+                    groupedNodesVertical.append(oldPacket)
+                    oldPacket = []
+                else:
+                    groupedNodesVertical.append(oldPacket)
+                    groupedNodesVertical.append(backetNodes)
+                    oldPacket = []
+            else:
+                groupedNodesVertical.append(backetNodes)
+        else:
+            oldPacket += backetNodes
+        indexUnvisited=getFirstUnvisitedIndex(visited)
+    if len(oldPacket) != 0:
+        groupedNodesVertical.append(oldPacket)
     return groupedNodesVertical
 
 def createParentNodeVertical(groupedNodes,imgH,parentType,img,notLeafChilds):
@@ -198,7 +277,7 @@ def createParentNodeVertical(groupedNodes,imgH,parentType,img,notLeafChilds):
     parentNode.childNodes = groupedNodes
     return parentNode
  
-def createParentNodeHorizontal(groupedNodes,imgW,img):
+def createParentNodeHorizontal(groupedNodes,img,x,width):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutHorizontal"
     #parentNode.width = "match_parent"
@@ -207,13 +286,15 @@ def createParentNodeHorizontal(groupedNodes,imgW,img):
     for i in range(len(groupedNodes)):
         minY=min(minY,groupedNodes[i].y)
         maxY=max(maxY,groupedNodes[i].y+int(groupedNodes[i].height))
-    parentNode.x = 0 
-    parentNode.width = imgW
+    parentNode.x = x 
+    parentNode.width = width
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
-        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - imgW/2) <= 30:
+        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 50:
             parentNode.gravity = "center"
+        elif groupedNodes[0].x/img.shape[1] > 0.5:
+            parentNode.gravity = "right"
         parentNode.childNodes = groupedNodes
         if not Constants.HAND_DRAWN:
             imgClean = clearInnerBoxes(parentNode,parentNode.childNodes,img)
@@ -221,7 +302,7 @@ def createParentNodeHorizontal(groupedNodes,imgW,img):
         else:
             parentNode.backgroundColor = "#ffffff"
         return parentNode
-    groupedNodes = setWeights(groupedNodes,'x',imgW,False)
+    groupedNodes = setWeights(groupedNodes,'x',width,False)
     parentNode.childNodes = groupedNodes
     if not Constants.HAND_DRAWN:
         imgClean = clearInnerBoxes(parentNode,parentNode.childNodes,img)
@@ -230,16 +311,54 @@ def createParentNodeHorizontal(groupedNodes,imgW,img):
         parentNode.backgroundColor = "#ffffff"
     return parentNode
 
+def groupTextViewsOfSameWord(groupedNodesI,img):
+    j=0
+    groupedNodesNew = []
+    while j<len(groupedNodesI):
+        startJ = j
+        if groupedNodesI[startJ].nodeType != 'android.widget.TextView':
+            groupedNodesNew.append(groupedNodesI[startJ])
+            j += 1
+            continue
+        minY = groupedNodesI[startJ].y
+        maxY =  groupedNodesI[startJ].height+groupedNodesI[startJ].y
+        text = groupedNodesI[startJ].text
+        while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.07\
+        and groupedNodesI[j+1].nodeType == 'android.widget.TextView' and abs(groupedNodesI[j+1].y-groupedNodesI[j].y)<=0.5*(maxY-minY):
+            text += (" "+groupedNodesI[j+1].text)
+            j+=1
+            minY = min(minY,groupedNodesI[j].y)
+            maxY = max(maxY,groupedNodesI[j].height+groupedNodesI[j].y)
+        box = [groupedNodesI[startJ].x,minY,groupedNodesI[j].x+groupedNodesI[j].width-groupedNodesI[startJ].x,maxY-minY]
+        groupedNodesNew.append(createLeafNode(box,text,'android.widget.TextView',img))
+        j += 1
+    return groupedNodesNew
+        
+def groupHorizontalInsideVertical(groupedNodesI,img):
+    groupedNodesNew = []
+    packetsVertical = packetVerticalLeafNodesNoParent(groupedNodesI,img.shape[0],img)
+    if len(packetsVertical) == 1:
+        return groupedNodesI
+    for i in range(len(packetsVertical)):
+        if len(packetsVertical[i]) == 1:
+            groupedNodesNew.append(packetsVertical[i][0])
+        else:
+            groupedNodesNew += groupHorizontalLeafNodes(packetsVertical[i],img.shape[0],img)     
+    return groupedNodesNew
+            
 def createLeavesParents(groupedNodes,img):
     parentNodes = []
     for i in range(len(groupedNodes)):
+        groupedNodes[i] = sorted(groupedNodes[i], key=operator.attrgetter('x'))
+        groupedNodes[i] = groupHorizontalInsideVertical(groupedNodes[i],img)
+        groupedNodes[i] = groupTextViewsOfSameWord(groupedNodes[i],img)
         groupedNodesVertical = groupVerticalLeafNodes(groupedNodes[i],img.shape[0],img)
-        parentNode = createParentNodeHorizontal(groupedNodesVertical,img.shape[1],img)
+        parentNode = createParentNodeHorizontal(groupedNodesVertical,img,0,img.shape[1])
         parentNodes.append(parentNode)
     return parentNodes
     
 def buildParentNodes(boxes,texts,predictedComponents,img):
-    groupedNodes = groupHorizontalLeafNodes(boxes,texts,predictedComponents,img)
+    groupedNodes = groupHorizontalLeafBoxes(boxes,texts,predictedComponents,img)
     parentNodes = createLeavesParents(groupedNodes,img)
     return parentNodes
 
@@ -498,7 +617,9 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup',img,True))
                 i = lastIndex
             elif lastIndex-i>=2 and patternToSearch.find('android.widget.EditText') == -1 and not(patternToSearch.find('android.widget.Button') != -1 and patternToSearch.find('android.widget.TextView') == -1)\
-            and not(patternToSearch.find('android.widget.CheckBox') != -1 and patternToSearch.find('android.widget.TextView') == -1):
+            and not(patternToSearch.find('android.widget.CheckBox') != -1 and patternToSearch.find('android.widget.TextView') == -1) \
+            and not(patternToSearch.find('android.widget.SeekBar') != -1 and patternToSearch.find('android.widget.TextView') == -1) \
+            and not(patternToSearch.find('android.widget.Switch') != -1 and patternToSearch.find('android.widget.TextView') == -1):
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.ListView',img,True))
                 i = lastIndex
             else:
@@ -534,7 +655,7 @@ def extractPatternOfNode(parentNode):
     for i in range(len(parentNode.childNodes)):
         pattern += parentNode.childNodes[i].nodeType
         if parentNode.childNodes[i].nodeType == 'android.widget.RadioButton':
-            pattern +=  'android.widget.RadioButton'
+            pattern =  'android.widget.RadioButton'
             countChildRadio +=1
     if countChildRadio > 1:
         radioHorizontal = True
