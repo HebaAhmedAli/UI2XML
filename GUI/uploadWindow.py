@@ -10,6 +10,7 @@ class uploadWindow(QDialog, skelUploadWindow.Ui_uploadWindow):
         self.setupUi(self)
 
     # Placement of the uploaded image
+        self.setAcceptDrops(True)
         self.screenW, self.screenH = self.getScreenDims()
         self.IsGrid = 1
         self.indexColumn = 0

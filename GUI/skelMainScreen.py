@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #
@@ -23,15 +22,18 @@ except AttributeError:
         return QtWidgets.QApplication.translate(context, text, disambig)
 
 
-class Ui_mainWindow(object):
+class Ui_mainWindow(QtWidgets.QGraphicsObject):
     def setupUi(self, mainWindow):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
         mainWindow.resize(800, 600)
         mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
+
         self.setAcceptDrops(True)
+
         self.centralwidget = QtWidgets.QWidget(mainWindow)
         self.centralwidget.setAcceptDrops(False)
         self.centralwidget.setAutoFillBackground(False)
+        #self.centralwidget.setAcceptDrops(True)
         mainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(mainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
