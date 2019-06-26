@@ -41,7 +41,7 @@ def processImage(subdir, file,model,invVocab):
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6])
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
     #print(Constants.mapToGui)
-    #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42],[19, 201, 502, 64]],['android.widget.'+"ImageButton",'android.widget.'+"ImageView"],['ImageView_0_0_0','EditText_0_2_0'],imgXML,file[:-5],file[len(file)-5])
+    #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         j = 0
         for x,y,w,h in boxes:
@@ -69,7 +69,7 @@ def updateImage(subdir,file,valMapFromGui):
         Constants.DYNAMIC=True
     else:
         Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
         
 # UI2XMLclassification_224_245000_99_93
@@ -92,6 +92,8 @@ def processAllImages(imagesPath,model,invVocab):
             processImage(imagesPath, file,model,invVocab)
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
+    # TODO: Comment after testing.
+    mapUpdatedFromGui = {"drND.png":([[19, 18, 44, 42]],['ImageView_0_16_1_0_1'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
@@ -103,3 +105,4 @@ model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 
 imagesPath='data/ScreenShots/ourTest'
 
 processAllImages(imagesPath,model,invVocab)
+updateAllImages(imagesPath,{})

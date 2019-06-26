@@ -592,9 +592,12 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
         if len(indices) == 4: # horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])]
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
-        else: # 5 horizontal vertical leaf
+        elif len(indices) == 5: # 5 horizontal vertical leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])]
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+        else: # 6 horizontal vertical horizontal leaf
+            parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])]
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
     parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
