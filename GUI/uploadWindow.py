@@ -41,6 +41,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             endI = imageName.rfind('.', 0, len(imageName))
             exten = imageName[endI:]
             name = imageName[:endI]
+            name = name.lower()
             if(image.hasActionBar.isChecked()):
                 name = name + "A"
             else:
