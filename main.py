@@ -12,10 +12,12 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
     def __init__(self):
         super(mainScreen, self).__init__()
         self.state = "INS_PIC"
-        self.startUp()
-        self.createUploadUI()
-        self.actionRun.triggered.connect(self.uploadWidget.populateProjDir)
-
+        self.setupUi(self)
+        # self.startUp()
+        # self.createUploadUI()
+        # self.actionRun.triggered.connect(self.uploadWidget.populateProjDir)
+        prev = prevWindow.previewWindow()
+        self.centralwidget.setLayout(prev.mainHLayout)
         
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -26,8 +28,3 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
         self.mainDialoge.activateWindow()
-        self.setupUi(self)
-
-    # @pyqtSlot()
-    # def removeUploadWidget(self):
-    #     self.uploadWidget.removeUploadWid()
