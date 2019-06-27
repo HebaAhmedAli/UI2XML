@@ -168,7 +168,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.indexColumn = newIndexCol
         self.indexRow = newIndexRow
 
-    def convertFiles(self):
+    def populateProjDir(self):
         names=[]
         for image in self.imageBoxes:
             name = str(image.imageNameLine.text())

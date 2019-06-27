@@ -24,4 +24,4 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.mainDialoge.activateWindow()
         self.setupUi(self)
         self.createUploadUI()
-        self.actionRun.triggered.connect(self.uploadWidget.scrollarea.convertFiles)
+        self.actionRun.triggered.connect(self.uploadWidget.scrollarea.populateProjDir)
