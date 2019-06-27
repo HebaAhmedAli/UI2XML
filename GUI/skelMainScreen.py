@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #

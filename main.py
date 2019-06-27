@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
 from GUI.createProjDialog import createProjectDialog
+import  GUI.prevWindow as prevWindow
 
 
 
