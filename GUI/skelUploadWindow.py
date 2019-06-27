@@ -41,7 +41,7 @@ class Ui_uploadWindow(object):
         self.dockWidgetContents = QtWidgets.QWidget()
         self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
         self.dockDesign.setWidget(self.dockWidgetContents)
-
+        self.dockDesign.setMinimumWidth(350)
 
         # Upload Area scrollable
         self.scrollarea = dragDropScroll()

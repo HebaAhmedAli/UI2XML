@@ -79,7 +79,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
                 return False
         return True
 
-
     def getScreenDims(self):
         monitor = screeninfo.get_monitors()
         monitor = str(monitor)
@@ -121,7 +120,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
             self.imageBoxes.append(newimage)
             self.horizontalLayouts[self.indexRow].addWidget(imagebox)
             self.indexColumn = self.indexColumn + 1
-    
 
     def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
         maxRowSize = noImgPerRow
