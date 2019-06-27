@@ -35,7 +35,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         for i in imageboxs:
             high = componentHighlight(self.activeImageWidget, i[2], i[3])
             self.highlights.append(high)
-            self.highlights[self.index].move(i[0], i[1])
+            self.highlights[self.index].move(i[0]+13, i[1]+13)
             self.index = self.index + 1
 
 
