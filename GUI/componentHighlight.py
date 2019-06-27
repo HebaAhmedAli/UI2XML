@@ -7,7 +7,8 @@ class componentHighlight(QtWidgets.QPushButton):
         self.installEventFilter(self)
 
         self.setFixedSize(width, height)
-        self.setStyleSheet("""background-color:rgba(0,0,0,1);""")
+        self.setStyleSheet("""background-color:rgba(0,0,0,0);
+        border: 0px solid rgb(0,0,255);""")
 
     def eventFilter(self, object, event):
 
@@ -16,11 +17,12 @@ class componentHighlight(QtWidgets.QPushButton):
             return True
 
         elif event.type() == QtCore.QEvent.HoverMove:
-            self.setStyleSheet("""background-color:rgba(0,0,0,1);
+            self.setStyleSheet("""background-color:rgba(0,0,0,0);
                    border: 3px solid rgb(0,0,255);""")
             return True
         elif event.type() == QtCore.QEvent.HoverLeave:
-            self.setStyleSheet("""background-color:rgba(0,0,0,1)""")
+            self.setStyleSheet("""background-color:rgba(0,0,0,0);
+            border: 0px solid rgb(0,0,255);""")
             return True
         return False
 
