@@ -24,6 +24,7 @@ except AttributeError:
 
 
 class Ui_mainWindow(object):
+    # makeProjectFolder = qtsignal(int)
     def setupUi(self, mainWindow):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
         mainWindow.resize(800, 600)
@@ -96,6 +97,7 @@ class Ui_mainWindow(object):
         self.actionDesign_Code.setChecked(True)
         self.actionDesign_Code.setObjectName(_fromUtf8("actionDesign_Code"))
         self.actionRun = QtWidgets.QAction(mainWindow)
+        # self.actionRun.triggered.connect(self.fireMakeProject)
         self.actionRun.setObjectName(_fromUtf8("actionRun"))
         self.actionEdit_Configurations = QtWidgets.QAction(mainWindow)
         self.actionEdit_Configurations.setObjectName(_fromUtf8("actionEdit_Configurations"))
@@ -205,3 +207,5 @@ class Ui_mainWindow(object):
         self.action3_images_per_row.setText(_translate("mainWindow", "3 images per row ", None))
         self.actionCoustom.setText(_translate("mainWindow", "Coustom...", None))
 
+    # def fireMakeProject(self):
+    #     self.makeProjectFolder.emit(0)

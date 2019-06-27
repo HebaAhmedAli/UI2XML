@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 designModes = ("Screenshots", "Hand Darwing",  "PSD File")
+imgExten = ["jpg", "jpeg", "png"]
+
 designMode = designModes[0]
 projCreationDetails = []
 
