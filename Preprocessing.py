@@ -13,7 +13,7 @@ def imageReadAndPreprocessingClassification(imgPath=None,imagee=None):
         img = np.array(img,dtype='float32')  
         img /= 255.
         return img
-    
+
 def preProcessEdges(image):
     lowThreshold = 30 #30
     highThreshold = 60 #60
