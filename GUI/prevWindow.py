@@ -3,7 +3,7 @@ import os
 import imagesize 
 from GUI.skelPrevWindow import  previewWindowSkel
 #from GUI.tabs import xmlTab
-import GUI.activityListItem as activityListItem
+from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
 import GUI.utils as utils
 import Constants
@@ -18,11 +18,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
                 ['ImageButton', 'ImageView', 'EditText', 'EditText'],
-                ["activity_twitter.xml", "activity_twitter1.xml"]),
+                ["activity.xml", "activity2.xml"]),
                 "kolND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
                 ['ImageButton', 'ImageView', 'EditText', 'EditText'],
-                ["activity_twitter.xml", "activity_twitter1.xml"])
+                ["activity.xml", "activity2.xml"])
                 }
         
         projDir = Constants.imagesPath
@@ -33,7 +33,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 mainActivityName = imgName
             imgDir = projDir+"/"+imgName
             imgName = imgName[:endI-2]+imgName[endI:]
-            activityHLayout = activityListItem.activityListItem(imgDir, imgName)
+            activityHLayout = activityListItem(imgDir, imgName)
             self.activitysHLayouts.append(activityHLayout)
             self.verticalLayout.addLayout(activityHLayout)
 
@@ -47,15 +47,14 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         imageboxs = imgsOutputInfo[mainActivityName][0]
         self.highlights = []
         imgW, imgH = imagesize.get(mainActivityDir)
-        print(imgW, imgH)
         for compBox in imageboxs:
             scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
             errorMargin = 10
             high = componentHighlight(self.activeImageWidget, scaledCompBox[2]+errorMargin, scaledCompBox[3]+errorMargin)
             high.move(scaledCompBox[0]+errorMargin, scaledCompBox[1]+errorMargin)
             self.highlights.append(high)
-            print(compBox)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
+        self.updateXMLTab(imgsOutputInfo[mainActivityName][3])
 
     def calculateScaledBox(self, originalBox, imgW, imgH):
         scaledBox = []
@@ -70,4 +69,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         scaledBox.append(x2-x1)
         scaledBox.append(y2-y1)
         return scaledBox
+    
+
+    def updateXMLTab(self, xmlFiles):
+        xmlDir = Constants.imagesPath + "/layouts"
+        for xmlFile in xmlFiles:
+            tab = xmlTab()
+            text=open(str(xmlDir+"/"+xmlFile)).read()
+            tab.textBrowser.setPlainText(text)
+            self.xmlTabs.addTab(tab, xmlFile[:-4])
 

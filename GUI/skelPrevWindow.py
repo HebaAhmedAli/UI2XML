@@ -14,8 +14,6 @@ class previewWindowSkel(object):
         self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
-        tab = QtWidgets.QWidget()
-        self.xmlTabs.addTab(tab, "Hope")
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.activeImgverticalLayout = QtWidgets.QVBoxLayout()

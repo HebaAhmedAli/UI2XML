@@ -21,3 +21,19 @@ class activityListItem(QHBoxLayout):
         self.nameBoxLay.addWidget(self.imageNameLine)
         self.addLayout(self.imageBoxLay)
         self.addLayout(self.nameBoxLay)
+
+
+class xmlTab(QWidget):
+    def __init__(self):
+        super(xmlTab, self).__init__()
+        vBoxlayout	= QVBoxLayout()
+        self.xmlWidget = QWidget()
+        self.textBrowser = QTextBrowser(self.xmlWidget)
+        self.textBrowser.setStyleSheet("background-color: \"white\";\n"
+            "color: rgb(156,156,156);\n"
+            "border: 5px solid  rgb(66, 138, 255);\n"
+            "border-radius: 20%;")
+        self.textBrowser.setGeometry(QRect(0, 0, 300, 600))
+        self.textBrowser.setAlignment(Qt.AlignCenter)                      
+        vBoxlayout.addWidget(self.xmlWidget)
+        self.setLayout(vBoxlayout)
