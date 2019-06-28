@@ -105,10 +105,10 @@ def createLeafNode(box,text,predictedComponent,img,weight = None):
     leafNode.nodeType = predictedComponent
     if predictedComponent == 'android.widget.ImageView' or predictedComponent == 'android.widget.ImageButton':
         if not Constants.HAND_DRAWN:
-            if not os.path.exists(Constants.DIRECTORY+'/drawable'):
-                os.makedirs(Constants.DIRECTORY+'/drawable')
+            if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
+                os.makedirs(Constants.DIRECTORY+'/res/drawable')
             cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
-            Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
+            Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
             leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
         else:
             leafNode.imagePath = "pic_x"
@@ -517,7 +517,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
-        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
+        fToListView=open(Constants.DIRECTORY+'/res/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
         Constants.xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
         Constants.listId += 1
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
@@ -543,7 +543,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
     else:
         if actionBarOp == 'A' and tabs == 0:
-            fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
+            fToActionBar=open(Constants.DIRECTORY+'/res/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
             Constants.xmlFilesToGui.append('action_bar_'+myParentType+'.xml')
             fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
                 '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
@@ -579,9 +579,9 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH,actionBarOp):
-    if not os.path.exists(Constants.DIRECTORY+'/layout'):
-            os.makedirs(Constants.DIRECTORY+'/layout') 
-    fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
+    if not os.path.exists(Constants.DIRECTORY+'/res/layout'):
+            os.makedirs(Constants.DIRECTORY+'/res/layout') 
+    fTo=open(Constants.DIRECTORY+'/res/layout/'+'activity_'+appName+'.xml', 'w+')
     Constants.xmlFilesToGui.append('activity_'+appName+'.xml')
     printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
     return
