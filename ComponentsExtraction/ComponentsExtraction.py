@@ -13,6 +13,18 @@ heightThrshold1 = 20
 heightThrshold2 = 40
 margin = 10
 
+def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
+    if ifSquare:
+        if slopedLines > 2 and slopedLines < 4:
+            return 'android.widget.CheckBox'
+    if circularity != 0 and (prediction == 'android.widget.ImageView' or prediction == 'android.widget.ImageButton'):
+        x,y,w,h = box
+        marginNew = 5
+        croppedImage = imageCopy[max(0,y - marginNew):min(imageCopy.shape[0],y + h + marginNew), max(x - marginNew,0):min(imageCopy.shape[1],x + w + marginNew)]
+        newPrediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
+        if newPrediction == 'android.widget.RadioButton':
+            return 'android.widget.RadioButton'
+    return prediction
 
 
 # Extract the boxes and text from given image -extracted components- and predict them.
@@ -34,8 +46,13 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
             textFeature = 1
         features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
         features.append(textFeature)
-        features += extractShapeFeatures(croppedImage,resizedImg)
-        pedictedComponents.append(Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model))
+        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg)
+        features += shpeFeatuesList
+        ifSquare = features[-6]
+        circularity = features[-5]
+        prediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
+        prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model)
+        pedictedComponents.append(prediction)
         extractedText.append(TextExtraction.extractText(croppedImage))
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
@@ -46,7 +63,9 @@ def extractShapeFeatures(img,resizedImg):
     edges,_=Preprocessing.preProcessEdges(img)
     edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
     # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
-    allShapeFeatures += Utils.getLinesEdgesFeatures(edgesResized)
+    linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
+    allShapeFeatures += linesEdgeFeatures
+    slopedLines = linesEdgeFeatures[-1]
     # widthResizingRatio, hightResizingRatio
     allShapeFeatures += Utils.getResizeRatios(img)
     # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
@@ -61,7 +80,7 @@ def extractShapeFeatures(img,resizedImg):
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
     allShapeFeatures += Utils.detectShapeAndFeature(cnt)
-    return allShapeFeatures
+    return allShapeFeatures,slopedLines
         
 def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \
@@ -205,20 +224,7 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     # Taaief ll edit text aly kan ta3bny whwa fasl.
     if predictedComponentsInBacket[0] == 'android.widget.EditText' and boxesInBacket[0][3]+2*margin < heightThrshold2:
         return True
-    ''' # may be uncommented if needed
-    croppedImage = imageCopy[boxesInBacket[0][1]:boxesInBacket[0][1] + boxesInBacket[0][3] , boxesInBacket[0][0]:boxesInBacket[0][0] + boxesInBacket[0][2]]
-    numTotalPixel = croppedImage.shape[0] * croppedImage.shape[1]
-    # Case 7dod same color.
-    numWhitePixel=0
-    valueToCompare = numpy.sum(croppedImage[0][0])
-    for i in range(croppedImage.shape[1]):
-        for j in range(croppedImage.shape[0]):
-            if numpy.sum(croppedImage[j][i]) == valueToCompare:
-                numWhitePixel+=1
-    if numWhitePixel/numTotalPixel >= 1 and boxesInBacket[0][3]+2*margin<heightThrshold2 \
-     and predictedComponentsInBacket[0] != 'android.widget.SeekBar' and boxesInBacket[0][2]+2*margin>imageCopy.shape[0]*0.6:
-        return True
-    '''
+   
     return False
     
 # and specialCaseButton(boxesInBacket,textsInBacket,predictedComponentsInBacket)

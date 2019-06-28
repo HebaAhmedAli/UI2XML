@@ -233,8 +233,6 @@ def getLinesEdgesFeatures(edged):
     noOfLines = 0
     if lines is not None:
         noOfLines = len(lines)
-        if noOfLines!=0:
-          slopedLines = slopedLines/noOfLines
         for line in lines:
             x1, y1, x2, y2 = line[0]
             if y2 - y1 == 0:
