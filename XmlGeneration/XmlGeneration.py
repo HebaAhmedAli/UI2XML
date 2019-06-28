@@ -399,7 +399,6 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
                 +'"\n'+tabsString+'\t' + \
                 'android:padding="5dp"'+'\n'+tabsString+'\t' 
          parentNode.id = str(Constants.listId)+'_'+parentNode.id
-         Constants.listId += 1
     else:
         toReturn = typeN+'\n'+tabsString+'\t'+'android:id = "@+id/'+typeN+'_'+parentNode.id \
                     +'"\n'+tabsString+'\t' + \
@@ -519,6 +518,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     if parentNode.nodeType == 'android.widget.ListView':
         fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
         Constants.xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
+        Constants.listId += 1
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
         +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
