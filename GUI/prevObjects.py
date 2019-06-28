@@ -8,6 +8,7 @@ import GUI.utils as utils
 class activityListItem(QHBoxLayout):
     def __init__(self, imgpath, imgName):
         super(activityListItem, self).__init__()
+        self.allVLayout = QVBoxLayout()
         self.imageBoxLay = QVBoxLayout()
         self.nameBoxLay = QVBoxLayout()
         self.imageLabel = QLabel()
@@ -33,7 +34,7 @@ class xmlTab(QWidget):
             "color: rgb(156,156,156);\n"
             "border: 5px solid  rgb(66, 138, 255);\n"
             "border-radius: 20%;")
-        self.textBrowser.setGeometry(QRect(0, 0, 300, 600))
+        self.textBrowser.setGeometry(QRect(0, 0, 500, 600))
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.xmlWidget)
         self.setLayout(vBoxlayout)

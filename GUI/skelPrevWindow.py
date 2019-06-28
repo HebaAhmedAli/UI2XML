@@ -17,11 +17,6 @@ class previewWindowSkel(object):
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.activeImgverticalLayout = QtWidgets.QVBoxLayout()
-        # self.activeImgverticalLayout.
-        # pixmapimage2 = QtGui.QPixmap("/home/fatema/PycharmProjects/UI2XML/GUI/main.jpg").scaled(300, 600)
-        # activeImg = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
-        # activeImg.setPixmap(pixmapimage2)
-        # self.activeImgverticalLayout.addWidget(activeImg)
 
         self.activityListVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.listScrolVerticalLayout = QtWidgets.QVBoxLayout()
@@ -30,6 +25,7 @@ class previewWindowSkel(object):
         self.activitysScrollArea = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitysScrollArea)
         self.listScrolVerticalLayout.addWidget(self.scrollArea)
+        self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
 
         self.activitiesList = QtWidgets.QWidget()

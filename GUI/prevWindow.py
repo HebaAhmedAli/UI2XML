@@ -15,7 +15,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.pixmapX = 300
         self.pixmapY = 600
         # The backend output
-        imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
+        imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
+                [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
                 ['ImageButton', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"]),
@@ -34,6 +35,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             imgDir = projDir+"/"+imgName
             imgName = imgName[:endI-2]+imgName[endI:]
             activityHLayout = activityListItem(imgDir, imgName)
+            activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(activityHLayout)
             self.verticalLayout.addLayout(activityHLayout)
 
