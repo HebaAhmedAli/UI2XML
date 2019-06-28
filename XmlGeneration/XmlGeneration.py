@@ -391,7 +391,8 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
     elif parentNode.nodeType == 'LinearLayoutHorizontal':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t' +\
-                'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+                'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'+\
+                'android:padding="8dp"'+'\n'+tabsString+'\t'
     parentNode.id = myIndex
     typeN = parentNode.nodeType[15:len(parentNode.nodeType)]
     if typeN == "ListView":
@@ -551,6 +552,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                 +'\t'+'android:layout_width = "match_parent"\n'\
                 +'\t'+'android:layout_height = "wrap_content"\n'\
                 +'\t'+'android:background = "'+parentNode.childNodes[0].backgroundColor+'"'+'\n'\
+                +'\t'+'android:padding="8dp"'+'\n'\
                 +'\t'+'android:orientation = "horizontal"'+'>\n'
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
