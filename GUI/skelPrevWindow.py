@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import GUI.activityListItem as activityListItem
 
 class previewWindowSkel(object):
     def setupUi(self, prev):
@@ -34,10 +33,6 @@ class previewWindowSkel(object):
         self.scrollArea.setWidget(self.activitysScrollArea)
         self.listScrolVerticalLayout.addWidget(self.scrollArea)
         self.activitysHLayouts = []
-
-        firstactivityHLayout = activityListItem.activityListItem()
-        self.activitysHLayouts.append(firstactivityHLayout)
-        self.scrollArea.setLayout(self.activitysHLayouts[0])
 
         self.activitiesList = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitiesList)
