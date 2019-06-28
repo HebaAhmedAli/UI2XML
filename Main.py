@@ -5,10 +5,10 @@ import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
-from keras.models import load_model
-import ScreenShots
-import HandDrawing
-import LoadDataClassification
+# from keras.models import load_model
+# import ScreenShots
+# import HandDrawing
+# import LoadDataClassification
 import Constants
 
 class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
@@ -19,8 +19,6 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.startUp()
         self.createUploadUI()
         self.actionRun.triggered.connect(self.processImagesAccToMode)
-        #prev = prevWindow.previewWindow()
-        #self.centralwidget.setLayout(prev.mainHLayout)
         
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -34,6 +32,9 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
 
     def processImagesAccToMode(self):
         self.uploadWidget.populateProjDir()
+        prev = prevWindow.previewWindow()
+        self.uploadWidget.layoutScroll.addLayout(prev.mainHLayout)
+        return
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
             model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150

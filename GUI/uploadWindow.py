@@ -22,7 +22,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             name = str(image.imageNameLine.text())
             endI = name.rfind('.', 0, len(name))
             if (not '.' in name or not name[endI+1:].lower() in Constants.IMG_EXTN):
-                utils.salertUser("File name Error", name + " File name or extension not correct")
+                utils.alertUser("File name Error", name + " File name or extension not correct")
                 return
             names.append(name[:endI])
         if(not "main" in names):
