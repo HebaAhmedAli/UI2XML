@@ -21,7 +21,6 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
-    margin = 10
     height=image.shape[0]
     width=image.shape[1]
     for x,y,w,h in extratctedBoxes:
@@ -101,7 +100,7 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
                 sumAreaPos+= (boxesInBacket[i][2]*boxesInBacket[i][3])
             else:
                 sumAreaNeg+= (boxesInBacket[i][2]*boxesInBacket[i][3])
-        if sumAreaPos>sumAreaNeg and (baseArea/imageArea<0.5):
+        if (sumAreaPos+(baseArea-(sumAreaPos+sumAreaNeg))>sumAreaNeg and (baseArea/imageArea<0.1)) or (sumAreaPos>sumAreaNeg and (baseArea/imageArea<0.5) and (baseArea/imageArea>0.1)):
             return True
         else:
             return False
@@ -114,12 +113,31 @@ def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBac
     if predictedComponentsInBacket[0] == 'android.widget.EditText':
         if boxesInBacket[0][2] < 0.2*imgW: # To handle fatafet :D
             return False
+        textViews = 0
+        seekBarORImg = 0
+        unDesired = 0
         for i in range(1,len(predictedComponentsInBacket)):
-            if (predictedComponentsInBacket[i] == 'android.widget.ImageButton'):
-                return False
-        return True
+            if (predictedComponentsInBacket[i] == 'android.widget.TextView'):
+                textViews += 1
+            elif (predictedComponentsInBacket[i] == 'android.widget.SeekBar' or predictedComponentsInBacket[i] == 'android.widget.ImageView') and boxesInBacket[i][2]/boxesInBacket[0][2]>= 0.8:
+                predictedComponentsInBacket[i] = 'android.widget.ImageView'
+                seekBarORImg += 1
+            else:
+                unDesired += 1
+        if textViews == 1 and  seekBarORImg == 1 and unDesired == 0:
+            return True
+        # Check Change to button.
+        if len(boxesInBacket)==1:
+            keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']
+            lowerStrings=textsInBacket[0].lower().split()
+            for j in range(len(keyStrings)):
+                if Utils.isSliceList(keyStrings[j].split(),lowerStrings):
+                    predictedComponentsInBacket[0]='android.widget.Button'
+                    return True
+        return False
     else:
         return True
+    
 
     
 def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
@@ -145,9 +163,6 @@ def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,text
     for i in range(len(predictedComponentsFiltered)):
         if predictedComponentsFiltered[i]== 'android.widget.ProgressBarHorizontal':
             continue
-        if predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical'\
-            and boxesFiltered[i][2]<img.shape[1]/2 and boxesFiltered[i][3]<img.shape[0]/2:
-            predictedComponentsFiltered[i] = 'android.widget.RadioButton'
         elif predictedComponentsFiltered[i]== 'android.widget.ProgressBarVertical':
             continue
         predictedComponentsFilteredNew.append(predictedComponentsFiltered[i])
@@ -156,6 +171,8 @@ def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,text
     return boxesFilteredNew,textsFilteredNew,predictedComponentsFilteredNew
             
 def checkSeekProgress(boxesInBacket,imageCopy):
+    if boxesInBacket[0][2]/imageCopy.shape[1] < 0.2:
+        return False
     croppedImage = imageCopy[max(0,boxesInBacket[0][1] - margin):min(imageCopy.shape[0],boxesInBacket[0][1] + boxesInBacket[0][3] + margin), max(boxesInBacket[0][0] - margin,0):min(imageCopy.shape[1],boxesInBacket[0][0] + boxesInBacket[0][2] + margin)]
     colors = Image.fromarray(croppedImage).convert('RGB').getcolors()
     if colors != None:
@@ -180,10 +197,14 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
         textsInBacket[0] == '':
         return True
+    
+    if predictedComponentsInBacket[0] == 'android.widget.Button' and \
+        textsInBacket[0] == '':
+        return True
+    
     # Taaief ll edit text aly kan ta3bny whwa fasl.
     if predictedComponentsInBacket[0] == 'android.widget.EditText' and boxesInBacket[0][3]+2*margin < heightThrshold2:
         return True
-
     ''' # may be uncommented if needed
     croppedImage = imageCopy[boxesInBacket[0][1]:boxesInBacket[0][1] + boxesInBacket[0][3] , boxesInBacket[0][0]:boxesInBacket[0][0] + boxesInBacket[0][2]]
     numTotalPixel = croppedImage.shape[0] * croppedImage.shape[1]
@@ -200,14 +221,16 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     '''
     return False
     
+# and specialCaseButton(boxesInBacket,textsInBacket,predictedComponentsInBacket)
 def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
                  boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
+    specialRongEdit = specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy.shape[1])
     if (predictedComponentsInBacket[0] != 'android.widget.ImageView' \
     and predictedComponentsInBacket[0] != 'android.widget.TextView'\
-    and specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy.shape[1]))\
+    and specialRongEdit)\
     or specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) \
     or len(predictedComponentsInBacket)==1:
-        if not neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
+        if not neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy) and specialRongEdit:
             boxesFiltered.append(boxesInBacket[0])
             textsFiltered.append(textsInBacket[0])
             predictedComponentsFiltered.append(predictedComponentsInBacket[0])
@@ -227,7 +250,7 @@ def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
                          boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
-        
+           
 def getFirstUnvisitedIndex(visited):
     for i in range(len(visited)):
         if visited[i]== False:
@@ -249,11 +272,17 @@ def backetOverlappingBoxes(boxesRemovingManual,textsRemovingManual,predictedComp
         backetPredicted.append(predictedComponentsRemovingManual[indexUnvisited])
         visited[indexUnvisited]=True
         for i in range(indexUnvisited+1,len(boxesRemovingManual)):
+            notUnderEachOther = True
+            if boxesRemovingManual[indexUnvisited][1]<boxesRemovingManual[i][1] and (boxesRemovingManual[i][1]-boxesRemovingManual[indexUnvisited][1])>=(boxesRemovingManual[indexUnvisited][3]-5):
+                notUnderEachOther = False
+            elif boxesRemovingManual[i][1]<boxesRemovingManual[indexUnvisited][1] and (boxesRemovingManual[indexUnvisited][1]-boxesRemovingManual[i][1])>=(boxesRemovingManual[i][3]-5):
+                notUnderEachOther = False
             if visited[i] == False and Utils.iou(boxesRemovingManual[indexUnvisited],boxesRemovingManual[i])>0:
-                visited[i] = True
-                backetBoxes.append(boxesRemovingManual[i])
-                backetTexts.append(textsRemovingManual[i])
-                backetPredicted.append(predictedComponentsRemovingManual[i])
+                if  notUnderEachOther:
+                    visited[i] = True
+                    backetBoxes.append(boxesRemovingManual[i])
+                    backetTexts.append(textsRemovingManual[i])
+                    backetPredicted.append(predictedComponentsRemovingManual[i])
         boxesInBackets.append(backetBoxes)
         textsInBackets.append(backetTexts)
         predictedComponentsInBackets.append(backetPredicted)

@@ -325,7 +325,7 @@ def groupTextViewsOfSameWord(groupedNodesI,img):
         minY = groupedNodesI[startJ].y
         maxY =  groupedNodesI[startJ].height+groupedNodesI[startJ].y
         text = groupedNodesI[startJ].text
-        while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.1\
+        while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.07\
         and groupedNodesI[j+1].nodeType == 'android.widget.TextView':
             text += (" "+groupedNodesI[j+1].text)
             j+=1
@@ -393,9 +393,17 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
     parentNode.id = myIndex
-    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+'_'+parentNode.id \
+    typeN = parentNode.nodeType[15:len(parentNode.nodeType)]
+    if typeN == "ListView":
+         toReturn = typeN+'\n'+tabsString+'\t'+'android:id = "@+id/'+typeN+str(Constants.listId)+'_'+parentNode.id \
                 +'"\n'+tabsString+'\t' + \
                 'android:padding="5dp"'+'\n'+tabsString+'\t' 
+         parentNode.id = str(Constants.listId)+'_'+parentNode.id
+         Constants.listId += 1
+    else:
+        toReturn = typeN+'\n'+tabsString+'\t'+'android:id = "@+id/'+typeN+'_'+parentNode.id \
+                    +'"\n'+tabsString+'\t' + \
+                    'android:padding="5dp"'+'\n'+tabsString+'\t' 
     Constants.ID += 1         
     return toReturn
        
@@ -509,8 +517,8 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
-        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+myIndex+'.xml', 'w+')
-        Constants.xmlFilesToGui.append('list_view_'+myIndex+'.xml')
+        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
+        Constants.xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
         +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\

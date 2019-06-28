@@ -15,3 +15,5 @@ predictedToGui = []
 idToGui = []
 xmlFilesToGui = []
 mapToGui = {}
+noContors = 0
+listId = 0

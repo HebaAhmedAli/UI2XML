@@ -91,6 +91,11 @@ def checkYrange(boxA,boxB):
     ((boxA[1]+boxA[3])>boxB[1] and (boxA[1]+boxA[3])<(boxB[1]+boxB[3])) or \
     (boxB[1]>=boxA[1] and boxB[1]<(boxA[1]+boxA[3])) or \
     ((boxB[1]+boxB[3])>boxA[1] and (boxB[1]+boxB[3])<(boxA[1]+boxA[3])):
+         # If under each other.
+        if boxA[1]<boxB[1] and boxB[1]-boxA[1]>=boxA[3]-5:
+            return False
+        elif boxB[1]<boxA[1] and boxA[1]-boxB[1]>=boxB[3]-5:
+            return False
         return True
     return False
 

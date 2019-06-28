@@ -47,7 +47,7 @@ def processImage(subdir, file,model,invVocab):
             # testing: print the cropped in folder
             crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputsAll"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
-            fTo.write(str(j)+'- '+texts[j]+'\n')
+            fTo.write(str(j)+'- '+texts[j]+" "+str(boxes[j])+'\n')
             j+=1    
         fTo.close()
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
@@ -56,7 +56,7 @@ def processImage(subdir, file,model,invVocab):
             # testing: print the cropped in folder
             crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
-            fTo.write(str(j)+'- '+textsFiltered[j]+'\n')
+            fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
             j+=1  
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
