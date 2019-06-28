@@ -293,7 +293,8 @@ def createParentNodeHorizontal(groupedNodes,img,x,width):
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
-        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 50:
+        if (abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 50 and Constants.HAND_DRAWN == True)\
+        or (abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 30 and Constants.HAND_DRAWN == False):
             parentNode.gravity = "center"
         elif groupedNodes[0].x/img.shape[1] > 0.5:
             parentNode.gravity = "right"
