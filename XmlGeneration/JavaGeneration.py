@@ -7,8 +7,14 @@ import Constants
 def printActionBar(appName):
     return "\t\tthis.getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);\n"+\
 "\t\tgetSupportActionBar().setDisplayShowCustomEnabled(true);\n"+\
-"\t\tgetSupportActionBar().setCustomView(R.layout.action_bar_"+appName+");\n"+\
-"\t\tView view = getSupportActionBar().getCustomView();\n"
+"\t\tLayoutInflater inflator=   (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);\n"+\
+"\t\tView v=inflator.inflate(R.layout.action_bar_"+appName+", null);\n"+\
+"\t\tActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,ActionBar.LayoutParams.MATCH_PARENT);\n"+\
+"\t\tgetSupportActionBar().setCustomView(v, layoutParams);\n"+\
+"\t\tToolbar parent = (Toolbar) v.getParent();\n"+\
+"\t\tparent.setContentInsetsAbsolute(0, 0);\n"
+
+
 
 def findListViewAndRadioGroup(rootNode,listViews,radioGroups):
     if rootNode.nodeType == 'android.widget.ListView':
