@@ -71,14 +71,12 @@ class dragDropScroll(QtWidgets.QScrollArea):
         endIdx = filePath.rfind('.', 0, len(filePath)) + 1
         fileExten = filePath[endIdx:]
         fileExten = fileExten.lower()
-        designModes = ("Hand Drawing", "Screenshots", "PSD File")
-        extensions = {"imgExten": ["jpg", "jpeg", "png"],"psdExten":["psd"]}
         if( Constants.designMode == Constants.DESIGN_MODES[0] or Constants.designMode == Constants.DESIGN_MODES[1]):
-            if( not (fileExten in extensions["imgExten"])):
+            if( not (fileExten in Constants.IMG_EXTN)):
                 utils.alertUser("Format Error", str(filePath) + " has inappropriate Image format.")
                 return False
         if( Constants.designMode == Constants.DESIGN_MODES[2]):
-            if(not (fileExten in extensions["psdExten"])):
+            if(not (fileExten == "psd")):
                 utils.alertUser("Format Error", str(filePath) + " has inappropriate PSD format.")
                 return False
         return True
