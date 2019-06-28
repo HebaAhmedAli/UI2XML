@@ -82,7 +82,7 @@ model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 
 imagesPath='data/ScreenShots/ourTest'
 '''
 def processAllImages(imagesPath,model,invVocab):
-    Constants.DIRECTORY = imagesPath+'/output'+'main/'
+    Constants.DIRECTORY = imagesPath+'/output/'+'main'
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
