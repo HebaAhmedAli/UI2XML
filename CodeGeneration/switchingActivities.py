@@ -12,7 +12,6 @@ def addIntentToJava(buttonsToActivities):
         with open(fromActivityFile, 'r') as file:
             filedata = file.read()
         filedata = filedata.replace("// onClick logic"+buttonId, intent)
-        print(filedata)
         with open(fromActivityFile, 'w') as file:
             file.write(filedata)
 
