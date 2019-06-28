@@ -98,7 +98,7 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
     if ('android.widget.Button' not in predictedComponentsFiltered \
        and 'android.widget.ImageButton' not in predictedComponentsFiltered) \
     and 'android.widget.EditText' in predictedComponentsFiltered:
-        changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered)    
+        changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered,boxesFiltered)    
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered\
         or 'android.widget.ProgressBarHorizontal' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
         boxesFiltered,textsFiltered,predictedComponentsFiltered = changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
@@ -170,10 +170,11 @@ def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imag
                 predictedComponentsFiltered[i]='android.widget.Button'
                 break
         
-def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered):
+def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered,boxesFiltered):
     for i in range(len(predictedComponentsFiltered)):
         if predictedComponentsFiltered[i]== 'android.widget.EditText':
             predictedComponentsFiltered[i] = 'android.widget.TextView'
+            boxesFiltered[i][2] = int(boxesFiltered[i][2] *0.5)
     
 def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,img):
     boxesFilteredNew = []
