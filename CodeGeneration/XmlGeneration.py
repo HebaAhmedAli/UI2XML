@@ -229,7 +229,7 @@ def packetVerticalLeafNodesNoParent(groupedNodesI,imgH,img):
         boxNew = [minX,groupedNodesI[indexUnvisited].y,maxX-minX,groupedNodesI[indexUnvisited].height]
         for i in range(indexUnvisited+1,len(groupedNodesI)):
             boxI = [groupedNodesI[i].x,groupedNodesI[i].y,groupedNodesI[i].width,groupedNodesI[i].height]
-            if visited[i] == False and Utils.checkXrange(boxNew,boxI) == True:
+            if visited[i] == False and Utils.checkXrange(boxNew,boxI) == True and not specialRadioHandDrawn(groupedNodesI[indexUnvisited],groupedNodesI[i]):
                 minX = min(minX,groupedNodesI[i].x)
                 maxX = max(maxX,groupedNodesI[i].x+groupedNodesI[i].width)
                 boxNew = [minX,groupedNodesI[i].y,maxX-minX,groupedNodesI[i].height]
