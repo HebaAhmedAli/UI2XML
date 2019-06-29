@@ -470,6 +470,7 @@ def printSpecialCase(parentNode,tabsString,imgH):
         attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
     return attributeString
 
+'''
 def printSpecialCaseListView(parentNode,tabsString,imgH):
     attributeString = ""
     
@@ -484,6 +485,7 @@ def printSpecialCaseListView(parentNode,tabsString,imgH):
         'android:background = "'+Constants.myParentColor+'"'+'\n'+tabsString+'\t'
             
     return attributeString
+'''
 
 def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
     tabsString=""
@@ -493,13 +495,25 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
     returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
-                                    printSpecialCaseListView(parentNode,tabsString,imgH)+'>\n'                                  
+                                    printSpecialCase(parentNode,tabsString,imgH)+'>\n'                                  
     for i in range(len(parentNode.childNodes)) :                                   
         returnString += printListViewChildNode(parentNode.childNodes[i],parentNode.nodeType,2,imgH,myIndex+'_'+str(i))
     returnString+= tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n'
                                     
     return returnString
 
+def appendNodeXml(parentNode,myIndex):
+    if len(parentNode.childNodes)==0:
+        parentNode.id = myIndex
+        typeOfNode = getType(parentNode.nodeType)
+        Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
+        Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
+        Constants.predictedToGui.append(typeOfNode)
+        return
+    for i in range(len(parentNode.childNodes)):
+        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i))
+            
+            
 def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None):    
     tabsString=""
     for i in range(tabs):
@@ -543,11 +557,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.close()   
         # Append the rest of chils.
         for i in range(len(parentNode.childNodes)):
-            for j in range(len(parentNode.childNodes[i].childNodes)):
-                typeOfNode = getType(parentNode.childNodes[i].childNodes[j].nodeType)
-                Constants.boxToGui.append([int(parentNode.childNodes[i].childNodes[j].x),int(parentNode.childNodes[i].childNodes[j].y),int(parentNode.childNodes[i].childNodes[j].width),int(parentNode.childNodes[i].childNodes[j].height)])
-                Constants.idToGui.append(typeOfNode+'_'+myIndex[:-2]+'_'+str(i+specialId)+'_'+str(j))
-                Constants.predictedToGui.append(typeOfNode)
+            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId))
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))

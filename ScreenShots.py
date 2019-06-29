@@ -104,4 +104,5 @@ model = load_model('data/ourModel/UI2XMLclassificationAllFeaturesAC_98_92.h5') #
 imagesPath='data/ScreenShots/ourTest'
 
 processAllImages(imagesPath,model,invVocab)
+#print(Constants.mapToGui)
 #updateAllImages(imagesPath,{})
