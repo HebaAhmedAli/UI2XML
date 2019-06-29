@@ -2,7 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import GUI.utils as utils
-
+import Constants
 
 
 class activityListItem(QHBoxLayout):
@@ -32,8 +32,9 @@ class xmlTab(QWidget):
         self.textBrowser = QTextBrowser(self.xmlWidget)
         self.textBrowser.setStyleSheet("background-color: \"white\";\n"           
             "border: 5px solid  rgb(66, 138, 255);\n"
+            "color: 5px solid  \"black\";\n"
             "border-radius: 20%;")
-        self.textBrowser.setGeometry(QRect(0, 0, 500, 600))
+        self.textBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*0.3, Constants.MONITOR_HEIGHT*0.85))
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.xmlWidget)
         self.setLayout(vBoxlayout)

@@ -13,7 +13,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         super(previewWindow, self).__init__()
         self.setupUi(self)
         self.pixmapX = Constants.MONITOR_WIDTH/3
-        self.pixmapY = Constants.MONITOR_HEIGHT*0.9
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         # The backend output
         imgsOutputInfo = Constants.mapToGui
         self.userCorrection = {}
