@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import Utils
 import Constants
-import XmlGeneration.JavaGeneration as JavaGeneration
+import CodeGeneration.JavaGeneration as JavaGeneration
 import os
 from PIL import Image
 import operator
