@@ -181,9 +181,11 @@ def printButtons(buttonsId):
     return onClick
 def setChecked(radioGroup,radioGroupIdx,radioIdx):
     checkedString = "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioIdx)+".setChecked(true);\n"
+    radioCount = 0
     for i in range(len(radioGroup.childNodes)):
         if radioGroup.childNodes[i].nodeType == 'android.widget.RadioButton' and i != radioIdx:
-            checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(i)+".setChecked(false);\n"
+            checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioCount)+".setChecked(false);\n"
+            radioCount+=1            
     
     return checkedString
 def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
@@ -191,7 +193,7 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
     findViews = ""
     onClicks = ""
     radioId = ""
-    if len(radioGroup.childNodes) > 1 : # Vertical RadioGroup
+    if len(radioGroup.childNodes) > 1 : # VerticalRadioGroup
         for i in range(len(radioGroup.childNodes)):
             for child in radioGroup.childNodes[i].childNodes: 
                 if child.nodeType == "android.widget.RadioButton":
@@ -207,7 +209,7 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
             onClicks+="\t\t\t}\n\t\t});"
         radioButtons+= ";\n"
         
-    else: # Horizontal RadioGroup containing only one horizontal Linearlayout
+    else: # HorizontalRadioGroup containing only one horizontal Linearlayout
        radioButtonCount = 0
        for i in range(len(radioGroup.childNodes[0].childNodes)):
            if radioGroup.childNodes[0].childNodes[i].nodeType == "android.widget.RadioButton":
