@@ -120,4 +120,3 @@ def extractBoxes(img,texts, txtBoxes):
     biggestBoxArea+=allBoxes[1:len(allBoxes)]
     allBoxes = biggestBoxArea
     return allBoxes,isText
-

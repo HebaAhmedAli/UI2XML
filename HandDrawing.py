@@ -13,9 +13,9 @@ from PIL import Image
 
 def processImage(subdir, file):
     xImage = np.array(Utils.genTable(300,300))
-    if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
-        os.makedirs(Constants.DIRECTORY+'/res/drawable')
-    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_x.png")
+    if not os.path.exists(Constants.DIRECTORY+'/drawable'):
+        os.makedirs(Constants.DIRECTORY+'/drawable')
+    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_x.png")
     path = subdir+'/' +file
     img = cv2.imread(path)
     imgCopy = copy.copy(img)
@@ -66,6 +66,7 @@ def updateImage(subdir,file,valMapFromGui):
 
 
 def processAllImages(imagesPath):
+    Constants.HAND_DRAWN = True
     Constants.DIRECTORY = imagesPath+'/output/'+'main'
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
@@ -75,13 +76,15 @@ def processAllImages(imagesPath):
             processImage(imagesPath, file)
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
+    Constants.HAND_DRAWN = True
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
 
-
-Constants.imagesPath='data/HandDrawn/ourTest'
+'''
+imagesPath='data/HandDrawn/ourTest'
 Constants.HAND_DRAWN = True
-processAllImages(Constants.imagesPath)
+processAllImages(imagesPath)
+'''

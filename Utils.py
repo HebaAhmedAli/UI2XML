@@ -312,9 +312,8 @@ def getMostAndSecondMostColors(img,firstOnly):
     return '#'+first,'#'+second
 
 def isCircle(imageCrop):
-    edged = Preprocessing.preProcessEdges(imageCrop)
-    (_, cnts, _) = cv2.findContours(edged,
-                                cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    edged,_ = Preprocessing.preProcessEdges(imageCrop)
+    (_, cnts, _) = cv2.findContours(edged,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(cnts) == 0:
         return False
     cnt = max(cnts, key = cv2.contourArea)
