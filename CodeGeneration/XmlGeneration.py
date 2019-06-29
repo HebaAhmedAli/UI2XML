@@ -339,6 +339,9 @@ def groupTextViewsOfSameWord(groupedNodesI,img):
 def groupHorizontalInsideVertical(groupedNodesI,img):
     groupedNodesNew = []
     packetsVertical = packetVerticalLeafNodesNoParent(groupedNodesI,img.shape[0],img)
+    if len(groupedNodesI) == len(packetsVertical):
+        groupedNodesI = groupTextViewsOfSameWord(groupedNodesI,img)
+        return groupedNodesI
     if len(packetsVertical) == 1:
         return groupedNodesI
     for i in range(len(packetsVertical)):
@@ -346,8 +349,6 @@ def groupHorizontalInsideVertical(groupedNodesI,img):
             groupedNodesNew.append(packetsVertical[i][0])
         else:
             groupedNodesNew += groupHorizontalLeafNodes(packetsVertical[i],img.shape[0],img)   
-    if len(groupedNodesI) == len(groupedNodesNew):
-        groupedNodesNew = groupTextViewsOfSameWord(groupedNodesNew,img)
     return groupedNodesNew
             
 def createLeavesParents(groupedNodes,img):
