@@ -13,9 +13,9 @@ from PIL import Image
 
 def processImage(subdir, file):
     xImage = np.array(Utils.genTable(300,300))
-    if not os.path.exists(Constants.DIRECTORY+'/drawable'):
-        os.makedirs(Constants.DIRECTORY+'/drawable')
-    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_x.png")
+    if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
+        os.makedirs(Constants.DIRECTORY+'/res/drawable')
+    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_x.png")
     path = subdir+'/' +file
     img = cv2.imread(path)
     imgCopy = copy.copy(img)

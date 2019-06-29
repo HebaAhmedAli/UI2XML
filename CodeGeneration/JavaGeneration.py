@@ -179,15 +179,25 @@ def printButtons(buttonsId):
         "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+'"'+",Toast.LENGTH_SHORT).show();\n"+\
         "\t}\n"
     return onClick
-def setChecked(radioGroup,radioGroupIdx,radioIdx):
+
+def setCheckedHorizontal(radioGroup,radioGroupIdx,radioIdx):
     checkedString = "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioIdx)+".setChecked(true);\n"
     radioCount = 0
     for i in range(len(radioGroup.childNodes)):
-        if radioGroup.childNodes[i].nodeType == 'android.widget.RadioButton' and i != radioIdx:
-            checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioCount)+".setChecked(false);\n"
-            radioCount+=1            
-    
+        if radioGroup.childNodes[i].nodeType == 'android.widget.RadioButton':
+            if radioCount != radioIdx:
+                checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioCount)+".setChecked(false);\n"
+            radioCount+=1
     return checkedString
+
+
+def setCheckedVertical(radioGroup,radioGroupIdx,radioIdx):
+    checkedString = "\t\t\t\tradioButton" + str(radioGroupIdx) + str(radioIdx) + ".setChecked(true);\n"
+    for i in range(len(radioGroup.childNodes)):
+        if i != radioIdx:
+            checkedString += "\t\t\t\tradioButton" + str(radioGroupIdx) + str(i) + ".setChecked(false);\n"
+    return checkedString
+
 def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
     radioButtons = "\tRadioButton "
     findViews = ""
@@ -205,7 +215,7 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
             findViews += "\t\tradioButton"+str(radioGroupIdx)+str(i)+" = "+"(RadioButton)findViewById(R.id.RadioButton_"+radioId+");\n"
             onClicks+= "\t\tradioButton"+str(radioGroupIdx)+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
             "\t\t\tpublic void onClick(View v) {\n"
-            onClicks+= setChecked(radioGroup,radioGroupIdx,i)
+            onClicks+= setCheckedVertical(radioGroup,radioGroupIdx,i)
             onClicks+="\t\t\t}\n\t\t});"
         radioButtons+= ";\n"
         
@@ -218,8 +228,8 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
                 findViews += "\t\tradioButton"+str(radioGroupIdx)+str(radioButtonCount)+" = "+"(RadioButton)findViewById(R.id.RadioButton_"+radioId+");\n"
                 onClicks+= "\t\tradioButton"+str(radioGroupIdx)+str(radioButtonCount)+".setOnClickListener(new View.OnClickListener() {\n"+\
                 "\t\t\tpublic void onClick(View v) {\n"
-                onClicks+= setChecked(radioGroup.childNodes[0],radioGroupIdx,radioButtonCount)
-                onClicks+="\t\t\t}\n\t\t});"
+                onClicks+= setCheckedHorizontal(radioGroup.childNodes[0],radioGroupIdx,radioButtonCount)
+                onClicks+="\t\t\t}\n\t\t});\n"
                 radioButtonCount += 1
        radioButtons = radioButtons[:-2]         
        radioButtons+= ";\n"
@@ -265,15 +275,19 @@ def generateJava(rootNode,appName,actionBarOp):
         addedListItems,leavesType,selectedIds,selectedVarNames = printAddingItems(listViews[i],i,appName)
         printListViewBean(leavesType,i,appName,package)
         printListViewBaseAdapter(listViews[i],leavesType,selectedIds,i,appName,package)
-     
+
+    groupsRadiosDef = ""
+    groupsRadiosOnClick = ""
     radiosDef = "" 
     radiosOnClick = ""
     if len(radioGroups)>0:
         imports += "import android.widget.RadioButton;\n"
     for i in range(len(radioGroups)):
         radiosDef,radiosOnClick = printRadiosAndOnClicks(radioGroups[i],i)
+        groupsRadiosDef+=radiosDef
+        groupsRadiosOnClick+=radiosOnClick
     
-    classBody += radiosDef
+    classBody += groupsRadiosDef
     
     classBody+= "\t@Override\n"+\
     "\tprotected void onCreate(Bundle savedInstanceState) {\n"
@@ -292,7 +306,7 @@ def generateJava(rootNode,appName,actionBarOp):
         onCreateBody+= printActionBar(appName)   
     
     onCreateBody+= addedListItems
-    onCreateBody+= radiosOnClick
+    onCreateBody+= groupsRadiosOnClick
     onCreateClose="\t}\n"
         
     buttonsId = []
