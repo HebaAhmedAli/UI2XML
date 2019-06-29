@@ -33,60 +33,50 @@ def printArrayList(noOfListViews,appName):
         "\t"+appName.capitalize()+"ListViewBaseAdapter"+str(i)+" adapter"+str(i)+";\n"+\
         "\tArrayList<"+appName.capitalize()+"ListViewBean"+str(i)+"> arr_bean"+str(i)+";\n"
     return arrayList
-'''
-def getItemsfromLeafNodes():
-'''
-def  printListItems(listView,idx):
-    varType = {'android.widget.ImageButton': 'int' ,'android.widget.ImageView': 'int',\
-              'android.widget.TextView': 'String', 'android.widget.Button': 'String'}
-    varName = {'android.widget.ImageButton': 'icons' ,'android.widget.ImageView': 'images',\
-              'android.widget.TextView': 'texts', 'android.widget.Button': 'buttonTexts'}
+
+
+def getItemsfromLeafNodes(listIdx,layoutIdx,node,leafIdx,varType,varName,selectedNames,selectedTypes,selectedIds):
+    leaves = ""
+    if len(node.childNodes) == 0:
+        if node.nodeType in varType:
+            if layoutIdx == 0:
+                selectedNames.append(varName[node.nodeType])
+                selectedTypes.append(node.nodeType)
+                selectedIds.append(node.id)
+            if node.nodeType == 'android.widget.TextView' or node.nodeType == 'android.widget.Button':
+                leaves += '"' + node.text + '"'
+            if node.nodeType == 'android.widget.ImageView' or node.nodeType == 'android.widget.ImageButton':
+                leaves += "R.drawable." + node.imagePath
+            leaves += ", "
+            leafIdx+=1
+        return leaves
+    for child in node.childNodes:
+         leaves += getItemsfromLeafNodes(listIdx,layoutIdx,child,leafIdx,varType,varName,selectedNames,selectedTypes,selectedIds)
+    return leaves
+
+
+def printAddingItems(listView,idx,appName):
+    varType = {'android.widget.ImageButton': 'int', 'android.widget.ImageView': 'int', \
+               'android.widget.TextView': 'String', 'android.widget.Button': 'String','android.widget.CheckedTextView': 'String'}
+    varName = {'android.widget.ImageButton': 'icons', 'android.widget.ImageView': 'images', \
+               'android.widget.TextView': 'texts', 'android.widget.Button': 'buttonTexts','android.widget.CheckedTextView': 'checkedTexts'}
     selectedNames = []
     selectedTypes = []
-    items=""
+    selectedIds = []
     leafIdx = 0
-    leafCount = 0
-    #items+= getItemsfromLeafNodes(items,)
-    while leafCount < len(listView.childNodes[0].childNodes):
-        layoutIdx = 0
-        if listView.childNodes[0].childNodes[leafCount].nodeType in varType:
-            items+="\t"+varType[listView.childNodes[0].childNodes[leafCount].nodeType]+" "\
-            +varName[listView.childNodes[0].childNodes[leafCount].nodeType]+str(idx)+str(leafIdx)+" [] = { "  
-            selectedNames.append(varName[listView.childNodes[0].childNodes[leafCount].nodeType])
-            selectedTypes.append(listView.childNodes[0].childNodes[leafCount].nodeType)
-            while layoutIdx < len(listView.childNodes):
-                if listView.childNodes[0].childNodes[leafCount].nodeType == 'android.widget.TextView' or \
-                listView.childNodes[0].childNodes[leafCount].nodeType == 'android.widget.Button':
-                    items+='"'+listView.childNodes[layoutIdx].childNodes[leafCount].text+'"'
-                    
-                if listView.childNodes[0].childNodes[leafCount].nodeType == 'android.widget.ImageView' or \
-                listView.childNodes[0].childNodes[leafCount].nodeType == 'android.widget.ImageButton':
-                    items+="R.drawable."+listView.childNodes[layoutIdx].childNodes[leafCount].imagePath 
-                    
-                if layoutIdx < len(listView.childNodes) -1:
-                        items+=", "
-                        
-                layoutIdx+=1
-            items+="};\n"
-            leafIdx+=1
-        leafCount+=1            
-    return items,selectedTypes,selectedNames
-def printAddingItems(listViewId,selectedVarNames,idx,appName):
     items = ""
-    items+= "\t\tlv"+str(idx)+" = (ListView) findViewById(R.id.ListView"+str(listViewId)+");\n"\
-    "\t\tarr_bean"+str(idx)+"=new ArrayList<>();\n"+\
-    "\t\tfor(int i = 0; i<"+selectedVarNames[0]+str(idx)+"0.length;i++){\n"+\
-    "\t\t\tarr_bean"+str(idx)+".add(new "+appName.capitalize()+"ListViewBean"+str(idx)+"("
-    for i in range (len(selectedVarNames)):
-        items+= selectedVarNames[i]+str(idx)+str(i)+"[i]"
-        if i < len(selectedVarNames)-1 :
-            items+=","        
-    items+= "));\n"+\
-    "\t\t}\n"+\
-    "\t\tadapter"+str(idx)+"=new "+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+"(arr_bean"+str(idx)+",this);\n"+\
+    items+= "\t\tlv"+str(idx)+" = (ListView) findViewById(R.id.ListView"+str(listView.id)+");\n"\
+    "\t\tarr_bean"+str(idx)+"=new ArrayList<>();\n"
+
+    for i in range(len(listView.childNodes)):
+        items += "\t\tarr_bean"+str(idx)+".add(new "+appName.capitalize()+"ListViewBean"+str(idx)+"("
+        items += getItemsfromLeafNodes(idx,i, listView.childNodes[i],leafIdx, varType, varName, selectedNames, selectedTypes,selectedIds)
+        items = items[:-2]
+        items += "));\n"
+    items+="\t\tadapter"+str(idx)+"=new "+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+"(arr_bean"+str(idx)+",this);\n"+\
     "\t\tlv"+str(idx)+".setAdapter(adapter"+str(idx)+");\n"
     
-    return items
+    return items,selectedTypes,selectedIds,selectedNames
     
 def printListViewBean(leavesType,idx,appName,package):
     listViewBean = ""
@@ -96,9 +86,9 @@ def printListViewBean(leavesType,idx,appName,package):
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBean"+str(idx)+'.java', 'w+')
 
     varType = {'android.widget.ImageButton': 'int' ,'android.widget.ImageView': 'int',\
-              'android.widget.TextView': 'String', 'android.widget.Button': 'String'}
+              'android.widget.TextView': 'String', 'android.widget.Button': 'String','android.widget.CheckedTextView': 'String'}
     varName = {'android.widget.ImageButton': 'icon' ,'android.widget.ImageView': 'image',\
-              'android.widget.TextView': 'text', 'android.widget.Button': 'buttonText'}
+              'android.widget.TextView': 'text', 'android.widget.Button': 'buttonText','android.widget.CheckedTextView': 'checkedTexts'}
     listViewBean+= "public class "+appName.capitalize()+"ListViewBean"+str(idx)+" {\n"
     constructor = ""
     getterAndSetter = ""
@@ -123,7 +113,7 @@ def printListViewBean(leavesType,idx,appName,package):
     return
     
     
-def printListViewBaseAdapter(listView,leavesType,idx,appName,package):
+def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package):
     listViewBean = ""
     if Constants.PACKAGE != '':
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+'.java', 'w+')
@@ -141,20 +131,20 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName,package):
     "\t\tthis.arrayListListener.addAll(mListenerList);\n\t}\n\tpublic class ViewHolder {\n"
 
     varName = {'android.widget.ImageButton': 'iconView' ,'android.widget.ImageView': 'imageView',\
-              'android.widget.TextView': 'textView', 'android.widget.Button': 'buttonView'}
+              'android.widget.TextView': 'textView', 'android.widget.Button': 'buttonView','android.widget.CheckedTextView':'checkedTextView'}
     viewType = {'android.widget.ImageButton': 'ImageButton' ,'android.widget.ImageView': 'ImageView',\
-              'android.widget.TextView': 'TextView', 'android.widget.Button': 'Button'}
+              'android.widget.TextView': 'TextView', 'android.widget.Button': 'Button','android.widget.CheckedTextView':'CheckedTextView'}
     setter = {'android.widget.ImageButton': 'setImageResource' ,'android.widget.ImageView': 'setImageResource',\
-              'android.widget.TextView': 'setText', 'android.widget.Button': 'setText'}
+              'android.widget.TextView': 'setText', 'android.widget.Button': 'setText','android.widget.CheckedTextView':'CheckedTextView'}
     getter = {'android.widget.ImageButton': 'getIcon' ,'android.widget.ImageView': 'getImage',\
-              'android.widget.TextView': 'getText', 'android.widget.Button': 'getButtonText'}
+              'android.widget.TextView': 'getText', 'android.widget.Button': 'getButtonText','android.widget.CheckedTextView':'getCheckedText'}
     
     holderItems=""
     setHolderItems=""
     for i in range(len(leavesType)):
         imports+= "import "+leavesType[i]+";\n"
         listViewBean += "\t\t"+viewType[leavesType[i]]+" "+ varName[leavesType[i]]+str(i)+";\n"
-        holderItems+= "\t\t\tholder."+varName[leavesType[i]]+str(i)+" = ("+viewType[leavesType[i]]+") view.findViewById(R.id."+viewType[leavesType[i]]+str(listView.childNodes[0].childNodes[i].id)+");\n"
+        holderItems+= "\t\t\tholder."+varName[leavesType[i]]+str(i)+" = ("+viewType[leavesType[i]]+") view.findViewById(R.id."+viewType[leavesType[i]]+'_'+str(selectedIds[i])+");\n"
         setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+"."+setter[leavesType[i]]+"(mListenerList.get(position)."+getter[leavesType[i]]+str(i)+"());\n"
         #if leavesType[i] == 'android.widget.ImageButton' or leavesType[i] == 'android.widget.Button':
         #    setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
@@ -165,12 +155,12 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName,package):
         "\t@Override\n\tpublic long getItemId(int position) {\n\t\treturn position;\n\t}\n\t@Override\n"+\
         "\tpublic View getView(final int position, View view, ViewGroup parent) {\n\t\tfinal ViewHolder holder;\n"+\
         "\t\tif (view == null) {\n"+\
-        "\t\t\tview = LayoutInflater.from(mContext).inflate(R.layout.list_view_"+str(listView.id)+", null);\n"+\
+        "\t\t\tview = LayoutInflater.from(mContext).inflate(R.layout.list_view"+str(listView.id)+", null);\n"+\
         "\t\t\tholder = new ViewHolder();\n"+holderItems+"\t\t\tview.setTag(holder);\n\t\t}\n"+\
         "\t\telse {\n\t\t\tholder = (ViewHolder) view.getTag();\n\t\t}\n\t\ttry {\n"+\
         setHolderItems+"\t\t} catch (Exception ex){\n\t\t}\n\t\treturn view;\n\t}\n}"
     
-    fTo.write("package com.example."+package+";\n"+imports+listViewBean)
+    fTo.write("package "+package+";\n"+imports+listViewBean)
     return listViewBean
        
   
@@ -268,11 +258,11 @@ def generateJava(rootNode,appName,actionBarOp):
     classBody+= printArrayList(len(listViews),appName)
     addedListItems=""
     for i in range(len(listViews)):
-        listItems,leavesType,selectedVarNames= printListItems(listViews[i],i)
-        classBody+=listItems
-        addedListItems = printAddingItems(listViews[i].id,selectedVarNames,i,appName)
+        #listItems,leavesType,selectedVarNames= printListItems(listViews[i],i)
+        #classBody+=listItems
+        addedListItems,leavesType,selectedIds,selectedVarNames = printAddingItems(listViews[i],i,appName)
         printListViewBean(leavesType,i,appName,package)
-        printListViewBaseAdapter(listViews[i],leavesType,i,appName,package)        
+        printListViewBaseAdapter(listViews[i],leavesType,selectedIds,i,appName,package)
      
     radiosDef = "" 
     radiosOnClick = ""
@@ -309,7 +299,7 @@ def generateJava(rootNode,appName,actionBarOp):
     
     
     classClose= "}"
-        
+
         
     fTo.write("package "+package+';\n'+imports+classBody+onCreateBody+onCreateClose+onClickFunctions+classClose)    
     
