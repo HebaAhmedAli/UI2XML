@@ -6,7 +6,6 @@ import os
 def addIntentToJava(buttonsToActivities):
     for buttonId,fromActivity,toActivity in buttonsToActivities:
         buttonId = buttonId[7:]
-        print(buttonId)
         fromActivity = fromActivity[:-6]
         fromActivityFile = "../"+Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
         toActivity = toActivity[:-6]
@@ -15,7 +14,6 @@ def addIntentToJava(buttonsToActivities):
             filedata = file.read()
         file.close()
         filedata = filedata.replace("\n\t// onClick logic_"+buttonId+"\n\t\t", intent)
-        print(filedata)
         with open(fromActivityFile, 'w') as file:
             file.write(filedata)
 
