@@ -186,7 +186,7 @@ def printButtons(buttonsId):
     onClick = ""
     for buttonId in  buttonsId:
         onClick += "\tpublic void clickMe"+str(buttonId)+"(View view){\n\t// onClick logic_"+buttonId+"\n"+\
-        "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+str(buttonId)+'"'+",Toast.LENGTH_SHORT).show();\n"+\
+        "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+'"'+",Toast.LENGTH_SHORT).show();\n"+\
         "\t}\n"
     return onClick
 def setChecked(radioGroup,radioGroupIdx,radioIdx):
@@ -249,8 +249,10 @@ def generateJava(rootNode,appName,actionBarOp):
         package = "com.example."+Constants.PROJECT_NAME
     imports = "import android.os.Bundle;\n"+\
     "import android.view.View;\n"+\
-    "import android.widget.Toast;\n" 
-    
+    "import android.widget.Toast;\n" +\
+    "import android.content.Intent;\n" +\
+    "import android.content.Context;\n" 
+
     if Constants.PACKAGE == '':
         imports+= "import androidx.appcompat.app.AppCompatActivity;\n"
     else:
@@ -286,12 +288,15 @@ def generateJava(rootNode,appName,actionBarOp):
     
     onCreateBody ="\t\tsuper.onCreate(savedInstanceState);\n"+\
     "\t\tsetContentView(R.layout.activity_"+appName+");\n"
-    
     if(actionBarOp == 'A'):
         if Constants.PACKAGE == '':
             imports+= "import androidx.appcompat.app.ActionBar;\n"
+            imports+= 'import android.view.LayoutInflater;\n'
+            imports+= 'import androidx.appcompat.widget.Toolbar;\n'
         else:    
             imports+= "import android.support.v7.app.ActionBar;\n"
+            imports+= 'import android.view.LayoutInflater;\n'
+            imports+= 'import androidx.appcompat.widget.Toolbar;\n'
         onCreateBody+= printActionBar(appName)   
     
     onCreateBody+= addedListItems

@@ -92,7 +92,7 @@ def processAllImages(imagesPath,model,invVocab):
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
-    mapUpdatedFromGui = {"drND.png":([[379, 1751, 67, 49],[36, 315, 128, 88]],['ImageView_0_16_1_0_1','ImageView_0_2_0'],['android.widget.'+"TextView",'android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
+    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)

@@ -285,7 +285,7 @@ def backetOverlappingBoxes(boxesRemovingManual,textsRemovingManual,predictedComp
             elif boxesRemovingManual[i][1]<boxesRemovingManual[indexUnvisited][1] and (boxesRemovingManual[indexUnvisited][1]-boxesRemovingManual[i][1])>=(boxesRemovingManual[i][3]-5):
                 notUnderEachOther = False
             if visited[i] == False and Utils.iou(boxesRemovingManual[indexUnvisited],boxesRemovingManual[i])>0:
-                if  notUnderEachOther:
+                if  notUnderEachOther or predictedComponentsRemovingManual[indexUnvisited]=='android.widget.EditText':
                     visited[i] = True
                     backetBoxes.append(boxesRemovingManual[i])
                     backetTexts.append(textsRemovingManual[i])

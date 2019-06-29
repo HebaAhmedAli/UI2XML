@@ -17,3 +17,5 @@ xmlFilesToGui = []
 mapToGui = {}
 noContors = 0
 listId = 0
+noOfLayouts = 0
+myParentColor = ""

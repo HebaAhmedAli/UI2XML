@@ -9,7 +9,7 @@ def addIntentToJava(buttonsToActivities):
         fromActivity = fromActivity[:-6]
         fromActivityFile = "../"+Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
         toActivity = toActivity[:-6]
-        intent = "\n\t\tIntent intent = new Intent("+fromActivity+"Activity.this, "+toActivity+"Activity.class);\n"+"\t\tstartActivity(intent);\n\t\t"
+        intent = "\n\t\tIntent intent = new Intent("+fromActivity.capitalize()+"Activity.this, "+toActivity.capitalize()+"Activity.class);\n"+"\t\tstartActivity(intent);\n\t\t"
         with open(fromActivityFile, 'r') as file:
             filedata = file.read()
         file.close()
@@ -18,9 +18,9 @@ def addIntentToJava(buttonsToActivities):
             file.write(filedata)
 
 def addIntentToMainifest(buttonsToActivities):
-    if not os.path.exists('../'+Constants.DIRECTORY+'/res'):
-            os.makedirs('../'+Constants.DIRECTORY+'/res') 
-    fTo=open('../'+Constants.DIRECTORY+'/res/'+'AndroidManifest.xml', 'w+')
+    if not os.path.exists('../'+Constants.DIRECTORY):
+            os.makedirs('../'+Constants.DIRECTORY) 
+    fTo=open('../'+Constants.DIRECTORY+'/'+'AndroidManifest.xml', 'w+')
     newActivities = ""
     for i in range(len(buttonsToActivities)):
         newActivities += '\t'+'\t'+'<activity android:name=".'+buttonsToActivities[i][2][:-6].capitalize()+'Activity"'+ '>\n'+\
@@ -28,7 +28,7 @@ def addIntentToMainifest(buttonsToActivities):
     
     fTo.write('<?xml version="1.0" encoding="utf-8"?>'+'\n'+
               '<manifest xmlns:android="http://schemas.android.com/apk/res/android"'+'\n'
-              +'\t'+'package="com.example.gp">'
+              +'\t'+'package="com.example.gp">\n'
               +'\t'+'<application'+'\n'
               +'\t'+'\t'+'android:allowBackup="true"'+'\n'
               +'\t'+'\t'+'android:icon="@mipmap/ic_launcher"'+'\n'
@@ -45,6 +45,7 @@ def addIntentToMainifest(buttonsToActivities):
               +newActivities
               +'\t'+'</application>'+'\n'
               +'</manifest>')
+    fTo.close()
     return
 
 def switchActivities(buttonsToActivities):
@@ -54,4 +55,4 @@ def switchActivities(buttonsToActivities):
 
 imagesPath='data/ScreenShots/ourTest'
 Constants.DIRECTORY = imagesPath+'/output/'+'main'
-switchActivities([['Button_0_4_0','mainAD.jpg','switchAS.png'],['Button_0_5_0','mainAD.jpg','radio1AS.png']])
+switchActivities([['Button_0_4_0','mainAD.jpg','drND.png'],['Button_0_5_0','mainAD.jpg','radio1AS.png']])
