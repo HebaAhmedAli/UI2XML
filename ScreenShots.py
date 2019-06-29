@@ -1,5 +1,5 @@
 import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
-import XmlGeneration.XmlGeneration as XmlGeneration
+import CodeGeneration.XmlGeneration as XmlGeneration
 from keras.models import load_model
 import LoadDataClassification
 import Constants
@@ -82,7 +82,7 @@ model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 
 imagesPath='data/ScreenShots/ourTest'
 '''
 def processAllImages(imagesPath,model,invVocab):
-    Constants.DIRECTORY = imagesPath+'/output'
+    Constants.DIRECTORY = imagesPath+'/output'+'main/'
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
