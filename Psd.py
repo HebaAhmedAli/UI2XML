@@ -75,9 +75,10 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         if (".png" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
 
-    
+'''
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/UI2XMLclassificationAllFeaturesAC_98_92.h5') # 150 * 150
 imagesPath='data/Psds/ourTest'
 
 processAllPsds(imagesPath,model,invVocab)
+'''

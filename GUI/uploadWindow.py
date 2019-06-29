@@ -22,7 +22,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             name = str(image.imageNameLine.text())
             endI = name.rfind('.', 0, len(name))
             if (not '.' in name or not name[endI+1:].lower() in Constants.IMG_EXTN):
-                utils.salertUser("File name Error", name + " File name or extension not correct")
+                utils.alertUser("File name Error", name + " File name or extension not correct")
                 return
             names.append(name[:endI])
         if(not "main" in names):
@@ -56,6 +56,8 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
     def removeUploadWid(self):
         for image in self.scrollarea.imageBoxes:        
             image.deleteImage.click()
+        self.scrollarea.UploadButton.setParent(None)
+        del self.scrollarea.UploadButton
         for horizontalLayout in self.scrollarea.horizontalLayouts:
             horizontalLayout.setParent(None)
             del horizontalLayout
@@ -66,3 +68,4 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
         del self.scrollarea
         self.dockDesign.setParent(None)
         del self.dockDesign
+

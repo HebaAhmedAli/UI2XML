@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import GUI.activityListItem as activityListItem
 
 class previewWindowSkel(object):
     def setupUi(self, prev):
@@ -15,15 +14,9 @@ class previewWindowSkel(object):
         self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
-        tab = QtWidgets.QWidget()
-        self.xmlTabs.addTab(tab, "Hope")
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.activeImgverticalLayout = QtWidgets.QVBoxLayout()
-        pixmapimage2 = QtGui.QPixmap("/home/fatema/PycharmProjects/UI2XML/GUI/main.jpg").scaled(300, 600)
-        activeImg = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
-        activeImg.setPixmap(pixmapimage2)
-        self.activeImgverticalLayout.addWidget(activeImg)
 
         self.activityListVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.listScrolVerticalLayout = QtWidgets.QVBoxLayout()
@@ -32,11 +25,8 @@ class previewWindowSkel(object):
         self.activitysScrollArea = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitysScrollArea)
         self.listScrolVerticalLayout.addWidget(self.scrollArea)
+        #self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
-
-        firstactivityHLayout = activityListItem.activityListItem()
-        self.activitysHLayouts.append(firstactivityHLayout)
-        self.scrollArea.setLayout(self.activitysHLayouts[0])
 
         self.activitiesList = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitiesList)

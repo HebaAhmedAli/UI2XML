@@ -14,6 +14,10 @@ DYNAMIC = True
 DESIGN_MODES = ("Screenshots", "Hand Darwing",  "PSD File")
 IMG_EXTN = ("jpg", "jpeg", "png")
 MODEL_NAME = 'UI2XMLclassificationAllFeaturesAC_98_92.h5'
+MODEL_PRED = ("CheckBox","CheckedTextView","EditText","ImageButton",
+              "RadioButton","SeekBar","Switch","ImageView","Button","TextView")
+MONITOR_WIDTH = 0
+MONITOR_HEIGHT = 0
 
 # Globals
 boxToGui = []

@@ -32,6 +32,10 @@ def processImage(subdir, file):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-6],file[len(file)-6])
+    # Translate x and y and handle outside range.
+    for i in range(len(Constants.boxToGui)):
+        Constants.boxToGui[i] = [Constants.boxToGui[i][0]+myImageBox[0],Constants.boxToGui[i][1]+myImageBox[1],Constants.boxToGui[i][2],Constants.boxToGui[i][3]]
+            
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
     margin = 10
     if Constants.DEBUG_MODE == True :
