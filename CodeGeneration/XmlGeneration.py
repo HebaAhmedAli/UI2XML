@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import Utils
 import Constants
-import XmlGeneration.JavaGeneration as JavaGeneration
+import CodeGeneration.JavaGeneration as JavaGeneration
 import os
 from PIL import Image
 import operator
@@ -46,15 +46,6 @@ def getFirstUnvisitedIndex(visited):
             return i
     return -1
 
-def setMarginsHorizontal(groupedNodes):
-    groupedNodes = sorted(groupedNodes, key=operator.attrgetter('x'))
-    
-    return groupedNodes
-
-def setMarginsVertical(groupedNodes):
-    groupedNodes = sorted(groupedNodes, key=operator.attrgetter('y'))
-
-    return groupedNodes
 
 def getWeightFromRatio(ratio,step):
     i = 1
@@ -88,13 +79,16 @@ def setWeights(groupedNodes,sortAttr,screenDim,root,img=None,notLeafChilds=None)
             else:
                 nextY = groupedNodes[i+1].y
             ratio = (nextY - (groupedNodes[i].y)) / screenDim
-            weight = getWeightFromRatio(ratio,0.15)
+            if len(groupedNodes)>10 and root:
+                weight = getWeightFromRatio(ratio,0.05)
+            else:
+                weight = getWeightFromRatio(ratio,0.15)
         groupedNodes[i].weight = weight
     return groupedNodes
 
 
 # set nodeType , text , color , x, y , width , hight , imagePath here.
-def createLeafNode(box,text,predictedComponent,img):
+def createLeafNode(box,text,predictedComponent,img,weight = None):
     leafNode = node()
     leafNode.x = box[0]
     leafNode.y = box[1]
@@ -105,13 +99,16 @@ def createLeafNode(box,text,predictedComponent,img):
     leafNode.nodeType = predictedComponent
     if predictedComponent == 'android.widget.ImageView' or predictedComponent == 'android.widget.ImageButton':
         if not Constants.HAND_DRAWN:
-            if not os.path.exists(Constants.DIRECTORY+'/drawable'):
-                os.makedirs(Constants.DIRECTORY+'/drawable')
+            if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
+                os.makedirs(Constants.DIRECTORY+'/res/drawable')
             cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
-            Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
+            Image.fromarray(cropImg.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_"+str(leafNode.x)+'_'+str(leafNode.y)+'.png')
             leafNode.imagePath = "pic_"+str(leafNode.x)+'_'+str(leafNode.y)
+            #firstColor= Utils.getMostAndSecondMostColors(cropImg,True)
+            #leafNode.backgroundColor = "#ffffff"
         else:
             leafNode.imagePath = "pic_x"
+            #leafNode.backgroundColor = "#ffffff"
     if predictedComponent == 'android.widget.TextView' or predictedComponent == 'android.widget.Button':
         cropImg = img[max(0,leafNode.y):min(leafNode.y+leafNode.height,img.shape[0]), max(0,leafNode.x):min(leafNode.x+leafNode.width,img.shape[1])]
         if not Constants.HAND_DRAWN:
@@ -120,6 +117,8 @@ def createLeafNode(box,text,predictedComponent,img):
             firstColor,secondColor = "#808080","#ffffff"
         leafNode.backgroundColor = firstColor
         leafNode.textColor = secondColor
+    if weight != None:
+        leafNode.weight = weight
     return leafNode
 
 
@@ -291,7 +290,7 @@ def createParentNodeHorizontal(groupedNodes,img,x,width):
     parentNode.y = minY
     parentNode.height = maxY - minY
     if len(groupedNodes) == 1 :
-        if abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 50:
+        if (abs(groupedNodes[0].x+0.5*groupedNodes[0].width - img.shape[1]/2) <= 50):
             parentNode.gravity = "center"
         elif groupedNodes[0].x/img.shape[1] > 0.5:
             parentNode.gravity = "right"
@@ -324,26 +323,32 @@ def groupTextViewsOfSameWord(groupedNodesI,img):
         maxY =  groupedNodesI[startJ].height+groupedNodesI[startJ].y
         text = groupedNodesI[startJ].text
         while j+1 < len(groupedNodesI) and (groupedNodesI[j+1].x-(groupedNodesI[j].x+groupedNodesI[j].width))/img.shape[1] < 0.07\
-        and groupedNodesI[j+1].nodeType == 'android.widget.TextView' and abs(groupedNodesI[j+1].y-groupedNodesI[j].y)<=0.5*(maxY-minY):
+        and groupedNodesI[j+1].nodeType == 'android.widget.TextView':
             text += (" "+groupedNodesI[j+1].text)
             j+=1
             minY = min(minY,groupedNodesI[j].y)
             maxY = max(maxY,groupedNodesI[j].height+groupedNodesI[j].y)
         box = [groupedNodesI[startJ].x,minY,groupedNodesI[j].x+groupedNodesI[j].width-groupedNodesI[startJ].x,maxY-minY]
-        groupedNodesNew.append(createLeafNode(box,text,'android.widget.TextView',img))
+        if startJ != j:
+            groupedNodesNew.append(createLeafNode(box,text,'android.widget.TextView',img))
+        else:
+            groupedNodesNew.append(groupedNodesI[startJ])
         j += 1
     return groupedNodesNew
         
 def groupHorizontalInsideVertical(groupedNodesI,img):
     groupedNodesNew = []
     packetsVertical = packetVerticalLeafNodesNoParent(groupedNodesI,img.shape[0],img)
+    if len(groupedNodesI) == len(packetsVertical):
+        groupedNodesI = groupTextViewsOfSameWord(groupedNodesI,img)
+        return groupedNodesI
     if len(packetsVertical) == 1:
         return groupedNodesI
     for i in range(len(packetsVertical)):
         if len(packetsVertical[i]) == 1:
             groupedNodesNew.append(packetsVertical[i][0])
         else:
-            groupedNodesNew += groupHorizontalLeafNodes(packetsVertical[i],img.shape[0],img)     
+            groupedNodesNew += groupHorizontalLeafNodes(packetsVertical[i],img.shape[0],img)   
     return groupedNodesNew
             
 def createLeavesParents(groupedNodes,img):
@@ -351,7 +356,6 @@ def createLeavesParents(groupedNodes,img):
     for i in range(len(groupedNodes)):
         groupedNodes[i] = sorted(groupedNodes[i], key=operator.attrgetter('x'))
         groupedNodes[i] = groupHorizontalInsideVertical(groupedNodes[i],img)
-        groupedNodes[i] = groupTextViewsOfSameWord(groupedNodes[i],img)
         groupedNodesVertical = groupVerticalLeafNodes(groupedNodes[i],img.shape[0],img)
         parentNode = createParentNodeHorizontal(groupedNodesVertical,img,0,img.shape[1])
         parentNodes.append(parentNode)
@@ -384,13 +388,28 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t' 
     elif parentNode.nodeType == 'LinearLayoutHorizontal':
+        Constants.myParentColor = parentNode.backgroundColor
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
     parentNode.id = myIndex
-    toReturn = parentNode.nodeType[15:len(parentNode.nodeType)]+'\n'+tabsString+'\t'+'android:id = "@+id/'+parentNode.nodeType[15:len(parentNode.nodeType)]+'_'+parentNode.id \
+    typeN = parentNode.nodeType[15:len(parentNode.nodeType)]
+    
+    padding = ""
+    if Constants.noOfLayouts<10:
+        padding = 'android:padding="5dp"'+'\n'+tabsString+'\t'
+    else:
+        padding = 'android:paddingLeft="5dp"'+'\n'+tabsString+'\t'+'android:paddingRight="5dp"'+'\n'+tabsString+'\t'  
+        
+    if typeN == "ListView":
+         toReturn = typeN+'\n'+tabsString+'\t'+'android:id = "@+id/'+typeN+str(Constants.listId)+'_'+parentNode.id \
                 +'"\n'+tabsString+'\t' + \
-                'android:padding="5dp"'+'\n'+tabsString+'\t' 
+               padding
+         parentNode.id = str(Constants.listId)+'_'+parentNode.id
+    else:
+        toReturn = typeN+'\n'+tabsString+'\t'+'android:id = "@+id/'+typeN+'_'+parentNode.id \
+                    +'"\n'+tabsString+'\t' + \
+                    padding 
     Constants.ID += 1         
     return toReturn
        
@@ -401,7 +420,7 @@ def getType(nodeType):
 
 def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
     toReturn = "" 
-    if myParentType == 'LinearLayoutVertical':
+    if myParentType == 'LinearLayoutVertical' or myParentType == 'android.widget.RadioGroup':
         toReturn+= "android:layout_width = "+'"match_parent"'+'\n'+tabsString+'\t'
         if weight == 0:
             toReturn+= 'android:layout_height = "wrap_content"'+'\n'+tabsString+'\t'
@@ -440,8 +459,10 @@ def printSpecialCase(parentNode,tabsString,imgH):
         
  
     if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
-        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
-        
+        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'+\
+        			'android:scaleType="centerInside"'+'\n'+tabsString+'\t'+\
+        'android:background = "'+Constants.myParentColor+'"'+'\n'+tabsString+'\t'
+                    
     if parentNode.nodeType == 'android.widget.ImageButton' or parentNode.nodeType == 'android.widget.Button':
          attributeString += "android:onClick = "+'"'+"clickMe"+parentNode.id+'"'+'\n'+tabsString+'\t'
          
@@ -449,6 +470,7 @@ def printSpecialCase(parentNode,tabsString,imgH):
         attributeString+= 'android:gravity = "center'+'"'+'\n'+tabsString+'\t'
     return attributeString
 
+'''
 def printSpecialCaseListView(parentNode,tabsString,imgH):
     attributeString = ""
     
@@ -458,9 +480,12 @@ def printSpecialCaseListView(parentNode,tabsString,imgH):
         "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'
         
     if parentNode.nodeType == 'android.widget.ImageView'or parentNode.nodeType == 'android.widget.ImageButton':
-        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'
-      
+        attributeString += "android:src = "+'"'+"@drawable/"+parentNode.imagePath+'"'+'\n'+tabsString+'\t'+\
+            'android:scaleType="centerInside"'+'\n'+tabsString+'\t'+\
+        'android:background = "'+Constants.myParentColor+'"'+'\n'+tabsString+'\t'
+            
     return attributeString
+'''
 
 def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
     tabsString=""
@@ -470,13 +495,25 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
     returnString+= tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
-                                    printSpecialCaseListView(parentNode,tabsString,imgH)+'>\n'                                  
+                                    printSpecialCase(parentNode,tabsString,imgH)+'>\n'                                  
     for i in range(len(parentNode.childNodes)) :                                   
         returnString += printListViewChildNode(parentNode.childNodes[i],parentNode.nodeType,2,imgH,myIndex+'_'+str(i))
     returnString+= tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n'
                                     
     return returnString
 
+def appendNodeXml(parentNode,myIndex):
+    if len(parentNode.childNodes)==0:
+        parentNode.id = myIndex
+        typeOfNode = getType(parentNode.nodeType)
+        Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
+        Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
+        Constants.predictedToGui.append(typeOfNode)
+        return
+    for i in range(len(parentNode.childNodes)):
+        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i))
+            
+            
 def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None):    
     tabsString=""
     for i in range(tabs):
@@ -504,8 +541,9 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
-        fToListView=open(Constants.DIRECTORY+'/layout/'+'list_view_'+myIndex+'.xml', 'w+')
-        Constants.xmlFilesToGui.append('list_view_'+myIndex+'.xml')
+        fToListView=open(Constants.DIRECTORY+'/res/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
+        Constants.xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
+        Constants.listId += 1
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
         +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
@@ -519,17 +557,13 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.close()   
         # Append the rest of chils.
         for i in range(len(parentNode.childNodes)):
-            for j in range(len(parentNode.childNodes[i].childNodes)):
-                typeOfNode = getType(parentNode.childNodes[i].childNodes[j].nodeType)
-                Constants.boxToGui.append([int(parentNode.childNodes[i].childNodes[j].x),int(parentNode.childNodes[i].childNodes[j].y),int(parentNode.childNodes[i].childNodes[j].width),int(parentNode.childNodes[i].childNodes[j].height)])
-                Constants.idToGui.append(typeOfNode+'_'+myIndex[:-2]+'_'+str(i+specialId)+'_'+str(j))
-                Constants.predictedToGui.append(typeOfNode)
+            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId))
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
     else:
         if actionBarOp == 'A' and tabs == 0:
-            fToActionBar=open(Constants.DIRECTORY+'/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
+            fToActionBar=open(Constants.DIRECTORY+'/res/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
             Constants.xmlFilesToGui.append('action_bar_'+myParentType+'.xml')
             fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
                 '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
@@ -539,6 +573,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                 +'\t'+'android:layout_height = "wrap_content"\n'\
                 +'\t'+'android:background = "'+parentNode.childNodes[0].backgroundColor+'"'+'\n'\
                 +'\t'+'android:orientation = "horizontal"'+'>\n'
+            Constants.myParentColor = parentNode.childNodes[0].backgroundColor
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
                 printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i))
@@ -564,10 +599,11 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
 def mapToXml(parentNode,appName,imgH,actionBarOp):
-    if not os.path.exists(Constants.DIRECTORY+'/layout'):
-            os.makedirs(Constants.DIRECTORY+'/layout') 
-    fTo=open(Constants.DIRECTORY+'/layout/'+'activity_'+appName+'.xml', 'w+')
+    if not os.path.exists(Constants.DIRECTORY+'/res/layout'):
+            os.makedirs(Constants.DIRECTORY+'/res/layout') 
+    fTo=open(Constants.DIRECTORY+'/res/layout/'+'activity_'+appName+'.xml', 'w+')
     Constants.xmlFilesToGui.append('activity_'+appName+'.xml')
+    Constants.noOfLayouts = len(parentNode.childNodes)
     printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
     return
 
@@ -591,12 +627,22 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])]
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
-        else: # 5 horizontal vertical leaf
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)
+        elif len(indices) == 5: # 5 horizontal vertical leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])]
-            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img)
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)
+        else: # 6 horizontal vertical horizontal leaf
+            parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])]
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes[int(indices[5])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)   
+    # Merge text views after update.
+    for i in range(len(idUpdated)):
+        indices = idUpdated[i].split('_')
+        if len(indices) == 4: # horizontal leaf
+            parentNodesForGui[int(indices[2])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes,img)
+        elif len(indices) == 6: # 6 horizontal vertical horizontal leaf
+            parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img) 
     parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
-    mapToXml(parentNode,appName,img.shape[0],actionBarOp)
+    mapToXml(parentNode,appName,img.shape[0],actionBarOp) 
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 
@@ -605,7 +651,7 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
     i = 0
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
-        if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
+        if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:
             groupedNodesNew.append(createParentNodeVertical([groupedNodes[i]],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue
@@ -613,7 +659,7 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
         if lastIndex != i:
             childs = groupedNodes[i:lastIndex+1]
-            if patternToSearch ==  'android.widget.RadioButton':
+            if 'android.widget.RadioButton' in patternToSearch:
                 groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup',img,True))
                 i = lastIndex
             elif lastIndex-i>=2 and patternToSearch.find('android.widget.EditText') == -1 and not(patternToSearch.find('android.widget.Button') != -1 and patternToSearch.find('android.widget.TextView') == -1)\
@@ -634,12 +680,12 @@ def groupRadio(groupedNodes,imgH,img):
     i = 0
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
-        if patternToSearch == 'android.widget.RadioButton' and radioHorizontal:
+        if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:
             groupedNodesNew.append(createParentNodeVertical(groupedNodes[i],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue        
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
-        if lastIndex != i and patternToSearch ==  'android.widget.RadioButton':
+        if lastIndex != i and 'android.widget.RadioButton' in patternToSearch:
             childs = groupedNodes[i:lastIndex+1]
             groupedNodesNew.append(createParentNodeVertical(childs,imgH,'android.widget.RadioGroup',img,True))
             i = lastIndex

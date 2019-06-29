@@ -21,4 +21,4 @@ def preProcessEdges(image):
     grayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(grayImg, (3,3), 0)  
     edges = cv2.Canny(blurred, lowThreshold, highThreshold)
-    return edges
+    return edges,grayImg

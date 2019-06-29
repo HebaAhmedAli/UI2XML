@@ -36,7 +36,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.uploadWidget.populateProjDir()
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-            model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
+            model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
             ScreenShots.processAllImages(Constants.imagesPath,model,invVocab)
         elif Constants.designMode == Constants.DESIGN_MODES[1]:
             HandDrawing.processAllImages(Constants.imagesPath)
