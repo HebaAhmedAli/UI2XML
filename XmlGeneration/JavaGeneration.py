@@ -33,7 +33,9 @@ def printArrayList(noOfListViews,appName):
         "\t"+appName.capitalize()+"ListViewBaseAdapter"+str(i)+" adapter"+str(i)+";\n"+\
         "\tArrayList<"+appName.capitalize()+"ListViewBean"+str(i)+"> arr_bean"+str(i)+";\n"
     return arrayList
-
+'''
+def getItemsfromLeafNodes():
+'''
 def  printListItems(listView,idx):
     varType = {'android.widget.ImageButton': 'int' ,'android.widget.ImageView': 'int',\
               'android.widget.TextView': 'String', 'android.widget.Button': 'String'}
@@ -44,6 +46,7 @@ def  printListItems(listView,idx):
     items=""
     leafIdx = 0
     leafCount = 0
+    #items+= getItemsfromLeafNodes(items,)
     while leafCount < len(listView.childNodes[0].childNodes):
         layoutIdx = 0
         if listView.childNodes[0].childNodes[leafCount].nodeType in varType:
@@ -136,7 +139,7 @@ def printListViewBaseAdapter(listView,leavesType,idx,appName,package):
     "\tpublic "+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+"(List<"+appName.capitalize()+"ListViewBean"+str(idx)+"> mListenerList, Context context) {\n"+\
     "\t\tmContext = context;\n\t\tthis.mListenerList = mListenerList;\n\t\tthis.arrayListListener = new ArrayList<"+appName.capitalize()+"ListViewBean"+str(idx)+">();\n"+\
     "\t\tthis.arrayListListener.addAll(mListenerList);\n\t}\n\tpublic class ViewHolder {\n"
-    
+
     varName = {'android.widget.ImageButton': 'iconView' ,'android.widget.ImageView': 'imageView',\
               'android.widget.TextView': 'textView', 'android.widget.Button': 'buttonView'}
     viewType = {'android.widget.ImageButton': 'ImageButton' ,'android.widget.ImageView': 'ImageView',\
