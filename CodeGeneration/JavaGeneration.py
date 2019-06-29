@@ -185,7 +185,7 @@ def findButtons(rootNode,buttonsIds):
 def printButtons(buttonsId):
     onClick = ""
     for buttonId in  buttonsId:
-        onClick += "\tpublic void clickMe"+str(buttonId)+"(View view){\n\t// onClick logic\n"+\
+        onClick += "\tpublic void clickMe"+str(buttonId)+"(View view){\n\t// onClick logic"+buttonId+"\n"+\
         "\t\tToast.makeText(getApplicationContext(),"+'"'+"Clicked on Button"+str(buttonId)+'"'+",Toast.LENGTH_SHORT).show();\n"+\
         "\t}\n"
     return onClick
