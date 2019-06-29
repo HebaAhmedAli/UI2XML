@@ -11,8 +11,7 @@ def addIntentToJava(buttonsToActivities):
         intent = "Intent intent = new Intent("+fromActivity+"Activity.this, "+toActivity+"Activity.class)\n;"+"\tstartActivity(intent);"
         with open(fromActivityFile, 'r') as file:
             filedata = file.read()
-        filedata = filedata.replace("// onClick logic"+buttonId, intent)
-        print(filedata)
+        filedata = filedata.replace("// onClick logic_"+buttonId, intent)
         with open(fromActivityFile, 'w') as file:
             file.write(filedata)
 
