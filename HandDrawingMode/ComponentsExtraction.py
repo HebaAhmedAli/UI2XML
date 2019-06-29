@@ -1,11 +1,9 @@
 import sys
 sys.path.append('../')
-import HandDrawingProcessing.BoxesExtraction as BoxesExtraction
-import HandDrawingProcessing.TextExtraction as TextExtraction
+import HandDrawingMode.BoxesExtraction as BoxesExtraction
+import HandDrawingMode.TextExtraction as TextExtraction
 import Utils
-import Constants
-import os
-import cv2
+
 
 def getFirstTextBoxAndRatio(boxesInBacket,textsInBacket):
     text = ""

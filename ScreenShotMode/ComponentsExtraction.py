@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
-import ComponentsExtraction.BoxesExtraction as BoxesExtraction
-import ComponentsExtraction.TextExtraction as TextExtraction
+import ScreenShotMode.BoxesExtraction as BoxesExtraction
+import ScreenShotMode.TextExtraction as TextExtraction
 import ModelClassification.Model as Model
 from PIL import Image
 import Utils
@@ -12,19 +12,6 @@ import Constants
 heightThrshold1 = 20
 heightThrshold2 = 40
 margin = 10
-
-def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
-    if ifSquare:
-        if slopedLines > 2 and slopedLines < 4:
-            return 'android.widget.CheckBox'
-    if circularity != 0 and (prediction == 'android.widget.ImageView' or prediction == 'android.widget.ImageButton'):
-        x,y,w,h = box
-        marginNew = 5
-        croppedImage = imageCopy[max(0,y - marginNew):min(imageCopy.shape[0],y + h + marginNew), max(x - marginNew,0):min(imageCopy.shape[1],x + w + marginNew)]
-        newPrediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
-        if newPrediction == 'android.widget.RadioButton':
-            return 'android.widget.RadioButton'
-    return prediction
 
 
 # Extract the boxes and text from given image -extracted components- and predict them.
@@ -56,7 +43,18 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         extractedText.append(TextExtraction.extractText(croppedImage))
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
-
+def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
+    if ifSquare:
+        if slopedLines > 2 and slopedLines < 4:
+            return 'android.widget.CheckBox'
+    if circularity != 0 and (prediction == 'android.widget.ImageView' or prediction == 'android.widget.ImageButton'):
+        x,y,w,h = box
+        marginNew = 5
+        croppedImage = imageCopy[max(0,y - marginNew):min(imageCopy.shape[0],y + h + marginNew), max(x - marginNew,0):min(imageCopy.shape[1],x + w + marginNew)]
+        newPrediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
+        if newPrediction == 'android.widget.RadioButton':
+            return 'android.widget.RadioButton'
+    return prediction
 
 def extractShapeFeatures(img,resizedImg):
     allShapeFeatures = []
@@ -101,8 +99,9 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
         changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered,boxesFiltered)    
     if 'android.widget.ProgressBarVertical' in predictedComponentsFiltered\
         or 'android.widget.ProgressBarHorizontal' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
-        boxesFiltered,textsFiltered,predictedComponentsFiltered = changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
+        boxesFiltered,textsFiltered,predictedComponentsFiltered = DeleteVerticalAndHorizontalProgressBar(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.
+    changeUnDesiredComponents(predictedComponentsFiltered)
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
 # Case image containing all image or text inside.
@@ -176,7 +175,7 @@ def changeEditTextToTextViewInCaseNoButtons(predictedComponentsFiltered,boxesFil
             predictedComponentsFiltered[i] = 'android.widget.TextView'
             boxesFiltered[i][2] = int(boxesFiltered[i][2] *0.5)
     
-def changeProgressBarVerticalToRadioButtonAndDeleteHorizontal(boxesFiltered,textsFiltered,predictedComponentsFiltered,img):
+def DeleteVerticalAndHorizontalProgressBar(boxesFiltered,textsFiltered,predictedComponentsFiltered,img):
     boxesFilteredNew = []
     textsFilteredNew = []
     predictedComponentsFilteredNew = []
@@ -307,3 +306,12 @@ def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedCo
             predictedComponentsRemovingManual.append(predictedComponents[i])
     return boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual
 
+def changeUnDesiredComponents(pedictedComponents):
+    for i in range(len(pedictedComponents)):
+        if pedictedComponents[i]== 'android.widget.NumberPicker' or\
+        pedictedComponents[i] =='android.widget.RatingBar':
+            pedictedComponents[i] = 'android.widget.ImageView'
+        elif pedictedComponents[i] =='android.widget.ToggleButton':
+            pedictedComponents[i] = 'android.widget.Switch'
+        elif pedictedComponents[i] =='android.widget.Spinner':
+            pedictedComponents[i] = 'android.widget.ImageButton'

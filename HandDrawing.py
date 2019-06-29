@@ -1,4 +1,4 @@
-import HandDrawingProcessing.ComponentsExtraction as ComponentsExtraction
+import HandDrawingMode.ComponentsExtraction as ComponentsExtraction
 from keras.preprocessing import image
 import CodeGeneration.XmlGeneration as XmlGeneration
 import numpy as np

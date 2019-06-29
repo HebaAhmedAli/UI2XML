@@ -1,4 +1,4 @@
-import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
+import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
 import CodeGeneration.XmlGeneration as XmlGeneration
 from keras.models import load_model
 import LoadDataClassification
@@ -52,9 +52,16 @@ def processImage(subdir, file,model,invVocab):
         fTo.close()
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
         j=0
+        edit = 0
         for x,y,w,h in boxesFiltered:
             # testing: print the cropped in folder
-            crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+            '''
+            if predictedComponentsFiltered[j] == "android.widget.EditText":
+                edit = 10
+            else:
+                edit = 0
+            '''
+            crop_img = imgCopy[max(0,y - margin - edit):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
             fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
             j+=1  
