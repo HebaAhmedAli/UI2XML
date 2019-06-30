@@ -26,7 +26,7 @@ class Ui_mainWindow(object):
     def setupUi(self, mainWindow):
         mainWindow.setObjectName(_fromUtf8("mainWindow"))
         mainWindow.resize(800, 600)
-        mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
+        # mainWindow.setStyleSheet(_fromUtf8("background-color:\"grey\";"))
         self.centralwidget = QtWidgets.QWidget(mainWindow)
         mainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(mainWindow)

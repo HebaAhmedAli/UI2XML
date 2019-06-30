@@ -45,8 +45,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.horizontalLayouts[0].addWidget(self.UploadButton)
 
 
-        
-
     def dragEnterEvent(self, event):
         if event.mimeData().hasImage:
             event.accept()
@@ -144,18 +142,18 @@ class dragDropScroll(QtWidgets.QScrollArea):
         newLine = QtWidgets.QHBoxLayout()
         newHorLayouts.append(newLine)
         newHorLayouts[0].setAlignment(QtCore.Qt.AlignLeft)
-        #newHorLayouts[0].addWidget(self.UploadButton)
+        newHorLayouts[0].addWidget(self.UploadButton)
 
 
         for imagebox in self.imageBoxes:
             imagebox.groupBox.setParent(None)
 
         for idx in range (0, self.numOfImages):
-            if idx / (indexRow +1) >= self.maxRowSize:
+            if (idx +1) / (indexRow +1) >= self.maxRowSize:
                 indexRow = indexRow + 1
                 indexCol = 0
             imagebox = self.imageBoxes[idx].resizeImg(idx,  newIndexRow, newIndexCol, imageBox_W, imageBox_H)
-            if idx / (newIndexRow +1) >= maxRowSize :
+            if (idx +1) / (newIndexRow +1) >= maxRowSize :
                 newIndexRow = newIndexRow + 1
                 newIndexCol = 0
                 newLine = QtWidgets.QHBoxLayout()

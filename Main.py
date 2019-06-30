@@ -6,7 +6,6 @@ import GUI.uploadWindow as uploadWindow
 from GUI.skelChangeCompPred import correctPredDialog
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
-import  GUI.helloScreen as helloScreen
 # from keras.models import load_model
 # import ScreenShots
 # import HandDrawing

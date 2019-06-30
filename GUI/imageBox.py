@@ -11,6 +11,8 @@ class imageBox(QWidget):
         self.groupBox.setMinimumHeight(height + 165)
         self.groupBox.setMaximumWidth(width + 40)
         self.groupBox.setMaximumHeight(height + 165)
+        #self.groupBox.setStyleSheet("""background-color: #acf3da;
+        #border: 1px solid #4d0056""")
         self.fullImageBoxLay = QVBoxLayout()
         self.checkboxsLay = QWidget()
         self.checkBoxs = QVBoxLayout()

@@ -30,8 +30,7 @@ class xmlTab(QWidget):
         vBoxlayout	= QVBoxLayout()
         self.xmlWidget = QWidget()
         self.textBrowser = QTextBrowser(self.xmlWidget)
-        self.textBrowser.setStyleSheet("background-color: \"white\";\n"
-            "color: rgb(156,156,156);\n"
+        self.textBrowser.setStyleSheet("background-color: \"white\";\n"           
             "border: 5px solid  rgb(66, 138, 255);\n"
             "border-radius: 20%;")
         self.textBrowser.setGeometry(QRect(0, 0, 500, 600))
