@@ -37,7 +37,7 @@ class componentHighlight(QtWidgets.QPushButton):
         self.correctPredDialog = correctPredDialog()
         self.correctPredDialog.show()
         self.correctPredDialog.activateWindow()
-        self.correctPredDialog.opa.connect(self.changePred)
+        self.correctPredDialog.correctedType.connect(self.changePred)
         print(self.idName)
 
     def changePred(self, newType):
