@@ -182,7 +182,7 @@ def printButtons(buttonsId):
 def setChecked(radioGroup,radioGroupIdx,radioIdx):
     checkedString = "\t\t\t\tradioButton"+str(radioGroupIdx)+str(radioIdx)+".setChecked(true);\n"
     for i in range(len(radioGroup.childNodes)):
-        if i != radioIdx:
+        if radioGroup.childNodes[i] == 'android.widget.RadioButton' and i != radioIdx :
             checkedString+=  "\t\t\t\tradioButton"+str(radioGroupIdx)+str(i)+".setChecked(false);\n"
     
     return checkedString
