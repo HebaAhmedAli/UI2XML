@@ -6,6 +6,7 @@ import GUI.uploadWindow as uploadWindow
 from GUI.skelChangeCompPred import correctPredDialog
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
+import  GUI.helloScreen as helloScreen
 # from keras.models import load_model
 # import ScreenShots
 # import HandDrawing
@@ -20,7 +21,8 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.startUp()
         self.createUploadUI()
         self.actionRun.triggered.connect(self.processImagesAccToMode)
-        
+
+
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
         self.centralwidget.setLayout(self.uploadWidget.layoutScroll)
@@ -46,3 +48,4 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         '''
         else:    # TODO : Call psd.
         '''
+

@@ -27,7 +27,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
         # Placement of the uploaded image
         self.IsGrid = 1
-        self.indexColumn = 0
+        self.indexColumn = 1
         self.indexRow = 0
         self.createImgsArea()
 
@@ -41,6 +41,10 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.horizontalLayouts.append(firstHLay)
         self.horizontalLayouts[0].setAlignment(QtCore.Qt.AlignLeft)        
         self.imgsHLayoutsContainer.addLayout(self.horizontalLayouts[0])
+        self.UploadButton = self.createUploadButton()
+        self.horizontalLayouts[0].addWidget(self.UploadButton)
+
+
         
 
     def dragEnterEvent(self, event):
@@ -101,13 +105,13 @@ class dragDropScroll(QtWidgets.QScrollArea):
             fileName = filePath[startI:]
             if(not self.matchFormat(filePath)):
                 continue
-
+            print("hna0")
             self.GroupBox = QtWidgets.QGroupBox()
             HLayoutCnt = len(self.horizontalLayouts)
-            newimage = imageBox(self.numOfImages)
+            newimage = imageBox(self.numOfImages, self.imageBox_W, self.imageBox_H)
             newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
             self.numOfImages = self.numOfImages + 1
-
+            print("hna")
             if (self.horizontalLayouts[HLayoutCnt -1]).count() >= self.maxRowSize  :
                 self.indexColumn = 0
                 self.indexRow = self.indexRow + 1
@@ -119,6 +123,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
             imagebox = newimage.setImage(filePath, fileName, self.indexRow, self.indexColumn, self.imageBox_W,
                                             self.imageBox_H, self.IsGrid)
+            print("hnak")
             self.imageBoxes.append(newimage)
             self.horizontalLayouts[self.indexRow].addWidget(imagebox)
             self.indexColumn = self.indexColumn + 1
@@ -132,13 +137,15 @@ class dragDropScroll(QtWidgets.QScrollArea):
         imageBox_H = int(imageBox_W * 4 / 3)  # 268
 
         indexRow = 0
-        indexCol = 0
+        indexCol = 1
         newIndexRow = 0
-        newIndexCol = 0
+        newIndexCol = 1
         newHorLayouts = []
         newLine = QtWidgets.QHBoxLayout()
         newHorLayouts.append(newLine)
         newHorLayouts[0].setAlignment(QtCore.Qt.AlignLeft)
+        #newHorLayouts[0].addWidget(self.UploadButton)
+
 
         for imagebox in self.imageBoxes:
             imagebox.groupBox.setParent(None)
@@ -175,3 +182,29 @@ class dragDropScroll(QtWidgets.QScrollArea):
         del self.imageBoxes[index]
         self.numOfImages = self.numOfImages -1
         self.chanageGridSize(self.maxRowSize)
+
+    def createUploadButton(self):
+        self.boxUploadImages = QtWidgets.QGroupBox()
+        self.boxUploadImages.setMinimumWidth(self.imageBox_W + 45)
+        self.boxUploadImages.setMinimumHeight(self.imageBox_H + 165)
+        self.boxUploadImages.setMaximumWidth(self.imageBox_W + 45)
+        self.boxUploadImages.setMaximumHeight(self.imageBox_H + 165)
+        self.addBoxLayout = QtWidgets.QVBoxLayout(self.boxUploadImages)
+        self.addButton = QtWidgets.QPushButton()
+        self.addButton.setText("ADD\nImages")
+        self.addButton.clicked.connect(self.addImages_onClick)
+        self.addBoxLayout.addWidget(self.addButton)
+        return self.boxUploadImages
+
+    def addImages_onClick(self):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select images to add", "main",
+                                                          "All Files (*);;JPG (*.JPG);;PNG (*.PNG)", options=options)
+        if paths:
+            self.pictureDropped(paths)
+
+            # self.changeView.emit(paths)
+
+
+
