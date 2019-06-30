@@ -7,12 +7,14 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import Constants as Constants
 
 class previewWindowSkel(object):
     def setupUi(self, prev):
         self.xmlTabsverticalLayoutWidget = QtWidgets.QWidget(prev)
         self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
+
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
