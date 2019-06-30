@@ -71,6 +71,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
         endIdx = filePath.rfind('.', 0, len(filePath)) + 1
         fileExten = filePath[endIdx:]
         fileExten = fileExten.lower()
+        print(fileExten,Constants.designMode)
         if( Constants.designMode == Constants.DESIGN_MODES[0] or Constants.designMode == Constants.DESIGN_MODES[1]):
             if( not (fileExten in Constants.IMG_EXTN)):
                 utils.alertUser("Format Error", str(filePath) + " has inappropriate Image format.")

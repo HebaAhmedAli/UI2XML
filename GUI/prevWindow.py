@@ -30,7 +30,6 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(activityHLayout)
             self.verticalLayout.addLayout(activityHLayout)
-
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
         activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)

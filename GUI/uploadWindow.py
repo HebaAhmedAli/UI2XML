@@ -5,6 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import GUI.skelUploadWindow as  skelUploadWindow
 import GUI.utils as utils
+from shutil import copyfile
 import Constants
 import os
 import cv2
@@ -21,7 +22,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
         for image in self.scrollarea.imageBoxes:
             name = str(image.imageNameLine.text())
             endI = name.rfind('.', 0, len(name))
-            if (not '.' in name or not name[endI+1:].lower() in Constants.IMG_EXTN):
+            if ((not '.' in name or not name[endI+1:].lower() in Constants.IMG_EXTN) and  name[endI+1:].lower() != "psd"):
                 utils.alertUser("File name Error", name + " File name or extension not correct")
                 return
             names.append(name[:endI])
@@ -36,7 +37,9 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             os.mkdir(fullProjDir)
         # TODO: Handle PSD
         for image in self.scrollarea.imageBoxes:
-            readImage = cv2.imread(image.srcPath)
+            readImage = None
+            if Constants.designMode != Constants.DESIGN_MODES[2]:  
+                readImage = cv2.imread(image.srcPath)
             imageName = str(image.imageNameLine.text())
             endI = imageName.rfind('.', 0, len(imageName))
             exten = imageName[endI:]
@@ -50,7 +53,10 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
                 name = name + "S"
             else:
                 name = name + "D"
-            cv2.imwrite(fullProjDir + "/" + name + exten,readImage)
+            if Constants.designMode != Constants.DESIGN_MODES[2]:
+                cv2.imwrite(fullProjDir + "/" + name + exten,readImage)
+            else:
+                copyfile(image.srcPath,fullProjDir + "/" + name + exten)
         self.removeUploadWid()
 
     def removeUploadWid(self):

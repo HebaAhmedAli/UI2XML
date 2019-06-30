@@ -34,7 +34,7 @@ class xmlTab(QWidget):
             "border: 5px solid  rgb(66, 138, 255);\n"
             "color: 5px solid  \"black\";\n"
             "border-radius: 20%;")
-        self.textBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*0.3, Constants.MONITOR_HEIGHT*0.85))
+        self.textBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*Constants.textBrowserWidth, Constants.MONITOR_HEIGHT*0.85))
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.xmlWidget)
         self.setLayout(vBoxlayout)

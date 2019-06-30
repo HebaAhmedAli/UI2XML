@@ -46,6 +46,8 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
             print("hhhh ",Constants.designMode)
             HandDrawing.processAllImages(Constants.imagesPath)
         else:  
+            vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+            model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
             Psd.processAllPsds(Constants.imagesPath,model,invVocab)
         prev = prevWindow.previewWindow()
         self.uploadWidget.layoutScroll.addLayout(prev.mainHLayout)

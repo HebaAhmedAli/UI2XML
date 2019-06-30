@@ -31,3 +31,4 @@ noContors = 0
 listId = 0
 noOfLayouts = 0
 myParentColor = ""
+textBrowserWidth = 0.42
