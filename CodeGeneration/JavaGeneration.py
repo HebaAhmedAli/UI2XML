@@ -34,8 +34,21 @@ def printArrayList(noOfListViews,appName):
         "\tArrayList<"+appName.capitalize()+"ListViewBean"+str(i)+"> arr_bean"+str(i)+";\n"
     return arrayList
 '''
-def getItemsfromLeafNodes():
+def getItemsfromLeafNodes(listView,listIdx,node,leafIdx,varType,varName,items,selectedNames,selectedTypes):
+    if len(node.childNodes) == 0:
+        if node.nodeType in varType:
+            items += "\t" + varType[node.nodeType] + " " + varName[node.nodeType] + str(listIdx) + str(leafIdx) + " [] = { "
+            selectedNames.append(varName[node.nodeType])
+            selectedTypes.append(node.nodeType)
+            if node.nodeType == 'android.widget.TextView' or node.nodeType == 'android.widget.Button':
+                items += '"' + node.text + '"'
 '''
+
+
+
+
+
+
 def  printListItems(listView,idx):
     varType = {'android.widget.ImageButton': 'int' ,'android.widget.ImageView': 'int',\
               'android.widget.TextView': 'String', 'android.widget.Button': 'String'}
