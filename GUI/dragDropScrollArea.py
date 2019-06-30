@@ -144,7 +144,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
         newHorLayouts[0].setAlignment(QtCore.Qt.AlignLeft)
         newHorLayouts[0].addWidget(self.UploadButton)
 
-
         for imagebox in self.imageBoxes:
             imagebox.groupBox.setParent(None)
 
@@ -201,8 +200,3 @@ class dragDropScroll(QtWidgets.QScrollArea):
                                                           "All Files (*);;JPG (*.JPG);;PNG (*.PNG)", options=options)
         if paths:
             self.pictureDropped(paths)
-
-            # self.changeView.emit(paths)
-
-
-
