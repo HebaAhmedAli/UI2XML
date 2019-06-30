@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
+from GUI.skelChangeCompPred import correctPredDialog
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
 # from keras.models import load_model
@@ -19,6 +20,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.startUp()
         self.createUploadUI()
         self.actionRun.triggered.connect(self.processImagesAccToMode)
+        # self.actionCorrectPred.connect(self.)
         
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -31,6 +33,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.mainDialoge.activateWindow()
 
     def processImagesAccToMode(self):
+        del self.mainDialoge
         self.uploadWidget.populateProjDir()
         prev = prevWindow.previewWindow()
         self.uploadWidget.layoutScroll.addLayout(prev.mainHLayout)

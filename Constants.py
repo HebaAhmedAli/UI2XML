@@ -12,6 +12,9 @@ HAND_DRAWN = False
 DYNAMIC = True
 DESIGN_MODES = ("Screenshots", "Hand Darwing",  "PSD File")
 IMG_EXTN = ("jpg", "jpeg", "png")
+MODEL_PRED = ("CheckBox","CheckedTextView","EditText","ImageButton","NumberPicker",
+            "ProgressBarHorizontal","ProgressBarVertical","RadioButton","RatingBar","SeekBar",
+            "Spinner","Switch","ToggleButton","ImageView","Button","TextView",)
 
 # Globals
 boxToGui = []
