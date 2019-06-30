@@ -36,6 +36,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
             activityHLayout = activityListItem(imgDir, imgName)
+            activityHLayout.activate.connect(self.onViewBtnClicked)
             activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(activityHLayout)
             self.verticalLayout.addLayout(activityHLayout)
@@ -75,6 +76,30 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         scaledBox.append(x2-x1)
         scaledBox.append(y2-y1)
         return scaledBox
+
+    @QtCore.pyqtSlot(str)
+    def onViewBtnClicked(self, imgPath):
+        print(imgPath)
+        # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
+        # self.activeImageWidget = QtWidgets.QWidget()
+        # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+        # imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
+        # pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
+        # imageLabel.setPixmap(QtGui.QPixmap(pixmapimage))
+        # activeImageLayout.addWidget(imageLabel)
+        # compBoxes = imgsOutputInfo[mainActivityName][0]
+        # compIDs = imgsOutputInfo[mainActivityName][1]
+        # compPreds = imgsOutputInfo[mainActivityName][2]
+        # self.highlights = []
+        # imgW, imgH = imagesize.get(mainActivityDir)
+        # for idx in range(0,len(compBoxes)):
+        #     compBox =compBoxes[idx]
+        #     compId = compIDs[idx]
+        #     compPred = compPreds[idx]
+        #     scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
+        #     high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
+        #     self.highlights.append(high)
+        # self.activeImgverticalLayout.addWidget(self.activeImageWidget)
     
 
     def updateXMLTab(self, xmlFiles):
