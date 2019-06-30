@@ -55,4 +55,4 @@ def switchActivities(buttonsToActivities):
 
 imagesPath='data/ScreenShots/ourTest'
 Constants.DIRECTORY = imagesPath+'/output/'+'main'
-switchActivities([['Button_0_4_0','mainAD.jpg','drND.png'],['Button_0_5_0','mainAD.jpg','radio1AS.png']])
+switchActivities([['Button_0_4_0','mainAD.jpg','drAD.png'],['Button_0_5_0','mainAD.jpg','radio1AS.png'],['Button_0_6_0','mainAD.jpg','switchAS.png']])
