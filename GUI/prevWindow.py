@@ -25,7 +25,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 ['ImageButton', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"])
                 }
-        
+        self.userCorrection = {}
         projDir = Constants.imagesPath
         mainActivityName = "main"
         for imgName in imgsOutputInfo:
@@ -33,6 +33,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if(mainActivityName==imgName[:endI-2]):
                 mainActivityName = imgName
             imgDir = projDir+"/"+imgName
+            self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
             activityHLayout = activityListItem(imgDir, imgName)
             activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
@@ -48,13 +49,15 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         activeImageLayout.addWidget(imageLabel)
         compBoxes = imgsOutputInfo[mainActivityName][0]
         compIDs = imgsOutputInfo[mainActivityName][1]
+        compPreds = imgsOutputInfo[mainActivityName][2]
         self.highlights = []
         imgW, imgH = imagesize.get(mainActivityDir)
         for idx in range(0,len(compBoxes)):
             compBox =compBoxes[idx]
             compId = compIDs[idx]
+            compPred = compPreds[idx]
             scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
-            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId)
+            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
         self.updateXMLTab(imgsOutputInfo[mainActivityName][3])

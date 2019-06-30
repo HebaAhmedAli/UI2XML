@@ -54,6 +54,7 @@ class skelChangeCompPred(object):
         self.updateBtn.setText(_translate("Dialog", "Update Component", None))
 
 class correctPredDialog(QtWidgets.QWidget, skelChangeCompPred):
+    correctedType = QtCore.pyqtSignal(str)
     def __init__(self):
         super(correctPredDialog, self).__init__()
         self.setupUi(self)
@@ -66,5 +67,6 @@ class correctPredDialog(QtWidgets.QWidget, skelChangeCompPred):
 
     def changePred(self):
         # get the combobox
-        print(self.compTypeComboBox.currentText())
+        # print(self.compTypeComboBox.currentText())
+        self.correctedType.emit(self.compTypeComboBox.currentText())
         self.close()

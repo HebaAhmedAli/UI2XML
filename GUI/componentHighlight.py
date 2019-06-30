@@ -3,11 +3,12 @@ from GUI.skelChangeCompPred import  skelChangeCompPred, correctPredDialog
 
 class componentHighlight(QtWidgets.QPushButton):
 
-    def __init__(self, parent, scaledCompBox, box, idName):
+    def __init__(self, parent, scaledCompBox, box, idName, predType):
         super(componentHighlight, self).__init__(parent)
         self.installEventFilter(self)
         self.idName = idName
         self.box = box
+        self.predicted = predType
         self.changed = False
         errorMargin = 10
         self.setFixedSize(scaledCompBox[2]+errorMargin, scaledCompBox[3]+errorMargin)
@@ -33,7 +34,13 @@ class componentHighlight(QtWidgets.QPushButton):
 
     def correctCompProduction(self):
         # Create Dialog to Correct
-        self.cor = correctPredDialog()
-        self.cor.show()
-        self.cor.activateWindow()
+        self.correctPredDialog = correctPredDialog()
+        self.correctPredDialog.show()
+        self.correctPredDialog.activateWindow()
+        self.correctPredDialog.correctedType.connect(self.changePred)
         print(self.idName)
+
+    def changePred(self, newType):
+        self.predicted=newType
+        self.changed=True
+
