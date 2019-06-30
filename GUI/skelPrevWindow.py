@@ -28,12 +28,12 @@ class previewWindowSkel(object):
         self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
 
-        self.activitiesList = QtWidgets.QWidget()
-        self.scrollArea.setWidget(self.activitiesList)
+        self.activitiesList = QtWidgets.QListWidget()
+        self.activitiesList.setViewMode(QtWidgets.QListView.ListMode)
         self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.activitiesList.setLayout(self.verticalLayout)
+        self.verticalLayout.addWidget(self.activitiesList)
 
         self.mainHLayout = QtWidgets.QHBoxLayout()
-        self.mainHLayout.addLayout(self.listScrolVerticalLayout)
+        self.mainHLayout.addLayout(self.verticalLayout)
         self.mainHLayout.addLayout(self.activeImgverticalLayout)
         self.mainHLayout.addLayout(self.xmlTabsverticalLayout)
