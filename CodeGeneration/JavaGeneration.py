@@ -196,7 +196,6 @@ def setCheckedVertical(radioGroup,radioGroupIdx,radioIdx):
     for i in range(len(radioGroup.childNodes)):
         if i != radioIdx:
             checkedString += "\t\t\t\tradioButton" + str(radioGroupIdx) + str(i) + ".setChecked(false);\n"
-    print(checkedString)
     return checkedString
 
 def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
@@ -285,8 +284,6 @@ def generateJava(rootNode,appName,actionBarOp):
         imports += "import android.widget.RadioButton;\n"
     for i in range(len(radioGroups)):
         radiosDef,radiosOnClick = printRadiosAndOnClicks(radioGroups[i],i)
-        print(radiosDef)
-        print(radiosOnClick)
         groupsRadiosDef+=radiosDef
         groupsRadiosOnClick+=radiosOnClick
     
