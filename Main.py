@@ -6,6 +6,7 @@ import GUI.uploadWindow as uploadWindow
 from GUI.skelChangeCompPred import correctPredDialog
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
+import  GUI.utils as utils
 # from keras.models import load_model
 # import ScreenShots
 # import HandDrawing
@@ -28,6 +29,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.addDockWidget(Qt.DockWidgetArea(2), self.uploadWidget.dockDesign)
     
     def startUp(self):
+        Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
         self.mainDialoge.activateWindow()

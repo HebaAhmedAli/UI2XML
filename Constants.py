@@ -15,7 +15,8 @@ IMG_EXTN = ("jpg", "jpeg", "png")
 MODEL_PRED = ("CheckBox","CheckedTextView","EditText","ImageButton","NumberPicker",
             "ProgressBarHorizontal","ProgressBarVertical","RadioButton","RatingBar","SeekBar",
             "Spinner","Switch","ToggleButton","ImageView","Button","TextView",)
-
+MONITOR_WIDTH = 0
+MONITOR_HEIGHT = 0
 # Globals
 boxToGui = []
 predictedToGui = []

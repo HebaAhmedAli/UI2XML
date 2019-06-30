@@ -3,7 +3,6 @@ sys.path.append('../')
 from PyQt5 import QtCore, QtGui, QtWidgets
 import GUI.utils as utils
 from GUI.imageBox import imageBox
-import screeninfo
 import Constants
 import os
 
@@ -13,13 +12,12 @@ class dragDropScroll(QtWidgets.QScrollArea):
         super().__init__()
         self.setAcceptDrops(True)
 
-        self.screenW, self.screenH = self.getScreenDims()
         self.horizontalLayouts = []
         self.imageBoxes = []
         self.numOfImages = 0
         self.maxRowSize = 7
 
-        self.imageBox_W = (self.screenW - 440 - 7* self.maxRowSize)/self.maxRowSize - 20         #201
+        self.imageBox_W = (Constants.MONITOR_WIDTH - 440 - 7* self.maxRowSize)/self.maxRowSize - 20         #201
         if self.imageBox_W < 180:
             self.imageBox_W = 180
             self.maxRowSize = 7
@@ -83,16 +81,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
                 return False
         return True
 
-    def getScreenDims(self):
-        monitor = screeninfo.get_monitors()
-        monitor = str(monitor)
-        startI = monitor.rfind('(', 0, len(monitor))
-        midI = monitor.rfind('x', 0, len(monitor))
-        endI = monitor.find('+', 0, len(monitor))
-        monitorW = int(monitor[startI+1:midI], 10)
-        monitorH = int(monitor[midI+1:endI], 10)
-        return monitorW, monitorH
-
     def pictureDropped(self, paths):
         for filePath in paths:
             if not os.path.exists(filePath):
@@ -128,7 +116,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
         maxRowSize = noImgPerRow
-        imageBox_W = (self.screenW - 440 - 7 * noImgPerRow) / noImgPerRow - 20  # 201
+        imageBox_W = (Constants.MONITOR_WIDTH - 440 - 7 * noImgPerRow) / noImgPerRow - 20  # 201
         if imageBox_W < 180:
             imageBox_W = 180
             maxRowSize = 7
