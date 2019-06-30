@@ -13,7 +13,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         super(previewWindow, self).__init__()
         self.setupUi(self)
         self.pixmapX = Constants.MONITOR_WIDTH/3
-        self.pixmapY = Constants.MONITOR_HEIGHT*0.85
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         # The backend output
         imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
                 [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
