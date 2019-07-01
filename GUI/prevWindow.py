@@ -63,6 +63,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             compId = compIDs[idx]
             compPred = compPreds[idx]
             scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
+            if compPreds[idx] == "EditText":
+                scaledCompBox[1] = scaledCompBox[1] - 15
+                scaledCompBox[3] = scaledCompBox[3] + 15
             high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
