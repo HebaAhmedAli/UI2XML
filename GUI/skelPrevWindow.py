@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class previewWindowSkel(object):
     def setupUi(self, prev):
+        self.mainHLayout = QtWidgets.QHBoxLayout()
         self.xmlTabsverticalLayoutWidget = QtWidgets.QWidget(prev)
         self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
@@ -33,7 +34,6 @@ class previewWindowSkel(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.activitiesList.setLayout(self.verticalLayout)
 
-        self.mainHLayout = QtWidgets.QHBoxLayout()
         self.mainHLayout.addLayout(self.listScrolVerticalLayout)
         self.mainHLayout.addLayout(self.activeImgverticalLayout)
         self.mainHLayout.addLayout(self.xmlTabsverticalLayout)

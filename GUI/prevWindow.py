@@ -9,8 +9,8 @@ import GUI.utils as utils
 import Constants
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
-    def __init__(self):
-        super(previewWindow, self).__init__()
+    def __init__(self, parent):
+        super(previewWindow, self).__init__(parent)
         self.setupUi(self)
         self.pixmapX = 350
         self.pixmapY = 700
@@ -35,11 +35,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             imgDir = projDir+"/"+imgName
             self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
-            activityHLayout = activityListItem(imgDir, imgName)
-            activityHLayout.activate.connect(self.onViewBtnClicked)
-            activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
-            self.activitysHLayouts.append(activityHLayout)
-            self.verticalLayout.addLayout(activityHLayout)
+            self.activityHLayout = activityListItem(imgDir, imgName)
+            self.activityHLayout.activate.connect(self.onViewBtnClicked)
+            self.activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
+            self.activitysHLayouts.append(self.activityHLayout)
+            self.verticalLayout.addLayout(self.activityHLayout)
 
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
@@ -79,7 +79,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     @QtCore.pyqtSlot(str)
     def onViewBtnClicked(self, imgPath):
-        print(imgPath)
+        print("k",imgPath)
         # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
         # self.activeImageWidget = QtWidgets.QWidget()
         # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
@@ -103,7 +103,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     
 
     def updateXMLTab(self, xmlFiles):
-        xmlDir = Constants.imagesPath + "/layouts"
+        xmlDir = Constants.imagesPath + "/output/main/res/layout"
         for xmlFile in xmlFiles:
             tab = xmlTab()
             text=open(str(xmlDir+"/"+xmlFile)).read()

@@ -24,8 +24,10 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
-        self.centralwidget.setLayout(self.uploadWidget.layoutScroll)
-        self.addDockWidget(Qt.DockWidgetArea(2), self.uploadWidget.dockDesign)
+        self.lay = QHBoxLayout()
+        self.centralwidget.setLayout(self.lay)
+        self.lay.addLayout(self.uploadWidget.layoutScroll)
+        # self.lay.addDockWidget(Qt.DockWidgetArea(2), self.uploadWidget.dockDesign)
     
     def startUp(self):
         self.mainDialoge = createProjectDialog()
@@ -35,8 +37,11 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
     def processImagesAccToMode(self):
         del self.mainDialoge
         self.uploadWidget.populateProjDir()
-        prev = prevWindow.previewWindow()
-        self.uploadWidget.layoutScroll.addLayout(prev.mainHLayout)
+        prev = prevWindow.previewWindow(self)
+        # self.centralwidget.setLayout(None)
+        del self.uploadWidget.layoutScroll
+        del self.uploadWidget
+        self.lay.addLayout(prev.mainHLayout)
         return
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
