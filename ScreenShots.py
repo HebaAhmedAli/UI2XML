@@ -1,5 +1,5 @@
-import ComponentsExtraction.ComponentsExtraction as ComponentsExtraction
-import XmlGeneration.XmlGeneration as XmlGeneration
+import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
+import CodeGeneration.XmlGeneration as XmlGeneration
 from keras.models import load_model
 import LoadDataClassification
 import Constants
@@ -8,8 +8,7 @@ import os
 import copy
 import numpy as np
 from keras.preprocessing import image
-
-
+import time
 
 
 def processImage(subdir, file,model,invVocab):
@@ -18,7 +17,7 @@ def processImage(subdir, file,model,invVocab):
     imgXML = image.load_img(subdir+'/' +file)
     imgXML = np.array(imgXML,dtype='float32')  
     file = file.replace('.jpeg','.jpg')
-    boxes, texts ,addedManuallyBool ,predictedComponents= ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,model,invVocab)
+    boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
     margin = 10
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
@@ -40,24 +39,30 @@ def processImage(subdir, file,model,invVocab):
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6])
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
-    #print(Constants.mapToGui)
-    #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42],[19, 201, 502, 64]],['android.widget.'+"ImageButton",'android.widget.'+"ImageView"],['ImageView_0_0_0','EditText_0_2_0'],imgXML,file[:-5],file[len(file)-5])
+    #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         j = 0
         for x,y,w,h in boxes:
             # testing: print the cropped in folder
             crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputsAll"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
-            fTo.write(str(j)+'- '+texts[j]+'\n')
+            fTo.write(str(j)+'- '+texts[j]+" "+str(boxes[j])+'\n')
             j+=1    
         fTo.close()
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
         j=0
+        edit = 0
         for x,y,w,h in boxesFiltered:
             # testing: print the cropped in folder
-            crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+            '''
+            if predictedComponentsFiltered[j] == "android.widget.EditText":
+                edit = 10
+            else:
+                edit = 0
+            '''
+            crop_img = imgCopy[max(0,y - margin - edit):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
-            fTo.write(str(j)+'- '+textsFiltered[j]+'\n')
+            fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
             j+=1  
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
@@ -69,12 +74,12 @@ def updateImage(subdir,file,valMapFromGui):
         Constants.DYNAMIC=True
     else:
         Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
         
 
 def processAllImages(imagesPath,model,invVocab):
-    Constants.DIRECTORY = imagesPath+'/output'
+    Constants.DIRECTORY = imagesPath+'/output/'+'main'
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
     Constants.mapToGui = {}
@@ -85,6 +90,8 @@ def processAllImages(imagesPath,model,invVocab):
             processImage(imagesPath, file,model,invVocab)
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
+    # TODO: Comment after testing.
+    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
@@ -96,9 +103,13 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
+
 '''
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-model = load_model('data/ourModel/UI2XMLclassification245000_98_91.h5') # 150 * 150
-Constants.imagesPath ='data/ScreenShots/ourTest'
-processAllImages(Constants.imagesPath,model,invVocab)
+model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
+imagesPath='data/ScreenShots/ourTest'
+
+processAllImages(imagesPath,model,invVocab)
+#print(Constants.mapToGui)
+#updateAllImages(imagesPath,{})
 '''

@@ -14,9 +14,11 @@ class clickableLineEdit(QtWidgets.QLineEdit):
     def clearAndChooseDir(self):
         self.setText("")
         path = os.path.dirname(os.path.realpath(__file__))
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
         file_path = str(QtWidgets.QFileDialog.getExistingDirectory(self, 
                     caption='Select Directory', directory=path,
-                    options=QtWidgets.QFileDialog.ShowDirsOnly))
+                    options=options))
         self.setText(file_path)
         self.curDir = file_path
  

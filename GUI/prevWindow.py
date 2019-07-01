@@ -12,20 +12,22 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def __init__(self):
         super(previewWindow, self).__init__()
         self.setupUi(self)
-        self.pixmapX = 400
-        self.pixmapY = 700
+        self.pixmapX = Constants.MONITOR_WIDTH/3
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         # The backend output
+        # imgsOutputInfo = Constants.mapToGui
         imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
                 [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
-                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText'],
+                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
+                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"]),
                 "kolND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
-                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText'],
+               ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
+                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"])
                 }
         self.activitiesList.itemDoubleClicked.connect(self.updateActiveImg)
+        self.userCorrection = {}
         projDir = Constants.imagesPath
         mainActivityName = "main"
         for imgName in imgsOutputInfo:
@@ -33,25 +35,36 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if(mainActivityName==imgName[:endI-2]):
                 mainActivityName = imgName
             imgDir = projDir+"/"+imgName
+            self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
-            item = activityListItem(imgDir, imgName)
-            self.activitiesList.addItem(item)
+            # activityHLayout = QtWidgets.QHBoxLayout()
+            self.activitiesList.add_item(imgDir, imgName)
+            # activityHLayout.addWidget(activityItem)
+            # activityItem.activate.connect(self.onViewBtnClicked)
+            # activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
+            # self.activitysHLayouts.append(activityItem.allHLayout)
+            # self.verticalLayout.addWidget(activityItem.allHLayout)
+            self.activitiesList.activated.connect(self.item_click)
+
 
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
-        self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
-        self.imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
-        self.pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
-        self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
-        self.activeImageLayout.addWidget(self.imageLabel)
-        imageboxs = imgsOutputInfo[mainActivityName][0]
+        activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+        imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
+        pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
+        imageLabel.setPixmap(QtGui.QPixmap(pixmapimage))
+        activeImageLayout.addWidget(imageLabel)
+        compBoxes = imgsOutputInfo[mainActivityName][0]
+        compIDs = imgsOutputInfo[mainActivityName][1]
+        compPreds = imgsOutputInfo[mainActivityName][2]
         self.highlights = []
         imgW, imgH = imagesize.get(mainActivityDir)
-        for compBox in imageboxs:
+        for idx in range(0,len(compBoxes)):
+            compBox =compBoxes[idx]
+            compId = compIDs[idx]
+            compPred = compPreds[idx]
             scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
-            errorMargin = 10
-            high = componentHighlight(self.activeImageWidget, scaledCompBox[2]+errorMargin, scaledCompBox[3]+errorMargin)
-            high.move(scaledCompBox[0]+errorMargin, scaledCompBox[1]+errorMargin)
+            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
         self.updateXMLTab(imgsOutputInfo[mainActivityName][3])
@@ -69,22 +82,36 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         scaledBox.append(x2-x1)
         scaledBox.append(y2-y1)
         return scaledBox
+
+    @QtCore.pyqtSlot(str)
+    def item_click(self, i):
+        print("imgPath")
+        # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
+        # self.activeImageWidget = QtWidgets.QWidget()
+        # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+        # imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
+        # pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
+        # imageLabel.setPixmap(QtGui.QPixmap(pixmapimage))
+        # activeImageLayout.addWidget(imageLabel)
+        # compBoxes = imgsOutputInfo[mainActivityName][0]
+        # compIDs = imgsOutputInfo[mainActivityName][1]
+        # compPreds = imgsOutputInfo[mainActivityName][2]
+        # self.highlights = []
+        # imgW, imgH = imagesize.get(mainActivityDir)
+        # for idx in range(0,len(compBoxes)):
+        #     compBox =compBoxes[idx]
+        #     compId = compIDs[idx]
+        #     compPred = compPreds[idx]
+        #     scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
+        #     high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
+        #     self.highlights.append(high)
+        # self.activeImgverticalLayout.addWidget(self.activeImageWidget)
     
 
     def updateXMLTab(self, xmlFiles):
-        xmlDir = Constants.imagesPath + "/layouts"
+        xmlDir = Constants.imagesPath + "/output/main/res/layout"
         for xmlFile in xmlFiles:
             tab = xmlTab()
             text=open(str(xmlDir+"/"+xmlFile)).read()
             tab.textBrowser.setPlainText(text)
             self.xmlTabs.addTab(tab, xmlFile[:-4])
-
-    def updateActiveImg(self, item):
-        print("recieving")
-        print(item.imgPath)
-        del self.pixmapimage
-        for high in self.highlights:
-            del high
-        del self.highlights
-        self.pixmapimage = QtGui.QPixmap(item.imgPath).scaled(self.pixmapX, self.pixmapY)
-        self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))

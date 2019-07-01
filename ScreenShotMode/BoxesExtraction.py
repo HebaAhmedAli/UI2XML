@@ -1,7 +1,9 @@
+import sys
+sys.path.append('../')
 import cv2
 import numpy as np
 import random
-
+import Utils
 
 # CANNY algorithm
 CANNY_KERRY_WONG_LOW_THRESHOLD_RATIO = 0.66
@@ -16,24 +18,18 @@ editTextThresholdHeight = 15
 editTextThresholdAddedHeight = 50
 
 def preProcess(image):
-    # convert the image to grayscale, blur it slightly, and threshold it
-    #ran=str(random.randint(0,100))
     grayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(grayImg, (3,3), 0)  
-    #cv2.imwrite('data/images/'+ran+'accountblurres.png',blurred)
     kernel = np.ones((2 * dilationSize + 1, 2 * dilationSize + 1), np.uint8)
     edges = cv2.Canny(blurred, lowThreshold, highThreshold)
-    #cv2.imwrite('data/images/'+ran+'accountedges.png',edges)
-    #morph = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
     morph = cv2.dilate(edges,kernel,iterations = 5)
-    #cv2.imwrite('data/images/'+ran+'accountmorph.png',morph)
-    return morph
+    return morph,edges
 
 # Extract boxes from given image.
 def extractBoxes(img):
     allBoxes=[]
     addedManuallyBool=[]
-    morph=preProcess(img)
+    morph,edges=preProcess(img)
     #finding the contours
     (_, contours , _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
     for cnt in contours:

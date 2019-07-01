@@ -2,13 +2,17 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-
-
 class imageBox(QWidget):
-    def __init__(self, index):
+    def __init__(self, index, width, height):
         super(imageBox, self).__init__()
         self.srcPath = ""
         self.groupBox = QGroupBox()
+        self.groupBox.setMinimumWidth(width + 45)
+        self.groupBox.setMinimumHeight(height + 165)
+        self.groupBox.setMaximumWidth(width + 40)
+        self.groupBox.setMaximumHeight(height + 165)
+        #self.groupBox.setStyleSheet("""background-color: #acf3da;
+        #border: 1px solid #4d0056""")
         self.fullImageBoxLay = QVBoxLayout()
         self.checkboxsLay = QWidget()
         self.checkBoxs = QVBoxLayout()
