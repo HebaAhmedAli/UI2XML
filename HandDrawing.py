@@ -1,6 +1,6 @@
-import HandDrawingProcessing.ComponentsExtraction as ComponentsExtraction
+import HandDrawingMode.ComponentsExtraction as ComponentsExtraction
 from keras.preprocessing import image
-import XmlGeneration.XmlGeneration as XmlGeneration
+import CodeGeneration.XmlGeneration as XmlGeneration
 import numpy as np
 import Constants
 import cv2
@@ -13,9 +13,9 @@ from PIL import Image
 
 def processImage(subdir, file):
     xImage = np.array(Utils.genTable(300,300))
-    if not os.path.exists(Constants.DIRECTORY+'/drawable'):
-        os.makedirs(Constants.DIRECTORY+'/drawable')
-    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/drawable/'+"pic_x.png")
+    if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
+        os.makedirs(Constants.DIRECTORY+'/res/drawable')
+    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_x.png")
     path = subdir+'/' +file
     img = cv2.imread(path)
     imgCopy = copy.copy(img)
@@ -32,6 +32,10 @@ def processImage(subdir, file):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-6],file[len(file)-6])
+    # Translate x and y and handle outside range.
+    for i in range(len(Constants.boxToGui)):
+        Constants.boxToGui[i] = [Constants.boxToGui[i][0]+myImageBox[0],Constants.boxToGui[i][1]+myImageBox[1],Constants.boxToGui[i][2],Constants.boxToGui[i][3]]
+            
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
     margin = 10
     if Constants.DEBUG_MODE == True :
@@ -66,7 +70,8 @@ def updateImage(subdir,file,valMapFromGui):
 
 
 def processAllImages(imagesPath):
-    Constants.DIRECTORY = imagesPath+'/output'
+    Constants.HAND_DRAWN = True
+    Constants.DIRECTORY = imagesPath+'/output/'+'main'
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
@@ -75,6 +80,7 @@ def processAllImages(imagesPath):
             processImage(imagesPath, file)
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
+    Constants.HAND_DRAWN = True
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
@@ -82,7 +88,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
             updateImage(imagesPath, key,val)
 
 '''
-# Constants.imagesPath='data/HandDrawn/ourTest'
+imagesPath='data/HandDrawn/ourTest'
 Constants.HAND_DRAWN = True
-processAllImages(Constants.imagesPath)
+processAllImages(imagesPath)
 '''

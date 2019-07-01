@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
-import HandDrawingProcessing.BoxesExtraction as BoxesExtraction
-import HandDrawingProcessing.TextExtraction as TextExtraction
+import HandDrawingMode.BoxesExtraction as BoxesExtraction
+import HandDrawingMode.TextExtraction as TextExtraction
 import Utils
 import Constants
 import os
@@ -140,7 +140,7 @@ appDict = {
 "loginND.jpg":
 (['Logm', 'Name', 'Email', 'Save'],
 [[87, 53, 37, 22], [27, 104, 31, 11], [23, 134, 32, 12], [195, 203, 32, 12]]),
- "login2ND.jpg":
+ "mainND.jpg":
 (['Login', 'Email', 'Password', 'Log', 'in'],
 [[677, 745, 219, 143], [330, 1015, 204, 94], [286, 1165, 360, 103], [832, 1516, 102, 80], [949, 1522, 59, 46]]),
  "login3ND.jpg":
@@ -164,7 +164,7 @@ appDict = {
   "radioAndCheck2ND.jpg":
 (['sign', 'up', 'login', 'Name', 'Email', 'I', 'agree', 'O', 'Play', 'good', 'Obad', 'Plot'],
 [[173, 236, 125, 71], [329, 244, 68, 52], [457, 206, 125, 86], [171, 376, 151, 55], [156, 562, 155, 67], [294, 755, 37, 66], [343, 768, 132, 60], [608, 860, 42, 72], [741, 864, 83, 66], [230, 866, 155, 72], [228, 926, 112, 52], [438, 1070, 114, 57]]),
- "maleFeemaleND.jpg":
+ "malefeemaleND.jpg":
  (['Male', 'Female', 'O', 'male', 'O', 'Female', 'he', 'ba', 'Feryal', 'Farema', 'Sobhy'],
 [[413, 530, 221, 62], [1031, 512, 303, 41], [309, 736, 72, 88], [399, 743, 196, 67], [890, 723, 75, 82], [991, 720, 291, 47], [434, 1007, 81, 73], [535, 1008, 91, 61], [415, 1185, 235, 76], [408, 1360, 260, 51], [389, 1508, 229, 91]]),
  "radioHListND.jpg":

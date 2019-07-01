@@ -12,19 +12,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def __init__(self):
         super(previewWindow, self).__init__()
         self.setupUi(self)
-        self.pixmapX = 350
-        self.pixmapY = 700
+        self.pixmapX = Constants.MONITOR_WIDTH/3
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         # The backend output
-        imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
-                [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
-                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'EditText_0_2_0', 'EditText_0_3_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'EditText', 'EditText', 'EditText'],
-                ["activity.xml", "activity2.xml"]),
-                "kolND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
-                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText'],
-                ["activity.xml", "activity2.xml"])
-                }
+        imgsOutputInfo = Constants.mapToGui
         self.userCorrection = {}
         projDir = Constants.imagesPath
         mainActivityName = "main"
@@ -107,7 +98,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     
 
     def updateXMLTab(self, xmlFiles):
-        xmlDir = Constants.imagesPath + "/layouts"
+        xmlDir = Constants.imagesPath + "/output/main/res/layout"
         for xmlFile in xmlFiles:
             tab = xmlTab()
             text=open(str(xmlDir+"/"+xmlFile)).read()
