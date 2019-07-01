@@ -35,11 +35,15 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             imgDir = projDir+"/"+imgName
             self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
-            activityHLayout = activityListItem(imgDir, imgName)
-            activityHLayout.activate.connect(self.onViewBtnClicked)
-            activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
-            self.activitysHLayouts.append(activityHLayout)
-            self.verticalLayout.addLayout(activityHLayout)
+            # activityHLayout = QtWidgets.QHBoxLayout()
+            self.activitiesList.add_item(imgDir, imgName)
+            # activityHLayout.addWidget(activityItem)
+            # activityItem.activate.connect(self.onViewBtnClicked)
+            # activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
+            # self.activitysHLayouts.append(activityItem.allHLayout)
+            # self.verticalLayout.addWidget(activityItem.allHLayout)
+            self.activitiesList.activated.connect(self.item_click)
+
 
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
@@ -78,8 +82,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         return scaledBox
 
     @QtCore.pyqtSlot(str)
-    def onViewBtnClicked(self, imgPath):
-        print(imgPath)
+    def item_click(self, i):
+        print("imgPath")
         # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
         # self.activeImageWidget = QtWidgets.QWidget()
         # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)

@@ -5,35 +5,26 @@ import GUI.utils as utils
 
 
 
-class activityListItem(QHBoxLayout):
+class activityListItem(QWidget):
     activate = pyqtSignal(str)
     def __init__(self, imgpath, imgName):
         super(activityListItem, self).__init__()
-        self.allVLayout = QVBoxLayout()
-        self.imageBoxLay = QVBoxLayout()
-        self.nameBoxLay = QVBoxLayout()
-        self.viewBtnLay = QVBoxLayout()
+        self.allHLayout = QHBoxLayout()
         self.imgpath = imgpath
         self.imageLabel = QLabel()
         self.imageNameLine = QLabel()
         pixmapimage = QPixmap(imgpath).scaled(50, 50)
-        self.viewImg = viewButton(imgpath)
-        self.viewImg.activated.connect(self.send)
+        self.viewImg = QPushButton()
+        self.viewImg.clicked.connect(self.sendMe)
         self.viewImg.setText("View")
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageNameLine.setText(imgName)
         self.imageNameLine.setAlignment(Qt.AlignHCenter)
         self.imageLabel.setAlignment(Qt.AlignHCenter)
-        self.imageBoxLay.addWidget(self.imageLabel)
-        self.nameBoxLay.addWidget(self.imageNameLine)
-        self.viewBtnLay.addWidget(self.viewImg)
-        self.addLayout(self.imageBoxLay)
-        self.addLayout(self.nameBoxLay)
-        self.addLayout(self.viewBtnLay)
+        self.allHLayout.addWidget(self.imageLabel)
+        self.allHLayout.addWidget(self.imageNameLine)
+        self.allHLayout.addWidget(self.viewImg)
 
-    def send(self):
-        self.activate.emit(self.imgpath)
-        print("yasatr")
 
 class xmlTab(QWidget):
     def __init__(self):
@@ -49,14 +40,3 @@ class xmlTab(QWidget):
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.xmlWidget)
         self.setLayout(vBoxlayout)
-
-class viewButton(QPushButton):
-    activated = pyqtSignal()
-    def __init__(self, imgPath):
-        super(viewButton, self).__init__()
-        self.setText("View me!")
-        self.clicked.connect(self.activateImg)
-
-    def activateImg(self):
-        self.activated.emit()
-        print("iam viewing")

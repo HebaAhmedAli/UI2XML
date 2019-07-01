@@ -28,12 +28,36 @@ class previewWindowSkel(object):
         self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
 
-        self.activitiesList = QtWidgets.QWidget()
-        self.scrollArea.setWidget(self.activitiesList)
+        self.activitiesList = customListWidget()
+        self.activitiesList.setViewMode(QtWidgets.QListView.ListMode)
         self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.activitiesList.setLayout(self.verticalLayout)
+        self.verticalLayout.addWidget(self.activitiesList)
 
         self.mainHLayout = QtWidgets.QHBoxLayout()
-        self.mainHLayout.addLayout(self.listScrolVerticalLayout)
+        self.mainHLayout.addLayout(self.verticalLayout)
         self.mainHLayout.addLayout(self.activeImgverticalLayout)
         self.mainHLayout.addLayout(self.xmlTabsverticalLayout)
+
+
+class customListWidget(QtWidgets.QListWidget):
+    activated = QtCore.pyqtSignal(str)
+    def __init__(self):
+        QtWidgets.QListWidget.__init__(self)
+        self.itemClicked.connect(self.item_click)
+
+    def add_item(self, imgPath, imgName):
+        item = QtWidgets.QListWidgetItem()
+        icon = QtGui.QIcon()
+        pmImg = QtGui.QPixmap(imgPath)
+        icon.addPixmap(pmImg, QtGui.QIcon.Normal, QtGui.QIcon.On)
+        item.setIcon(icon)
+        # item.imageLabel = QtWidgets.QLabel()
+        # item.imageLabel.setPixmap(pmImg)
+        item.setText(imgName)
+        item.setSizeHint(QtCore.QSize(150,65))
+
+        self.addItem(item)
+
+    def item_click(self, item):
+        self.activated.emit(str(item.text))
+        print (item, str(item.text()))
