@@ -50,7 +50,7 @@ def processImage(subdir, file):
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
         for x,y,w,h in boxes:
             # testing: print the cropped in folder
-            crop_img = imgCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+            crop_img = imgCopy[max(0,y):min(height,y + h), max(x,0):min(width,x + w )]
             #cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j) + str(file[len(file)-4:len(file)]),crop_img)
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponents[j] + str(file[len(file)-4:len(file)]),crop_img)
             fTo.write(str(j)+'- '+texts[j]+'\n')
@@ -87,8 +87,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
 
-'''
+
 imagesPath='data/HandDrawn/ourTest'
 Constants.HAND_DRAWN = True
 processAllImages(imagesPath)
-'''
