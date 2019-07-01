@@ -40,3 +40,26 @@ class xmlTab(QWidget):
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.xmlWidget)
         self.setLayout(vBoxlayout)
+
+
+class activityListItem(QListWidgetItem):
+    def __init__(self, imgpath, imgName):
+        super(activityListItem, self).__init__()
+        self.imgPath = imgpath
+        # self.allVLayout = QHBoxLayout()
+        self.icon = QIcon()
+        self.pmImg = QPixmap(imgpath)
+        self.icon.addPixmap(self.pmImg, QIcon.Normal, QIcon.On)
+        # self.icon.pixmap(QSize(100,50))
+        self.setIcon(self.icon)
+        self.imageLabel = QLabel()
+        self.imageLabel.setPixmap(self.pmImg)
+        # self.allVLayout.addWidget(self.imageLabel)
+        self.lbl = QLabel()
+        self.setText(imgName)
+        self.setSizeHint(QSize(150,65))
+        self.setBackground(QBrush(QColor("white")))
+        # self.allVLayout.addWidget(self.lbl)
+        # self.setFixedSize(150,50)
+        # self.setData(imgName)
+        # self.addWidget(self.lbl)

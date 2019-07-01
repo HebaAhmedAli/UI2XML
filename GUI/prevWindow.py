@@ -26,6 +26,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"])
                 }
+        # self.activitiesList.itemDoubleClicked.connect(self.updateActiveImg)
         self.userCorrection = {}
         projDir = Constants.imagesPath
         mainActivityName = "main"
