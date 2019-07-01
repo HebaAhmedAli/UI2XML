@@ -87,8 +87,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
 
-'''
+
 imagesPath='data/HandDrawn/ourTest'
 Constants.HAND_DRAWN = True
 processAllImages(imagesPath)
-'''
