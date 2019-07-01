@@ -37,7 +37,9 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
 
     def processImagesAccToMode(self):
         del self.mainDialoge
-        self.uploadWidget.populateProjDir()
+        populateWithoutError = True
+        while(not populateWithoutError):
+            populateWithoutError = self.uploadWidget.populateProjDir()
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
             model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150

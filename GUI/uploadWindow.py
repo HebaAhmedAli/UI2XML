@@ -24,18 +24,19 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             endI = name.rfind('.', 0, len(name))
             if ((not '.' in name or not name[endI+1:].lower() in Constants.IMG_EXTN) and  name[endI+1:].lower() != "psd"):
                 utils.alertUser("File name Error", name + " File name or extension not correct")
-                return
+                return False
             names.append(name[:endI])
         if(not "main" in names):
             utils.alertUser("Missing main", "Choose one of the files as your Main Activity")
-            return
+            return False
         
         # Creating Input folder for recognition
         fullProjDir = Constants.imagesPath
         print("Directory of project" + fullProjDir )
-        if(not os.path.exists(fullProjDir)):
-            os.mkdir(fullProjDir)
-        # TODO: Handle PSD
+        if(os.path.exists(fullProjDir)):
+            utils.alertUser("Path Error", "Project Name already exists")
+            return False
+        os.mkdir(fullProjDir)
         for image in self.scrollarea.imageBoxes:
             readImage = None
             if Constants.designMode != Constants.DESIGN_MODES[2]:  
@@ -58,6 +59,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             else:
                 copyfile(image.srcPath,fullProjDir + "/" + name + exten)
         self.removeUploadWid()
+        return True
 
     def removeUploadWid(self):
         for image in self.scrollarea.imageBoxes:        

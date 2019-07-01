@@ -681,7 +681,7 @@ def groupRadio(groupedNodes,imgH,img):
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:
-            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i],imgH,'android.widget.RadioGroup',img,True))
+            groupedNodesNew.append(createParentNodeVertical([groupedNodes[i]],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue        
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)
