@@ -11,10 +11,10 @@ import Constants as Constants
 
 class previewWindowSkel(object):
     def setupUi(self, prev):
+        self.mainHLayout = QtWidgets.QHBoxLayout()
         self.xmlTabsverticalLayoutWidget = QtWidgets.QWidget(prev)
         self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
-
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
@@ -27,19 +27,17 @@ class previewWindowSkel(object):
         self.activitysScrollArea = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitysScrollArea)
         self.listScrolVerticalLayout.addWidget(self.scrollArea)
-        #self.scrollArea.setMaximumWidth(300)
+        self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
 
-        self.activitiesList = customListWidget()
-        self.activitiesList.setViewMode(QtWidgets.QListView.ListMode)
+        self.activitiesList = QtWidgets.QWidget()
+        self.scrollArea.setWidget(self.activitiesList)
         self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.addWidget(self.activitiesList)
+        self.activitiesList.setLayout(self.verticalLayout)
 
-        self.mainHLayout = QtWidgets.QHBoxLayout()
-        self.mainHLayout.addLayout(self.verticalLayout)
+        self.mainHLayout.addLayout(self.listScrolVerticalLayout)
         self.mainHLayout.addLayout(self.activeImgverticalLayout)
         self.mainHLayout.addLayout(self.xmlTabsverticalLayout)
-
 
 class customListWidget(QtWidgets.QListWidget):
     activated = QtCore.pyqtSignal(str)

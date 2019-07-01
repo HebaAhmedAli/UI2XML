@@ -9,8 +9,8 @@ import GUI.utils as utils
 import Constants
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
-    def __init__(self):
-        super(previewWindow, self).__init__()
+    def __init__(self, parent):
+        super(previewWindow, self).__init__(parent)
         self.setupUi(self)
         self.pixmapX = Constants.MONITOR_WIDTH/3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.87
@@ -36,15 +36,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             imgDir = projDir+"/"+imgName
             self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
-            # activityHLayout = QtWidgets.QHBoxLayout()
-            self.activitiesList.add_item(imgDir, imgName)
-            # activityHLayout.addWidget(activityItem)
-            # activityItem.activate.connect(self.onViewBtnClicked)
-            # activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
-            # self.activitysHLayouts.append(activityItem.allHLayout)
-            # self.verticalLayout.addWidget(activityItem.allHLayout)
-            self.activitiesList.activated.connect(self.item_click)
-
+            self.activityHLayout = activityListItem(imgDir, imgName)
+            self.activityHLayout.activate.connect(self.onViewBtnClicked)
+            self.activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
+            self.activitysHLayouts.append(self.activityHLayout)
+            self.verticalLayout.addLayout(self.activityHLayout)
 
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
@@ -86,8 +82,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         return scaledBox
 
     @QtCore.pyqtSlot(str)
-    def item_click(self, i):
-        print("imgPath")
+    def onViewBtnClicked(self, imgPath):
+        print("k",imgPath)
         # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
         # self.activeImageWidget = QtWidgets.QWidget()
         # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)

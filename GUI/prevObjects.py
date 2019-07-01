@@ -5,26 +5,36 @@ import GUI.utils as utils
 import Constants
 
 
-class activityListItem(QWidget):
+
+class activityListItem(QHBoxLayout):
     activate = pyqtSignal(str)
     def __init__(self, imgpath, imgName):
         super(activityListItem, self).__init__()
-        self.allHLayout = QHBoxLayout()
+        self.allVLayout = QVBoxLayout()
+        self.imageBoxLay = QVBoxLayout()
+        self.nameBoxLay = QVBoxLayout()
+        self.viewBtnLay = QVBoxLayout()
         self.imgpath = imgpath
         self.imageLabel = QLabel()
         self.imageNameLine = QLabel()
         pixmapimage = QPixmap(imgpath).scaled(50, 50)
         self.viewImg = QPushButton()
-        self.viewImg.clicked.connect(self.sendMe)
+        self.viewImg.clicked.connect(self.send)
         self.viewImg.setText("View")
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageNameLine.setText(imgName)
         self.imageNameLine.setAlignment(Qt.AlignHCenter)
         self.imageLabel.setAlignment(Qt.AlignHCenter)
-        self.allHLayout.addWidget(self.imageLabel)
-        self.allHLayout.addWidget(self.imageNameLine)
-        self.allHLayout.addWidget(self.viewImg)
+        self.imageBoxLay.addWidget(self.imageLabel)
+        self.nameBoxLay.addWidget(self.imageNameLine)
+        self.viewBtnLay.addWidget(self.viewImg)
+        self.addLayout(self.imageBoxLay)
+        self.addLayout(self.nameBoxLay)
+        self.addLayout(self.viewBtnLay)
 
+    def send(self):
+        self.activate.emit(self.imgpath)
+        print("yasatr")
 
 class xmlTab(QWidget):
     def __init__(self):
