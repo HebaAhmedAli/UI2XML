@@ -71,7 +71,7 @@ def updateImage(subdir,file,valMapFromGui):
 
 def processAllImages(imagesPath):
     Constants.HAND_DRAWN = True
-    Constants.DIRECTORY = imagesPath+'/app/src/'+'main'
+    Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:

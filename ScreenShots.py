@@ -79,7 +79,7 @@ def updateImage(subdir,file,valMapFromGui):
         
 
 def processAllImages(imagesPath,model,invVocab):
-    Constants.DIRECTORY = imagesPath+'/'+'main'
+    Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
     Constants.mapToGui = {}
