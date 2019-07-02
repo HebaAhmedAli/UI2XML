@@ -618,6 +618,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     Constants.predictedToGui = []
     Constants.idToGui = []
     Constants.xmlFilesToGui = []
+    Constants.inWhichFile = []
     parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img)        
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
@@ -628,6 +629,7 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
     Constants.predictedToGui = []
     Constants.idToGui = []
     Constants.xmlFilesToGui = []
+    Constants.inWhichFile = []
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
