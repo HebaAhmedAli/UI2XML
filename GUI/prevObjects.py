@@ -6,7 +6,7 @@ import Constants
 
 
 class activityListItem(QWidget):
-    activate = pyqtSignal(str)
+    #activate = pyqtSignal(str)
     def __init__(self, imgpath, imgName):
         super(activityListItem, self).__init__()
         self.allHLayout = QHBoxLayout()
@@ -15,7 +15,7 @@ class activityListItem(QWidget):
         self.imageNameLine = QLabel()
         pixmapimage = QPixmap(imgpath).scaled(50, 50)
         self.viewImg = QPushButton()
-        self.viewImg.clicked.connect(self.sendMe)
+        #self.viewImg.clicked.connect(self.sendMe)
         self.viewImg.setText("View")
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageNameLine.setText(imgName)

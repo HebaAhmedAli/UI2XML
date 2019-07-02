@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import os
 import imagesize 
-from GUI.skelPrevWindow import  previewWindowSkel
+from GUI.skelPrevWindow import  previewWindowSkel, customListWidget
 #from GUI.tabs import xmlTab
 from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
@@ -30,6 +30,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.userCorrection = {}
         projDir = Constants.imagesPath
         mainActivityName = "main"
+        idx=0
+        print("2bl 2lm3rka")
         for imgName in imgsOutputInfo:
             endI = imgName.rfind('.', 0, len(imgName))
             if(mainActivityName==imgName[:endI-2]):
@@ -38,15 +40,20 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.userCorrection.update(imgName=[])
             imgName = imgName[:endI-2]+imgName[endI:]
             # activityHLayout = QtWidgets.QHBoxLayout()
-            self.activitiesList.add_item(imgDir, imgName)
+            self.imageBox = customListWidget(imgDir, imgName, idx)
+            self.imageBox.activated.connect(self.setActiveImage)
+            self.verticalLayout.addWidget(self.imageBox)
+            #self.activitiesList.add_item(imgDir, imgName)
+        #self.activitiesList[idx].activated.connect(self.setActiveImage)
+            idx = idx+1
             # activityHLayout.addWidget(activityItem)
             # activityItem.activate.connect(self.onViewBtnClicked)
             # activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             # self.activitysHLayouts.append(activityItem.allHLayout)
             # self.verticalLayout.addWidget(activityItem.allHLayout)
-            self.activitiesList.activated.connect(self.item_click)
+            #self.activitiesList.activated.connect(self.item_click)
 
-
+        print("flt mnihom")
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImageWidget = QtWidgets.QWidget()
         activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
@@ -86,9 +93,15 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         scaledBox.append(y2-y1)
         return scaledBox
 
-    @QtCore.pyqtSlot(str)
-    def item_click(self, i):
-        print("imgPath")
+    def setActiveImage(self, path):
+        print("27mdk ya rb ")
+        print(path)
+        print("2na 7y ")
+
+
+    # @QtCore.pyqtSlot(str)
+    # def item_click(self, i):
+    #     print("imgPath")
         # mainActivityDir = Constants.imagesPath+"/"+mainActivityName
         # self.activeImageWidget = QtWidgets.QWidget()
         # activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
