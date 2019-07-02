@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
-from GUI.skelChangeCompPred import correctPredDialog
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
 import  GUI.utils as utils

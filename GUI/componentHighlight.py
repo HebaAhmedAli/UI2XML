@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from GUI.skelChangeCompPred import  skelChangeCompPred, correctPredDialog
 
 class componentHighlight(QtWidgets.QPushButton):
 
@@ -20,7 +19,6 @@ class componentHighlight(QtWidgets.QPushButton):
     def eventFilter(self, object, event):
 
         if event.type() == QtCore.QEvent.MouseButtonPress:
-            self.correctCompProduction()
             return True
 
         if event.type() == QtCore.QEvent.HoverMove:
@@ -33,15 +31,4 @@ class componentHighlight(QtWidgets.QPushButton):
             return True
         return False
 
-    def correctCompProduction(self):
-        # Create Dialog to Correct
-        self.correctPredDialog = correctPredDialog()
-        self.correctPredDialog.show()
-        self.correctPredDialog.activateWindow()
-        self.correctPredDialog.correctedType.connect(self.changePred)
-        print(self.idName)
-
-    def changePred(self, newType):
-        self.predicted=newType
-        self.changed=True
 
