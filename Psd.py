@@ -48,7 +48,7 @@ def processPsd(subdir, file,model,invVocab):
 
 
 def processAllPsds(imagesPath,model,invVocab):
-   Constants.DIRECTORY = imagesPath+'/output/'+'main'
+   Constants.DIRECTORY = imagesPath+'/app/src/'+'main'
    Constants.mapToGui = {}
    _,_, files= next(os.walk(imagesPath))
    for file in files:

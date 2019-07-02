@@ -79,7 +79,7 @@ def updateImage(subdir,file,valMapFromGui):
         
 
 def processAllImages(imagesPath,model,invVocab):
-    Constants.DIRECTORY = imagesPath+'/output/'+'main'
+    Constants.DIRECTORY = imagesPath+'/'+'main'
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
     Constants.mapToGui = {}
@@ -103,8 +103,8 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
-
 '''
+
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
 imagesPath='data/ScreenShots/ourTest'

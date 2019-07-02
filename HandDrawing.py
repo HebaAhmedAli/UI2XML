@@ -71,7 +71,7 @@ def updateImage(subdir,file,valMapFromGui):
 
 def processAllImages(imagesPath):
     Constants.HAND_DRAWN = True
-    Constants.DIRECTORY = imagesPath+'/output/'+'main'
+    Constants.DIRECTORY = imagesPath+'/app/src/'+'main'
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:

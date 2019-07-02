@@ -68,7 +68,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     
 
     def updateXMLTab(self, xmlFiles):
-        xmlDir = Constants.imagesPath + "/output/main/res/layout"
+        xmlDir = Constants.imagesPath + "/app/src/main/res/layout"
         for xmlFile in xmlFiles:
             tab = xmlTab()
             text=open(str(xmlDir+"/"+xmlFile)).read()
