@@ -1,12 +1,13 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 class componentHighlight(QtWidgets.QPushButton):
-
-    def __init__(self, parent, scaledCompBox, box, idName, predType):
+    showComp = QtCore.pyqtSignal(int, str)
+    def __init__(self, parent, scaledCompBox, box, idName, predType, idx):
         super(componentHighlight, self).__init__(parent)
         self.installEventFilter(self)
         self.idName = idName
         self.box = box
+        self.index = idx
         self.predicted = predType
         self.changed = False
         errorMargin = 10
@@ -19,6 +20,7 @@ class componentHighlight(QtWidgets.QPushButton):
     def eventFilter(self, object, event):
 
         if event.type() == QtCore.QEvent.MouseButtonPress:
+            self.showComp.emit(self.index, self.predicted)
             return True
 
         if event.type() == QtCore.QEvent.HoverMove:
@@ -31,4 +33,6 @@ class componentHighlight(QtWidgets.QPushButton):
             return True
         return False
 
-
+    def changePred(self, newType):
+        self.predicted=newType
+        self.changed=True

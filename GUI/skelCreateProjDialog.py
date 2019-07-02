@@ -49,7 +49,6 @@ class Ui_Dialog(object):
         self.packageNameLine = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         self.verticalLayout_2.addWidget(self.packageNameLine)
         self.projectDirectoryL = clickableLineEdit.clickableLineEdit(self.verticalLayoutWidget_2)
-        # self.projectDirectoryL.mousePressEvent.connect(self.clearAndChooseDir)
         self.verticalLayout_2.addWidget(self.projectDirectoryL)
         self.designComboBox = QtWidgets.QComboBox(self.verticalLayoutWidget_2)
         self.designComboBox.addItems(Constants.DESIGN_MODES)

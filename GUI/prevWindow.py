@@ -9,11 +9,16 @@ import GUI.utils as utils
 import Constants
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
+    # updateCompSig = QtCore.pyqtSignal(str)
     def __init__(self, parent):
         super(previewWindow, self).__init__(parent)
         self.setupUi(self)
         self.pixmapX = Constants.MONITOR_WIDTH/3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.87
+        self.updateBtn.clicked.connect(self.updateCompType)
+        self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
+        self.changedCompIdx = None
+        self.changedCompName = None
         # The backend output
         # imgsOutputInfo = Constants.mapToGui
         self.imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
@@ -21,10 +26,16 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
                 ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml", "activity2.xml"]),
-                "kolND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64]],
-               ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
-                ["activity.xml", "activity2.xml"])
+                
+                'switchAS.png': ([[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
+                [0, 426, 300, 63], [26, 509, 41, 41], [117, 513, 204, 31], [21, 604, 51, 38], [116, 606, 239, 32], [500, 600, 74, 47], [28, 695, 37, 43],
+                [117, 699, 159, 32], [506, 695, 73, 44],[0, 799, 300, 63], [25, 881, 44, 43], [116, 885, 184, 32]],
+                ['ImageView_0_0_0', 'TextView_0_0_1', 'ImageView_0_0_2', 'ImageView_0_1_0', 'TextView_0_2_0', 'TextView_0_3_0', 'TextView_0_4_0',
+                'ImageView_0_5_0', 'TextView_0_5_1', 'ImageView_0_6_0', 'TextView_0_6_1', 'Switch_0_6_2', 'ImageView_0_7_0', 'TextView_0_7_1',
+                'Switch_0_7_2', 'TextView_0_8_0', 'ImageView_0_9_0', 'TextView_0_9_1'],
+                ['ImageView', 'TextView', 'ImageView', 'ImageView', 'TextView', 'TextView', 'TextView', 'ImageView', 'TextView', 'ImageView',
+                'TextView', 'Switch', 'ImageView', 'TextView', 'Switch', 'TextView', 'ImageView', 'TextView'],
+                ['activity.xml', 'activity2.xml'])
                 }
         self.userCorrection = {}
         projDir = Constants.imagesPath
@@ -42,29 +53,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.activitysHLayouts.append(self.activityHLayout)
             self.verticalLayout.addLayout(self.activityHLayout)
         mainActivityDir = projDir+"/"+mainActivityName
-        self.activeImgDir=mainActivityDir
-        self.activeImageWidget = QtWidgets.QWidget()
-        self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
-        self.imageLabel = QtWidgets.QLabel()
-        self.pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
-        self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
-        self.activeImageLayout.addWidget(self.imageLabel)
-        compBoxes = self.imgsOutputInfo[mainActivityName][0]
-        compIDs = self.imgsOutputInfo[mainActivityName][1]
-        compPreds = self.imgsOutputInfo[mainActivityName][2]
-        self.highlights = []
-        imgW, imgH = imagesize.get(mainActivityDir)
-        for idx in range(0,len(compBoxes)):
-            compBox =compBoxes[idx]
-            compId = compIDs[idx]
-            compPred = compPreds[idx]
-            scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
-            if compPreds[idx] == "EditText":
-                scaledCompBox[1] = scaledCompBox[1] - 15
-                scaledCompBox[3] = scaledCompBox[3] + 15
-            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
-            self.highlights.append(high)
-        self.activeImgverticalLayout.addWidget(self.activeImageWidget)
+        self.activeImgDir = mainActivityDir
+        self.updateActiveImg(mainActivityDir)
         self.updateXMLTab(self.imgsOutputInfo[mainActivityName][3])
 
     def calculateScaledBox(self, originalBox, imgW, imgH):
@@ -86,48 +76,41 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         print("k",imgPath)
         if self.activeImgDir==imgPath:
             return
-        startI = imgPath.rfind('/', 0, len(imgPath))+1
-        imgName = imgPath[startI:]
         self.activeImgDir = imgPath
         for h in self.highlights:
             h.setParent(None)
             del h
-        # del self.highlights
         del self.pixmapimage
-
-
         self.activeImageLayout.removeWidget(self.imageLabel)
         del self.imageLabel
-        #self.imageLabel.setParent(None)
-        #self.activeImageLayout.setParent(None)
-        #self.activeImageWidget.setParent(None)
+        self.compOriginalLbl.setText("")
+
+        # update the map user correction
         self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        self.updateActiveImg(imgPath)
 
-        self.activeImageWidget = QtWidgets.QWidget()
-        self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+    def viewCompDetails(self, idx, compName):
+        idx = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
+        if idx >= 0:
+            self.compTypeComboBox.setCurrentIndex(idx)
+        self.updateBtn.setEnabled(False)
+        self.compOriginalLbl.setText(compName)
+        self.changedCompIdx = idx
+        self.changedCompName = compName
 
-        self.imageLabel = QtWidgets.QLabel()
-        self.pixmapimage = QtGui.QPixmap(self.activeImgDir).scaled(self.pixmapX, self.pixmapY)
-        self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
-        self.activeImageLayout.addWidget(self.imageLabel)
-        compBoxes = self.imgsOutputInfo[imgName][0]
-        compIDs = self.imgsOutputInfo[imgName][1]
-        compPreds = self.imgsOutputInfo[imgName][2]
-        self.highlights = []
-        imgW, imgH = imagesize.get(self.activeImgDir)
-        for idx in range(0,len(compBoxes)):
-            compBox =compBoxes[idx]
-            compId = compIDs[idx]
-            compPred = compPreds[idx]
-            scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
-            if compPreds[idx] == "EditText":
-                scaledCompBox[1] = scaledCompBox[1] - 15
-                scaledCompBox[3] = scaledCompBox[3] + 15
-            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
-            self.highlights.append(high)
-        #self.activeImageWidget.setLayout(self.activeImageLayout)
-        self.activeImgverticalLayout.addWidget(self.activeImageWidget)
-        #activeImageWidget
+    def enableUpdateBtn(self):
+        self.updateBtn.setEnabled(True)
+
+        
+    
+    def updateCompType(self):
+        # self.updateCompSig.emit(self.changedCompIdx, self.changedCompName)
+        print(self.highlights[self.changedCompIdx].predicted)
+        self.changedCompName = self.compTypeComboBox.currentText()
+        self.highlights[self.changedCompIdx].predicted=self.changedCompName
+        self.highlights[self.changedCompIdx].changed=True
+        print(self.highlights[self.changedCompIdx].predicted)
+
 
     def updateXMLTab(self, xmlFiles):
         xmlDir = Constants.imagesPath + "/output/main/res/layout"
@@ -136,3 +119,31 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             text=open(str(xmlDir+"/"+xmlFile)).read()
             tab.textBrowser.setPlainText(text)
             self.xmlTabs.addTab(tab, xmlFile[:-4])
+
+    def updateActiveImg(self, imagePath):
+        startI = imagePath.rfind('/', 0, len(imagePath))+1
+        imgName = imagePath[startI:]
+        self.activeImageWidget = QtWidgets.QWidget()
+        self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+        self.imageLabel = QtWidgets.QLabel()
+        self.pixmapimage = QtGui.QPixmap(imagePath).scaled(self.pixmapX, self.pixmapY)
+        self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
+        self.activeImageLayout.addWidget(self.imageLabel)
+        compBoxes = self.imgsOutputInfo[imgName][0]
+        compIDs = self.imgsOutputInfo[imgName][1]
+        compPreds = self.imgsOutputInfo[imgName][2]
+        self.highlights = []
+        imgW, imgH = imagesize.get(imagePath)
+        for idx in range(0,len(compBoxes)):
+            compBox =compBoxes[idx]
+            compId = compIDs[idx]
+            compPred = compPreds[idx]
+            scaledCompBox =  self.calculateScaledBox(compBox, imgW, imgH)
+            if compPreds[idx] == Constants.MODEL_PRED[2]:
+                scaledCompBox[1] = scaledCompBox[1] - 15
+                scaledCompBox[3] = scaledCompBox[3] + 15
+            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred, idx)
+            high.showComp.connect(self.viewCompDetails)
+            self.highlights.append(high)
+        self.activeImgverticalLayout.addWidget(self.activeImageWidget)
+        self.userCorrection[imgName]=[compBoxes,compIDs,compPreds]
