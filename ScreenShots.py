@@ -95,7 +95,7 @@ def processAllImages(imagesPath,model,invVocab):
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            processes += createProcessToProcessImage(imagesPath, file,model,invVocab)
+            processes.append(createProcessToProcessImage(imagesPath, file,model,invVocab))
             #processImage(imagesPath, file,model,invVocab)
     for p in processes:
         p.start()
@@ -103,6 +103,7 @@ def processAllImages(imagesPath,model,invVocab):
         p.join()
         p.terminate()
         
+         
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
     mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4],Constants.mapToGui.get("drND.png")[5])}
@@ -118,12 +119,14 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
 
-'''
+
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
 imagesPath='data/ScreenShots/ourTest'
-
+startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
+print("Total time = ",time.time()-startTime)
+'''
 print(Constants.mapToGui,'\n')
 print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
 print(Utils.getXmlOfComponent(2,'face3AD.jpg'),'\n')
