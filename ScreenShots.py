@@ -1,5 +1,6 @@
 import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
 import CodeGeneration.XmlGeneration as XmlGeneration
+from multiprocessing import Process,Manager
 from keras.models import load_model
 import LoadDataClassification
 import Constants
@@ -77,21 +78,34 @@ def updateImage(subdir,file,valMapFromGui):
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
     Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
         
+def createProcessToProcessImage(imagesPath, file,model,invVocab):
+    process = Process(target=processImage, args=(imagesPath, file,model,invVocab))
+    return process
 
 def processAllImages(imagesPath,model,invVocab):
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
-    Constants.mapToGui = {}
+    manager=Manager()
+    # Initialize the vectors of each image with empty vector(this vector is shared between processes)
+    Constants.mapToGui=manager.dict()
+    processes = []
+    #Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            processImage(imagesPath, file,model,invVocab)
-
+            processes += createProcessToProcessImage(imagesPath, file,model,invVocab)
+            #processImage(imagesPath, file,model,invVocab)
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+        p.terminate()
+        
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
-    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
+    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4],Constants.mapToGui.get("drND.png")[5])}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
