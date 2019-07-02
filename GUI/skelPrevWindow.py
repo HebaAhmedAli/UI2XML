@@ -29,7 +29,6 @@ class previewWindowSkel(object):
         self.listScrolVerticalLayout.addWidget(self.scrollArea)
         self.scrollArea.setMaximumWidth(300)
         self.activitysHLayouts = []
-
         self.activitiesList = QtWidgets.QWidget()
         self.scrollArea.setWidget(self.activitiesList)
         self.verticalLayout = QtWidgets.QVBoxLayout()

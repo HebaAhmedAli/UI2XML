@@ -41,12 +41,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(self.activityHLayout)
             self.verticalLayout.addLayout(self.activityHLayout)
-
         mainActivityDir = projDir+"/"+mainActivityName
         self.activeImgDir=mainActivityDir
         self.activeImageWidget = QtWidgets.QWidget()
         self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
-        self.imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
+        self.imageLabel = QtWidgets.QLabel()
         self.pixmapimage = QtGui.QPixmap(mainActivityDir).scaled(self.pixmapX, self.pixmapY)
         self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
         self.activeImageLayout.addWidget(self.imageLabel)
@@ -95,9 +94,19 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             del h
         # del self.highlights
         del self.pixmapimage
-        self.imageLabel.setParent(None)
+
+
+        self.activeImageLayout.removeWidget(self.imageLabel)
         del self.imageLabel
-        self.imageLabel = QtWidgets.QLabel(self.activeImgVerticalLayoutWidget)
+        #self.imageLabel.setParent(None)
+        #self.activeImageLayout.setParent(None)
+        #self.activeImageWidget.setParent(None)
+        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+
+        self.activeImageWidget = QtWidgets.QWidget()
+        self.activeImageLayout = QtWidgets.QVBoxLayout(self.activeImageWidget)
+
+        self.imageLabel = QtWidgets.QLabel()
         self.pixmapimage = QtGui.QPixmap(self.activeImgDir).scaled(self.pixmapX, self.pixmapY)
         self.imageLabel.setPixmap(QtGui.QPixmap(self.pixmapimage))
         self.activeImageLayout.addWidget(self.imageLabel)
@@ -116,8 +125,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 scaledCompBox[3] = scaledCompBox[3] + 15
             high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred)
             self.highlights.append(high)
+        #self.activeImageWidget.setLayout(self.activeImageLayout)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
-    
+        #activeImageWidget
 
     def updateXMLTab(self, xmlFiles):
         xmlDir = Constants.imagesPath + "/output/main/res/layout"

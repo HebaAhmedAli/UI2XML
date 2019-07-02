@@ -13,6 +13,7 @@ class componentHighlight(QtWidgets.QPushButton):
         errorMargin = 10
         self.setFixedSize(scaledCompBox[2]+errorMargin, scaledCompBox[3]+errorMargin)
         self.move(scaledCompBox[0]+errorMargin, scaledCompBox[1]+errorMargin)
+
         self.setStyleSheet("""background-color:rgba(0,0,0,0);
         border: 0px solid rgb(0,0,255);""")
 
