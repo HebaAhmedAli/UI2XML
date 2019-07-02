@@ -505,20 +505,20 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
                                     
     return returnString
 
-def appendNodeXml(parentNode,myIndex,listViewId,fTo):
+def appendNodeXml(parentNode,myIndex,listViewId,fTo,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
     if len(parentNode.childNodes)==0:
         parentNode.id = myIndex
         typeOfNode = getType(parentNode.nodeType)
-        Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
-        Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
-        Constants.predictedToGui.append(typeOfNode)
-        Constants.inWhichFile.append((listViewId,fTo.name))
+        boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
+        idToGui.append(typeOfNode+'_'+parentNode.id)
+        predictedToGui.append(typeOfNode)
+        inWhichFile.append((listViewId,fTo.name))
         return
     for i in range(len(parentNode.childNodes)):
-        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i),listViewId,fTo)
+        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i),listViewId,fTo,boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
             
             
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False):  
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False,boxToGui=None,predictedToGui=None,idToGui=None,xmlFilesToGui=None,inWhichFile=None):  
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -539,10 +539,10 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     if len(parentNode.childNodes)==0:
         typeOfNode = getType(parentNode.nodeType)
         fTo.write(tabsString+"</"+ typeOfNode+'>'+'\n')
-        Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
-        Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
-        Constants.predictedToGui.append(typeOfNode)
-        Constants.inWhichFile.append(("",fTo.name))
+        boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
+        idToGui.append(typeOfNode+'_'+parentNode.id)
+        predictedToGui.append(typeOfNode)
+        inWhichFile.append(("",fTo.name))
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
@@ -562,10 +562,10 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.close()   
         # Append the rest of chils.
         for i in range(len(parentNode.childNodes)):
-            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId),"ListView"+str(parentNode.id),fTo)
+            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId),"ListView"+str(parentNode.id),fTo,boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
-            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
+            printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId),boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
     else:
         if actionBarOp == 'A' and tabs == 0:
             fToActionBar=open(Constants.DIRECTORY+'/res/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
@@ -581,53 +581,45 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
             Constants.myParentColor = parentNode.childNodes[0].backgroundColor
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
-                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i),insideActionBar=True)
+                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i),insideActionBar=True,boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
             idd = 1
             for i in range(1,len(parentNode.childNodes)):
                 if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadioGroup':
-                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),idd)
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),idd,boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
                     idd += len(parentNode.childNodes[i].childNodes)
                 else:
-                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd))
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
                     idd += 1
         else:
             idd= 0
             for i in range(len(parentNode.childNodes)):
                 if parentNode.childNodes[i].nodeType == 'android.widget.ListView' or parentNode.childNodes[i].nodeType == 'android.widget.RadioGroup':
-                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),idd)
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),idd,boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
                     idd += len(parentNode.childNodes[i].childNodes)
                 else:
-                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd))
+                    printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex+'_'+str(idd),boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
                     idd += 1
     fTo.write(tabsString+"</"+ getType(parentNode.nodeType)+'>'+'\n')
         
-def mapToXml(parentNode,appName,imgH,actionBarOp):
+def mapToXml(parentNode,appName,imgH,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
     if not os.path.exists(Constants.DIRECTORY+'/res/layout'):
             os.makedirs(Constants.DIRECTORY+'/res/layout') 
     fTo=open(Constants.DIRECTORY+'/res/layout/'+'activity_'+appName+'.xml', 'w+')
     Constants.xmlFilesToGui.append('activity_'+appName+'.xml')
     Constants.noOfLayouts = len(parentNode.childNodes)
-    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0")
+    printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0",boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
     return
 
     
-def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
-    Constants.boxToGui = []
-    Constants.predictedToGui = []
-    Constants.idToGui = []
-    Constants.xmlFilesToGui = []
+def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
     parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img)        
-    mapToXml(parentNode,appName,img.shape[0],actionBarOp)
+    mapToXml(parentNode,appName,img.shape[0],actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 
-def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appName,actionBarOp):
-    Constants.boxToGui = []
-    Constants.predictedToGui = []
-    Constants.idToGui = []
-    Constants.xmlFilesToGui = []
+def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
@@ -647,7 +639,7 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
         elif len(indices) == 6: # 6 horizontal vertical horizontal leaf
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img) 
     parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
-    mapToXml(parentNode,appName,img.shape[0],actionBarOp) 
+    mapToXml(parentNode,appName,img.shape[0],actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile) 
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 

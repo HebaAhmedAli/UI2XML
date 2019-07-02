@@ -38,8 +38,13 @@ def processImage(subdir, file,model,invVocab):
         Constants.DYNAMIC=True
     else:
         Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui)})
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
+    Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -75,8 +80,13 @@ def updateImage(subdir,file,valMapFromGui):
         Constants.DYNAMIC=True
     else:
         Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
+    Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
         
 def createProcessToProcessImage(imagesPath, file,model,invVocab):
     process = Process(target=processImage, args=(imagesPath, file,model,invVocab))
@@ -96,13 +106,17 @@ def processAllImages(imagesPath,model,invVocab):
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             processes.append(createProcessToProcessImage(imagesPath, file,model,invVocab))
+            print("append")
             #processImage(imagesPath, file,model,invVocab)
     for p in processes:
         p.start()
+    print("after start")
     for p in processes:
         p.join()
+        print("after join")
         p.terminate()
-        
+    print("after join")
+
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
