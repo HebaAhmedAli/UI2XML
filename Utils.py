@@ -12,6 +12,7 @@ import math
 from skimage.feature import hog,local_binary_pattern
 import Constants
 import Preprocessing
+import re
 
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
@@ -331,7 +332,40 @@ def isCircle(imageCrop):
         # return the name of the shape
     return circle
 
+def getContentOfComponent(filedata,componentId):
+    toSearch = 'android:id = "@+id/'+ componentId
+    i=filedata.find(toSearch)
+    content = ""
+    while filedata[i] != '>':
+        content+=filedata[i]
+        i+=1
+    content+='>'
+    contentList = content.split('\n')
+    content = ""
+    for i in range(len(contentList)):
+        contentList[i]=contentList[i].strip('\t')
+        content += ('\n\t'+contentList[i])
+    #content = '\n\t'.join(contentList)
+    return content
 
+def getXmlOfComponent(index,appName): # index of component in the list of ids in map, appName is the key of map for this activity.
+    filedata = ""
+    with open(Constants.mapToGui[appName][4][index][1], 'r') as file:
+            filedata = file.read()
+    file.close() 
+    toPrint = ""
+    if Constants.mapToGui[appName][4][index][0] == "":
+        toPrint += '<'+Constants.mapToGui[appName][2][index]+'\t'
+        content = getContentOfComponent(filedata,Constants.mapToGui[appName][1][index])
+        toPrint += content+'\n'
+        toPrint += '</'+Constants.mapToGui[appName][2][index]+'>'
+    else:
+        toPrint += '<'+'ListView'+'\t'
+        content = getContentOfComponent(filedata,Constants.mapToGui[appName][4][index][0])
+        toPrint += content+'\n'
+        toPrint += '</'+'ListView'+'>'
+    return toPrint
+    
 # For Testing.
 '''
 img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/17-android.widget.ImageView.jpg')

@@ -9,7 +9,7 @@ import copy
 import numpy as np
 from keras.preprocessing import image
 import time
-
+import Utils
 
 def processImage(subdir, file,model,invVocab):
     img = cv2.imread(subdir+'/' +file)
@@ -38,7 +38,7 @@ def processImage(subdir, file,model,invVocab):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui)})
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -103,13 +103,16 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
-'''
 
+'''
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
 imagesPath='data/ScreenShots/ourTest'
 
 processAllImages(imagesPath,model,invVocab)
-#print(Constants.mapToGui)
-#updateAllImages(imagesPath,{})
+print(Constants.mapToGui,'\n')
+print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
+print(Utils.getXmlOfComponent(2,'face3AD.jpg'),'\n')
+print(Utils.getXmlOfComponent(3,'face3AD.jpg'),'\n')
 '''
+#updateAllImages(imagesPath,{})

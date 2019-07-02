@@ -24,6 +24,7 @@ boxToGui = []
 predictedToGui = []
 idToGui = []
 xmlFilesToGui = []
+inWhichFile = [] # Contains activity file name, or action bar file name, or list view id.
 mapToGui = {}
 imagesPath = ""
 designMode = DESIGN_MODES[0]

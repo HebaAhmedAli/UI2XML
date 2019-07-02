@@ -505,19 +505,20 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
                                     
     return returnString
 
-def appendNodeXml(parentNode,myIndex):
+def appendNodeXml(parentNode,myIndex,listViewId,fTo):
     if len(parentNode.childNodes)==0:
         parentNode.id = myIndex
         typeOfNode = getType(parentNode.nodeType)
         Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
         Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
         Constants.predictedToGui.append(typeOfNode)
+        Constants.inWhichFile.append((listViewId,fTo.name))
         return
     for i in range(len(parentNode.childNodes)):
-        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i))
+        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i),listViewId,fTo)
             
             
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False):  
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -541,6 +542,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
         Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
         Constants.predictedToGui.append(typeOfNode)
+        Constants.inWhichFile.append(("",fTo.name))
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
@@ -560,7 +562,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.close()   
         # Append the rest of chils.
         for i in range(len(parentNode.childNodes)):
-            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId))
+            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId),"ListView"+str(parentNode.id),fTo)
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
