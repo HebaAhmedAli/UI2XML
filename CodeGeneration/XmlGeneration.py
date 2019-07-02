@@ -383,7 +383,7 @@ def buildHierarchy(boxes,texts,predictedComponents,img):
     rootNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
     return rootNode,parentNodesForGui
 
-def getTypeAndOriAndID(parentNode,tabsString,myIndex):
+def getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar=False):
     if parentNode.nodeType == 'LinearLayoutVertical':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t' 
@@ -392,6 +392,9 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+                
+    if parentNode.nodeType == 'android.widget.ImageView' and insideActionBar==True:
+        parentNode.nodeType = 'android.widget.ImageButton'
     parentNode.id = myIndex
     typeN = parentNode.nodeType[15:len(parentNode.nodeType)]
     
@@ -415,7 +418,7 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
        
 def getType(nodeType):
     if nodeType == 'LinearLayoutVertical' or nodeType == 'LinearLayoutHorizontal':
-        return 'LinearLayout'
+        return 'LinearLayout' 
     return nodeType[15:len(nodeType)]
 
 def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
@@ -514,7 +517,7 @@ def appendNodeXml(parentNode,myIndex):
         appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i))
             
             
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False):    
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -528,7 +531,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                   +'\t'+'android:orientation = "vertical"\n'
                   +'\t'+'tools:context = "'+'.'+myParentType.capitalize()+'Activity"'+'>\n')
     else:
-        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
+        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCase(parentNode,tabsString,imgH)+'>\n')
@@ -576,7 +579,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
             Constants.myParentColor = parentNode.childNodes[0].backgroundColor
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
-                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i))
+                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i),insideActionBar=True)
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
             idd = 1
