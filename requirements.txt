@@ -26,3 +26,4 @@ SecretStorage==2.3.1
 setuptools==39.0.1
 six==1.11.0
 wheel==0.30.0
+skimage==0.12.3
