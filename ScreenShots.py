@@ -77,7 +77,7 @@ def updateImage(subdir,file,valMapFromGui):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui]})
+    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
         
 
 def processAllImages(imagesPath,model,invVocab):
@@ -95,7 +95,7 @@ def processAllImages(imagesPath,model,invVocab):
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
-    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
+    mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
@@ -108,13 +108,14 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
 
-
+'''
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
 imagesPath='data/ScreenShots/ourTest'
 startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
+'''
 '''
 print(Constants.mapToGui,'\n')
 print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
