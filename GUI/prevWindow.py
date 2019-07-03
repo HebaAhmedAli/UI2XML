@@ -14,8 +14,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def __init__(self, parent):
         super(previewWindow, self).__init__(parent)
         self.setupUi(self)
-        self.pixmapX = Constants.MONITOR_WIDTH/3
-        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
+        self.pixmapX = Constants.MONITOR_WIDTH*0.3
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.8
         self.updateBtn.clicked.connect(self.updateCompType)
         # self.connectBtn.clicked.connect(self.generateUpdatedXML)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
@@ -23,23 +23,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.changedCompName = None
         self.mapAfterCorrecting = {}
         # The backend output
-        # imgsOutputInfo = Constants.mapToGui
-        self.imgsOutputInfo = {"mainND.jpg": [[[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
-                [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
-                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
-                ["activity.xml"]],
-                
-                'switchND.png': [[[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
-                [0, 426, 300, 63], [26, 509, 41, 41], [117, 513, 204, 31], [21, 604, 51, 38], [116, 606, 239, 32], [500, 600, 74, 47], [28, 695, 37, 43],
-                [117, 699, 159, 32], [506, 695, 73, 44],[0, 799, 300, 63], [25, 881, 44, 43], [116, 885, 184, 32]],
-                ['ImageView_0_0_0', 'TextView_0_0_1', 'ImageView_0_0_2', 'ImageView_0_1_0', 'TextView_0_2_0', 'TextView_0_3_0', 'TextView_0_4_0',
-                'ImageView_0_5_0', 'TextView_0_5_1', 'ImageView_0_6_0', 'TextView_0_6_1', 'Switch_0_6_2', 'ImageView_0_7_0', 'TextView_0_7_1',
-                'Switch_0_7_2', 'TextView_0_8_0', 'ImageView_0_9_0', 'TextView_0_9_1'],
-                ['ImageView', 'TextView', 'ImageView', 'ImageView', 'TextView', 'TextView', 'TextView', 'ImageView', 'TextView', 'ImageView',
-                'TextView', 'Switch', 'ImageView', 'TextView', 'Switch', 'TextView', 'ImageView', 'TextView'],
-                ['activity.xml', 'activity2.xml']]
-                }
+        self.imgsOutputInfo = Constants.mapToGui
         self.userCorrection = {}
         mainActivityName = self.initActivitiesList()
         # TODO: Handle if mainActivityName is None
@@ -129,9 +113,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             del component
         self.imgsOutputInfo.get(imgName)[2] = compPreds
         if(len(compCorrectedPreds)>0):
-            self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
-            # self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds)})
-            #     Constants.mapToGui.get(imgName)[4], Constants.mapToGui.get(imgName)[5]]})
+            #self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
+            self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
+                Constants.mapToGui.get(imgName)[5]]})
 
     def viewCompDetails(self, index, compName):
         self.compTypeComboBox.setEnabled(True)
@@ -142,10 +126,12 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.compOriginalLbl.setText(compName)
         self.changedCompIdx = index
         self.changedCompName = compName
-        # componentXML = Utils.getXmlOfComponent(index, imgName)
+        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+        imgName = self.activeImgDir[startI:]
+        componentXML = Utils.getXmlOfComponent(index, imgName)
         # curTab = self.xmlTabs.currentWidget()
         for tab in self.activeImgXMLtabs:
-            tab.compXMLBrowser.setPlainText("YAAAAAAAAAAA\nAAAAAAAAAAAA\nAAAAAAAAAAA\nAAAAA\nLAAAAAAAAAAAAAAA")
+            tab.compXMLBrowser.setPlainText(componentXML)
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
