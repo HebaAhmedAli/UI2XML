@@ -24,7 +24,7 @@ def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcess
     for x,y,w,h in extratctedBoxesPart:
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         text = TextExtraction.extractText(croppedImage)
-        featuresProcesses[index]=text
+        featuresProcesses[index]=[text]
         index+=1
     
         
@@ -45,16 +45,16 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     # Initialize the vectors of each image with empty vector(this vector is shared between processes)
     featuresProcesses=manager.list()
     for i in range(len(extratctedBoxes)):
-        featuresProcesses.append("")
+        featuresProcesses.append([])
     step = int(math.ceil(len(extratctedBoxes)/float(Constants.PROCESSES_NO)))
-    processes = [createProcess(image,imageCopy,imageXML,extratctedBoxes[i*step:min(i*step+step,len(extratctedBoxes))],featuresProcesses,i) for i in range(Constants.PROCESSES_NO)]
+    processes = [createProcess(image,imageCopy,imageXML,extratctedBoxes[i*step:min(i*step+step,len(extratctedBoxes))],featuresProcesses,i*step) for i in range(Constants.PROCESSES_NO)]
     for p in processes:
         p[0].start()
     for p in processes:
         p[0].join()
-        print("join")
         p[0].terminate()
     print("time timeExtractText = ",time.time()-timeExtractText)
+    print(len(featuresProcesses),len(extratctedBoxes))
     # featuresProcesses[i][0] features
     # featuresProcesses[i][1] ifSquare
     # featuresProcesses[i][2] circularity
@@ -70,7 +70,7 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         resizedImg = cv2.resize(croppedImage, (150,150))
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
         textFeature = 0
-        text = featuresProcesses[i]
+        text = featuresProcesses[i][0]
         if text != "":
             textFeature = 1
         features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
