@@ -96,6 +96,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
             HLayoutCnt = len(self.horizontalLayouts)
             newimage = imageBox(self.numOfImages, self.imageBox_W, self.imageBox_H)
             newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
+            newimage.cropImage.crop.connect(self.on_cropButton_clicked)
             self.numOfImages = self.numOfImages + 1
             if (self.horizontalLayouts[HLayoutCnt -1]).count() >= self.maxRowSize  :
                 self.indexColumn = 0
@@ -166,6 +167,9 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.numOfImages = self.numOfImages -1
         self.chanageGridSize(self.maxRowSize)
 
+    def on_cropButton_clicked(self, index):
+        print("2na 2das 3laia")
+
     def createUploadButton(self):
         self.boxUploadImages = QtWidgets.QGroupBox()
         self.boxUploadImages.setMinimumWidth(self.imageBox_W + 45)
@@ -186,3 +190,4 @@ class dragDropScroll(QtWidgets.QScrollArea):
                                                           "All Files (*);;JPG (*.JPG);;PNG (*.PNG)", options=options)
         if paths:
             self.pictureDropped(paths)
+

@@ -15,28 +15,33 @@ class imageBox(QWidget):
         #border: 1px solid #4d0056""")
         self.fullImageBoxLay = QVBoxLayout()
         self.checkboxsLay = QWidget()
+        self.buttonsBox = QWidget()
+
+        self.buttonsLayout = QVBoxLayout()
         self.checkBoxs = QVBoxLayout()
         self.Hor = QHBoxLayout()
         self.imageLabel = QLabel()
-
 
         self.imageNameLine = QLineEdit()
         self.hasActionBar = QCheckBox("Action Bar")
         self.staticList = QCheckBox("Static List")
         self.checkBoxs.addWidget(self.hasActionBar)
         self.checkBoxs.addWidget(self.staticList)
-
         self.deleteImage = delButton(self, index)
+
+        self.cropImage = cropButton(self, index)
+        self.buttonsLayout.addWidget(self.deleteImage)
+        self.buttonsLayout.addWidget(self.cropImage)
         self.checkboxsLay.setLayout(self.checkBoxs)
+        self.buttonsBox.setLayout(self.buttonsLayout)
         self.Hor.addWidget(self.checkboxsLay)
-        self.Hor.addWidget(self.deleteImage)
+        self.Hor.addWidget(self.buttonsBox)
 
         # self.checked = False
         self.row = 0
         self.col = 0
-        print(index)
+        # print(index)
         self.index = index
-
     # TODO: row and column can be calculated from the index
     def setImage (self, image, label, row, col, width, height, isGrid =0):
         self.row = row
@@ -69,10 +74,34 @@ class delButton(QPushButton):
     deleted = pyqtSignal(int)
     def __init__(self, parent, imageIndex):
         super(delButton, self).__init__(parent)
-        self.setText("Delete me!")
+        iconImage = QIcon()
+        iconImage.addPixmap(QPixmap("Resources/Images/delete-white.png"), QIcon.Normal, QIcon.Off)
+        self.setIcon(iconImage)
+        #self.setText("Delete")
+        self.setStyleSheet("""
+        background-color:rgba(0,0,0,0)""")
+        self.resize(50,50)
+
         self.index = imageIndex
         self.clicked.connect(self.deleteImageBox)
 
     def deleteImageBox(self):
-        print("iam deleting")
         self.deleted.emit(self.index)
+
+class cropButton(QPushButton):
+    crop = pyqtSignal(int)
+    def __init__(self, parent, imageIndex):
+        super(cropButton, self).__init__(parent)
+        iconImage = QIcon()
+        iconImage.addPixmap(QPixmap("Resources/Images/crop-white.png"), QIcon.Normal, QIcon.Off)
+        self.setIcon(iconImage)
+        #self.setText("Delete")
+        self.setStyleSheet("""
+        background-color:rgba(0,0,0,0)""")
+        self.resize(50,50)
+
+        self.index = imageIndex
+        self.clicked.connect(self.cropImageBox)
+
+    def cropImageBox(self):
+        self.crop.emit(self.index)
