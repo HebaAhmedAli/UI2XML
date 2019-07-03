@@ -28,12 +28,13 @@ def processPsd(subdir, file,model,invVocab):
     if Constants.DEBUG_MODE == True :
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
 
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.generateXml(boxes,texts,predictedComponents,imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file[:-4]+'.png' : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.generateXml(boxes,texts,predictedComponents,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
     #print(Constants.mapToGui)
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -45,7 +46,7 @@ def processPsd(subdir, file,model,invVocab):
             j+=1    
         fTo.close()
         j=0
-
+    
 
 def processAllPsds(imagesPath,model,invVocab):
    Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
@@ -59,20 +60,21 @@ def processAllPsds(imagesPath,model,invVocab):
 def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
     imgXML = np.array(imgXML,dtype='float32')  
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
-    
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
     #mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4])}
     Constants.mapToGui = {}
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
-        if (".png" in imgPath) and ('._' not in imgPath):
+        if (".psd" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
 
 '''

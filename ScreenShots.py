@@ -93,16 +93,12 @@ def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
     imgXML = np.array(imgXML,dtype='float32')  
     file = file.replace('.jpeg','.jpg')  
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
     boxToGui=[]
     predictedToGui=[]
     idToGui=[]
     xmlFilesToGui=[]
     inWhichFile=[]
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
     Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
 
 def createUpdateProcess(subdir,file,valMapFromGui):

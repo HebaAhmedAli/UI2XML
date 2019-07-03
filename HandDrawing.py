@@ -1,4 +1,5 @@
 import HandDrawingMode.ComponentsExtraction as ComponentsExtraction
+from multiprocessing import Process,Manager
 from keras.preprocessing import image
 import CodeGeneration.XmlGeneration as XmlGeneration
 import numpy as np
@@ -27,17 +28,17 @@ def processImage(subdir, file):
     # TODO: Remove last parameter after testing.
     boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,imgCopy,img4Txt,file)
     myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-6],file[len(file)-6])
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
     # Translate x and y and handle outside range.
-    for i in range(len(Constants.boxToGui)):
-        Constants.boxToGui[i] = [Constants.boxToGui[i][0]+myImageBox[0],Constants.boxToGui[i][1]+myImageBox[1],Constants.boxToGui[i][2],Constants.boxToGui[i][3]]
+    for i in range(len(boxToGui)):
+        boxToGui[i] = [boxToGui[i][0]+myImageBox[0],boxToGui[i][1]+myImageBox[1],boxToGui[i][2],boxToGui[i][3]]
             
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
-    margin = 10
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
             os.makedirs(subdir+'/compOutputs'+file[:-4])
@@ -57,35 +58,63 @@ def processImage(subdir, file):
             j+=1
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
-def updateImage(subdir,file,valMapFromGui):
-    imgXML = image.load_img(subdir+'/' +file)
-    imgXML = np.array(imgXML,dtype='float32')  
-    file = file.replace('.jpeg','.jpg')  
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+def createProcess(imagesPath, file):
+    process = Process(target=processImage, args=(imagesPath, file))
+    return process    
 
 
 def processAllImages(imagesPath):
     Constants.HAND_DRAWN = True
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
-    Constants.mapToGui = {}
+    manager=Manager()
+    # Initialize the vectors of each image with empty vector(this vector is shared between processes)
+    Constants.mapToGui=manager.dict()
+    processes = []
     _,_, files= next(os.walk(imagesPath))
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            processImage(imagesPath, file)
+            process = createProcess(imagesPath, file)
+            processes.append(process)
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+        p.terminate()
+
+def updateImage(subdir,file,valMapFromGui):
+    imgXML = image.load_img(subdir+'/' +file)
+    imgXML = np.array(imgXML,dtype='float32')  
+    file = file.replace('.jpeg','.jpg')  
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+
+
+def createUpdateProcess(subdir,file,valMapFromGui):
+    process = Process(target=updateImage, args=(subdir,file,valMapFromGui))
+    return process    
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     Constants.HAND_DRAWN = True
-    Constants.mapToGui = {}
+    manager=Manager()
+    # Initialize the vectors of each image with empty vector(this vector is shared between processes)
+    Constants.mapToGui=manager.dict()
+    processes = []
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            updateImage(imagesPath, key,val)
+            process = createUpdateProcess(imagesPath,key,val)
+            processes.append(process)
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+        p.terminate()
 
 '''
 imagesPath='data/HandDrawn/ourTest'
