@@ -23,6 +23,10 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.createUploadUI()
         self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
+        self.actionConnectCmpts.triggered.connect(self.connectComponents)
+        # self.actionFinish.triggered.connect()
+        # self.actionUpdateCmpts.triggered.connect()
+        # self.actionUpdateCmpts.triggered.connect()
 
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -50,6 +54,8 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         del self.uploadWidget.layoutScroll
         del self.uploadWidget
         self.lay.addLayout(self.prev.mainHLayout)
+        self.actionConnectCmpts.setEnabled(True)
+
         return
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
@@ -62,9 +68,14 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         '''
 
     def regenerateXMLafterCorrection(self):
+        # self.actionConnectCmpts.setEnabled(True)
+
         updatedMap = self.prev.generateUpdatedXML()
         # self.prev.mainHLayout.setParent(None)
         # del self.prev.mainHLayout
         # del self.prev
         # self.prev = prevWindow.previewWindow(self)
         # self.actionConnectCmpts.setEnabled(True)
+
+    def connectComponents(self):
+        self.prev.connectCmptsStart()

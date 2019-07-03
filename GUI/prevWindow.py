@@ -14,6 +14,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def __init__(self, parent):
         super(previewWindow, self).__init__(parent)
         self.setupUi(self)
+        self.state = "UpdateCmpts"
         self.pixmapX = Constants.MONITOR_WIDTH/3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         self.updateBtn.clicked.connect(self.updateCompType)
@@ -27,7 +28,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.imgsOutputInfo = {"mainND.jpg": [[[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
                 [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
-                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
+                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageButton', 'EditText', 'EditText'],
                 ["activity.xml"]],
                 
                 'switchND.png': [[[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
@@ -36,15 +37,16 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 ['ImageView_0_0_0', 'TextView_0_0_1', 'ImageView_0_0_2', 'ImageView_0_1_0', 'TextView_0_2_0', 'TextView_0_3_0', 'TextView_0_4_0',
                 'ImageView_0_5_0', 'TextView_0_5_1', 'ImageView_0_6_0', 'TextView_0_6_1', 'Switch_0_6_2', 'ImageView_0_7_0', 'TextView_0_7_1',
                 'Switch_0_7_2', 'TextView_0_8_0', 'ImageView_0_9_0', 'TextView_0_9_1'],
-                ['ImageView', 'TextView', 'ImageView', 'ImageView', 'TextView', 'TextView', 'TextView', 'ImageView', 'TextView', 'ImageView',
-                'TextView', 'Switch', 'ImageView', 'TextView', 'Switch', 'TextView', 'ImageView', 'TextView'],
+                ['ImageView', 'TextView', 'ImageView', 'ImageButton', 'TextView', 'TextView', 'TextView', 'ImageView', 'TextView', 'ImageView',
+                'TextView', 'Button', 'ImageView', 'TextView', 'Switch', 'TextView', 'ImageView', 'TextView'],
                 ['activity.xml', 'activity2.xml']]
                 }
         self.userCorrection = {}
-        mainActivityName = self.initActivitiesList()
+        mainName = self.initActivitiesList()
+        self.mainActivityDir = Constants.imagesPath+"/"+ mainName
         # TODO: Handle if mainActivityName is None
-        self.updateActiveImg(Constants.imagesPath+"/"+mainActivityName)
-        self.updateXMLTab(self.imgsOutputInfo[mainActivityName][3])
+        self.updateActiveImg(self.mainActivityDir)
+        self.updateXMLTab(self.imgsOutputInfo[mainName][3])
 
     def initActivitiesList(self):
         projDir = Constants.imagesPath
@@ -85,21 +87,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             return
         self.updateMapAfterCorrecting()
         self.activeImgDir = imgPath
-        del self.pixmapimage
-        self.activeImageLayout.removeWidget(self.imageLabel)
-        del self.imageLabel
-        self.compOriginalLbl.setText("")
-        self.compTypeComboBox.setEnabled(False)
         startI = imgPath.rfind('/', 0, len(imgPath))+1
         imgName = imgPath[startI:]
+        self.clearActiveImg()
 
-        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        self.compOriginalLbl.setText("")
+        self.compTypeComboBox.setEnabled(False)
         self.updateActiveImg(imgPath)
-        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
-        for tab in self.activeImgXMLtabs:
-            tab.setParent(None)
-            del tab
-        del self.xmlTabs
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
         self.updateXMLTab(self.imgsOutputInfo[imgName][3])
@@ -181,6 +175,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.highlights = []
         imgW, imgH = imagesize.get(imagePath)
         for idx in range(0,len(compBoxes)):
+            if self.state == "ConnectCmpts" and \
+                    not (compPreds[idx] == "Button" or compPreds[idx] == "ImageButton"):
+                continue
             compBox =compBoxes[idx]
             compId = compIDs[idx]
             compPred = compPreds[idx]
@@ -206,7 +203,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         #     del activ.imageLabel
         #     del activ.imageNameLine
         #     del activ
-        # for tab in self.activeImgXMLtabs:
+        # for tab in self.activeImgXMLt7abs:
         #     tab.setParent(None)
         #     del tab
         # self.imageLabel.setParent(None)
@@ -225,3 +222,40 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         # del self.scrollArea
         # del self.listScrolVerticalLayout
         return self.mapAfterCorrecting
+
+    def connectCmptsStart(self):
+        #todo call update function to the rest components
+        self.state = "ConnectCmpts"
+        #call clear screen
+        #self.clearScreen()
+        self.onViewBtnClicked(self.mainActivityDir)
+        print("connect success")
+
+
+    def clearScreen(self):
+        for comp in self.highlights:
+            comp.setParent(None)
+            del comp
+        for activ in self.activitysHLayouts:
+            activ.imageLabel.setParent(None)
+            activ.imageNameLine.setParent(None)
+            activ.viewImg.setParent(None)
+            activ.setParent(None)
+            del activ.imageLabel
+            del activ.imageNameLine
+            del activ
+        self.clearActiveImg()
+
+    def clearActiveImg(self):
+        self.imageLabel.setParent(None)
+        del self.pixmapimage
+        self.activeImageLayout.removeWidget(self.imageLabel)
+        del self.imageLabel
+        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
+        for tab in self.activeImgXMLtabs:
+            tab.setParent(None)
+            del tab
+        del self.xmlTabs
+
+
