@@ -25,15 +25,12 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
         self.actionFinish.triggered.connect(self.connectActivitiesResult)
-        # self.actionUpdateCmpts.triggered.connect()
-        # self.actionUpdateCmpts.triggered.connect()
 
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
         self.lay = QHBoxLayout()
         self.centralwidget.setLayout(self.lay)
         self.lay.addLayout(self.uploadWidget.layoutScroll)
-        # self.lay.addDockWidget(Qt.DockWidgetArea(2), self.uploadWidget.dockDesign)
     
     def startUp(self):
         Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
@@ -67,7 +64,6 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionConnectCmpts.setEnabled(True)
 
     def regenerateXMLafterCorrection(self):
-        # self.actionConnectCmpts.setEnabled(True)
         updatedMap = self.prev.generateUpdatedXML()
         self.actionConnectCmpts.setEnabled(True)
         # if Constants.designMode == Constants.DESIGN_MODES[0]:
@@ -82,7 +78,6 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.setEnabled(False)
         self.actionConnectCmpts.setEnabled(False)
         self.actionFinish.setEnabled(True)
-        # self.regenerateXMLafterCorrection()
         self.prev.connectCmptsStart()
         self.state = "ConnectCmpts"
 

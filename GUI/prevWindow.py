@@ -88,6 +88,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def onViewBtnClicked(self, imgPath):
         startI = imgPath.rfind('/', 0, len(imgPath))+1
         imgName = imgPath[startI:]
+        self.connectBtn.setEnabled(False)
 
         if self.connectBtnState :
             startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
@@ -134,7 +135,6 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             compPreds.append(component.predicted)
             component.setParent(None)
             del component
-        print("k  ",imgName, compPreds)
         self.imgsOutputInfo.get(imgName)[2] = compPreds
         if(len(compCorrectedPreds)>0):
             self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
