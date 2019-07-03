@@ -12,12 +12,14 @@ import time
 import Utils
 
 def processImage(subdir, file,model,invVocab):
+    startTime = time.time()
     img = cv2.imread(subdir+'/' +file)
     imgCopy = copy.copy(img)
     imgXML = image.load_img(subdir+'/' +file)
     imgXML = np.array(imgXML,dtype='float32')  
     file = file.replace('.jpeg','.jpg')
     boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
+    print("Time for prediction for "+file+" = ",time.time()-startTime)
     margin = 10
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
@@ -38,7 +40,7 @@ def processImage(subdir, file,model,invVocab):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui)})
+    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -75,7 +77,7 @@ def updateImage(subdir,file,valMapFromGui):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui]})
         
 
 def processAllImages(imagesPath,model,invVocab):
@@ -106,13 +108,14 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
 
-'''
+
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
 imagesPath='data/ScreenShots/ourTest'
 startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
+'''
 print(Constants.mapToGui,'\n')
 print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
 print(Utils.getXmlOfComponent(2,'face3AD.jpg'),'\n')
