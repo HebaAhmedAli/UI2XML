@@ -20,7 +20,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.setupUi(self)
         self.startUp()
         self.createUploadUI()
-        self.actionRun.triggered.connect(self.processImagesAccToMode)
+        self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
 
 
     def createUploadUI(self):
