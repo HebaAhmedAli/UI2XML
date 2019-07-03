@@ -85,14 +85,17 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def onViewBtnClicked(self, imgPath):
         if self.activeImgDir==imgPath:
             return
-        self.updateMapAfterCorrecting()
+        if self.state == "UpdateCmpts":
+            self.updateMapAfterCorrecting()
+        # else:
+        #     self.updateConnectMap()
         self.activeImgDir = imgPath
+        self.compOriginalLbl.setText("")
+        self.compTypeComboBox.setEnabled(False)
         startI = imgPath.rfind('/', 0, len(imgPath))+1
         imgName = imgPath[startI:]
         self.clearActiveImg()
 
-        self.compOriginalLbl.setText("")
-        self.compTypeComboBox.setEnabled(False)
         self.updateActiveImg(imgPath)
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
         self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
@@ -192,45 +195,20 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def generateUpdatedXML(self):
         self.updateMapAfterCorrecting()
-        # for comp in self.highlights:
-        #     comp.setParent(None)
-        #     del comp
-        # for activ in self.activitysHLayouts:
-        #     activ.imageLabel.setParent(None)
-        #     activ.imageNameLine.setParent(None)
-        #     activ.viewImg.setParent(None)
-        #     activ.setParent(None)
-        #     del activ.imageLabel
-        #     del activ.imageNameLine
-        #     del activ
-        # for tab in self.activeImgXMLt7abs:
-        #     tab.setParent(None)
-        #     del tab
-        # self.imageLabel.setParent(None)
-        # # self.activitysScrollArea.setParent(None)
-        # # self.activityListVerticalLayoutWidget.setParent(None)
-        # del self.pixmapimage
-        # self.activeImageLayout.removeWidget(self.imageLabel)
-        # self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        # self.listScrolVerticalLayout.removeWidget(self.scrollArea)
-        # self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
-        # del self.imageLabel
-        # del self.activeImageLayout
-        # del self.xmlTabsverticalLayout
-        # del self.xmlTabs
-        # del self.activeImgverticalLayout
-        # del self.scrollArea
-        # del self.listScrolVerticalLayout
         return self.mapAfterCorrecting
 
     def connectCmptsStart(self):
         #todo call update function to the rest components
         self.state = "ConnectCmpts"
+        self.mapConnect = {}
         #call clear screen
         #self.clearScreen()
         self.onViewBtnClicked(self.mainActivityDir)
+        self.compOriginalLbl.setText("")
         print("connect success")
 
+    def updateConnectMap(self):
+        self.mapConnect = {}
 
     def clearScreen(self):
         for comp in self.highlights:
