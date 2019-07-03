@@ -66,7 +66,7 @@ class previewWindowSkel(object):
         self.buttonsLayout.addWidget(self.updateBtn)
         self.connectBtn = QtWidgets.QPushButton()
         self.connectBtn.setText("Connect")
-        self.connectBtn.setEnabled(False)
+        # self.connectBtn.setEnabled(False)
         self.buttonsLayout.addWidget(self.connectBtn)
         self.correctionLayout.addLayout(self.buttonsLayout)
         # self.verticalLayoutWidget.setMinimumHeight(Constants.MONITOR_HEIGHT/3)

@@ -16,6 +16,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.pixmapX = Constants.MONITOR_WIDTH/3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.87
         self.updateBtn.clicked.connect(self.updateCompType)
+        self.connectBtn.clicked.connect(self.generateUpdatedXML)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
         self.changedCompIdx = None
         self.changedCompName = None
@@ -76,7 +77,18 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def onViewBtnClicked(self, imgPath):
         if self.activeImgDir==imgPath:
             return
-        
+        self.updateMapAfterCorrecting()
+        self.activeImgDir = imgPath
+        del self.pixmapimage
+        self.activeImageLayout.removeWidget(self.imageLabel)
+        del self.imageLabel
+        self.compOriginalLbl.setText("")
+        self.compTypeComboBox.setEnabled(False)
+
+        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        self.updateActiveImg(imgPath)
+
+    def updateMapAfterCorrecting(self):
         startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
         imgName = self.activeImgDir[startI:]
         compBoxes = []
@@ -86,13 +98,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         if imgName in self.mapAfterCorrecting:
             compBoxes = self.mapAfterCorrecting[imgName][0]
             compIDs = self.mapAfterCorrecting[imgName][1]
-            compPreds = self.mapAfterCorrecting[imgName][2]
+            compCorrectedPreds = self.mapAfterCorrecting[imgName][2]
         for component in self.highlights:
             if(component.changed):
                 if(component.idName in compIDs):
                     idx = compIDs.index(component.idName)
                     print(idx, compCorrectedPreds)
-                    compPreds[idx] = 'android.widget.'+component.predicted
+                    compCorrectedPreds[idx] = 'android.widget.'+component.predicted
                 else:
                     compBoxes.append(component.box)
                     compIDs.append(component.idName)
@@ -106,15 +118,6 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             # self.mapAfterCorrecting.update( {imgName :(compBoxes, compIDs, compCorrectedPreds)})
             #     Constants.mapToGui.get(imgName)[4], Constants.mapToGui.get(imgName)[5])})
         print(self.mapAfterCorrecting)
-        self.activeImgDir = imgPath
-        del self.pixmapimage
-        self.activeImageLayout.removeWidget(self.imageLabel)
-        del self.imageLabel
-        self.compOriginalLbl.setText("")
-        self.compTypeComboBox.setEnabled(False)
-
-        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        self.updateActiveImg(imgPath)
 
     def viewCompDetails(self, index, compName):
         self.compTypeComboBox.setEnabled(True)
@@ -128,9 +131,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
-
-        
-    
+   
     def updateCompType(self):
         self.changedCompName = self.compTypeComboBox.currentText()
         self.highlights[self.changedCompIdx].predicted=self.changedCompName
@@ -172,3 +173,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             high.showComp.connect(self.viewCompDetails)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
+
+    def generateUpdatedXML(self):
+        self.updateMapAfterCorrecting()
+        #TODO: send self.mapAfterCorrection to Backend
