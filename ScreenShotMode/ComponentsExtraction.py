@@ -24,7 +24,9 @@ def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcess
     for x,y,w,h in extratctedBoxesPart:
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         text = TextExtraction.extractText(croppedImage)
-        featuresProcesses[index]=[text]
+        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
+        colorFeatures = Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
+        featuresProcesses[index]=[text,colorFeatures]
         index+=1
     
         
@@ -54,7 +56,6 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         p[0].join()
         p[0].terminate()
     print("time timeExtractText = ",time.time()-timeExtractText)
-    print(len(featuresProcesses),len(extratctedBoxes))
     # featuresProcesses[i][0] features
     # featuresProcesses[i][1] ifSquare
     # featuresProcesses[i][2] circularity
@@ -68,14 +69,13 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         x,y,w,h = extratctedBoxes[i]
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         resizedImg = cv2.resize(croppedImage, (150,150))
-        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
         textFeature = 0
         text = featuresProcesses[i][0]
         if text != "":
             textFeature = 1
-        features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
+        features += featuresProcesses[i][1]
         features.append(textFeature)
-        shpeFeatuesList,slopedLines = extractShapeFeatures(copy.copy(croppedImage),copy.copy(resizedImg))
+        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg)
         features += shpeFeatuesList
         ifSquare = features[-6]
         circularity = features[-5]
