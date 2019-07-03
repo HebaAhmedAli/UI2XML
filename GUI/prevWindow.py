@@ -7,6 +7,7 @@ from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
 import GUI.utils as utils
 import Constants
+import Utils
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     # updateCompSig = QtCore.pyqtSignal(str)
@@ -141,6 +142,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.compOriginalLbl.setText(compName)
         self.changedCompIdx = index
         self.changedCompName = compName
+        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+        imgName = self.activeImgDir[startI:]
+        # componentXML = Utils.getXmlOfComponent(index, imgName)
+        curTab = self.xmlTabs.currentWidget()
+        curTab.compXMLBrowser.setPlainText("YAAAAAAAAAAA\nAAAAAAAAAAAA\nAAAAAAAAAAA\nAAAAA\nLAAAAAAAAAAAAAAA")
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)

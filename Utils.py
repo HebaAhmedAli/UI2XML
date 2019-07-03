@@ -1,18 +1,18 @@
 import sys
 sys.path.append('../')
-from collections import Counter 
-from keras.preprocessing import image
-from colormath.color_objects import sRGBColor, LabColor
-from colormath.color_conversions import convert_color
-from colormath.color_diff import delta_e_cie2000
-import numpy as np
-import cv2
-import copy
-import math
-from skimage.feature import hog,local_binary_pattern
+# from collections import Counter 
+# from keras.preprocessing import image
+# from colormath.color_objects import sRGBColor, LabColor
+# from colormath.color_conversions import convert_color
+# from colormath.color_diff import delta_e_cie2000
+# import numpy as np
+# import cv2
+# import copy
+# import math
+# from skimage.feature import hog,local_binary_pattern
 import Constants
-import Preprocessing
-import re
+# import Preprocessing
+# import re
 
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
