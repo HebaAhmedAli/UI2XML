@@ -1,52 +1,32 @@
-import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
-import CodeGeneration.XmlGeneration as XmlGeneration
 from multiprocessing import Process,Manager
-from keras.models import load_model
-import LoadDataClassification
 import Constants
 import cv2
 import os
 import copy
 import numpy as np
-from keras.preprocessing import image
 import time
-import Utils
-
-def processImage(subdir, file,model,invVocab,mapToGui):
-    img = cv2.imread(subdir+'/' +file)
-    imgCopy = copy.copy(img)
-    imgXML = image.load_img(subdir+'/' +file)
-    imgXML = np.array(imgXML,dtype='float32')  
-    file = file.replace('.jpeg','.jpg')
-    boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
-    margin = 10
-    if Constants.DEBUG_MODE == True :
-        if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
-            os.makedirs(subdir+'/compOutputsAll'+file[:-4])
-        if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
-            os.makedirs(subdir+'/compOutputs'+file[:-4])    
-        if not os.path.exists(subdir+'/boxOutputs'):
-            os.makedirs(subdir+'/boxOutputs')
-
-    height= img.shape[0]
-    width= img.shape[1]
+from keras.models import load_model
+from keras.preprocessing import image
+import LoadDataClassification
+import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
+import CodeGeneration.XmlGeneration as XmlGeneration
     
-    if Constants.DEBUG_MODE == True :
-        fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
-    boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy,model,invVocab)
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
+
+def filterAndConstructXml(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents):
+    margin = 10
+    boxesFiltered,textsFiltered,predictedComponentsFiltered=ComponentsExtraction.filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imgCopy)
     boxToGui=[]
     predictedToGui=[]
     idToGui=[]
     xmlFilesToGui=[]
     inWhichFile=[]
-    parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
-    mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
+    parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
+    Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
+        height= imgCopy.shape[0]
+        width= imgCopy.shape[1]
+        fTo=open(subdir+'/compOutputsAll'+file[:-4]+'/texts.txt', 'w+')
         j = 0
         for x,y,w,h in boxes:
             # testing: print the cropped in folder
@@ -59,18 +39,32 @@ def processImage(subdir, file,model,invVocab,mapToGui):
         j=0
         edit = 0
         for x,y,w,h in boxesFiltered:
-            # testing: print the cropped in folder
-            '''
-            if predictedComponentsFiltered[j] == "android.widget.EditText":
-                edit = 10
-            else:
-                edit = 0
-            '''
             crop_img = imgCopy[max(0,y - margin - edit):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
             fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
             j+=1  
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
+        
+def createProcess(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents):
+    process = Process(target=filterAndConstructXml, args=(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents))
+    return process
+
+def processImage(subdir, file,model,invVocab):
+    img = cv2.imread(subdir+'/' +file)
+    imgCopy = copy.copy(img)
+    imgXML = image.load_img(subdir+'/' +file)
+    imgXML = np.array(imgXML,dtype='float32')  
+    file = file.replace('.jpeg','.jpg')
+    boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
+    if Constants.DEBUG_MODE == True :
+        if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
+            os.makedirs(subdir+'/compOutputsAll'+file[:-4])
+        if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
+            os.makedirs(subdir+'/compOutputs'+file[:-4])    
+        if not os.path.exists(subdir+'/boxOutputs'):
+            os.makedirs(subdir+'/boxOutputs')
+    # open Process
+    return createProcess(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents)
 
 def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
@@ -88,9 +82,6 @@ def updateImage(subdir,file,valMapFromGui):
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
     Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
         
-def createProcessToProcessImage(imagesPath, file,model,invVocab,mapToGui):
-    process = Process(target=processImage, args=(imagesPath, file,model,invVocab,mapToGui))
-    return process
 
 def processAllImages(imagesPath,model,invVocab):
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
@@ -98,16 +89,16 @@ def processAllImages(imagesPath,model,invVocab):
             os.makedirs(Constants.DIRECTORY)
     manager=Manager()
     # Initialize the vectors of each image with empty vector(this vector is shared between processes)
-    mapToGui=manager.dict()
+    Constants.mapToGui=manager.dict()
     processes = []
     #Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            processes.append(createProcessToProcessImage(imagesPath, file,model,invVocab,mapToGui))
+            process = processImage(imagesPath, file,model,invVocab)
+            processes.append(process)
             print("append")
-            #processImage(imagesPath, file,model,invVocab)
     for p in processes:
         p.start()
     print("after start")
@@ -115,8 +106,7 @@ def processAllImages(imagesPath,model,invVocab):
         p.join()
         print("after join")
         p.terminate()
-    print("after join")
-    Constants.mapToGui = mapToGui
+    print("after term")
 
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
@@ -137,6 +127,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
+
 imagesPath='data/ScreenShots/ourTest'
 startTime = time.time()
 processAllImages(imagesPath,model,invVocab)

@@ -377,10 +377,10 @@ def createRoot(parentNodes,imgH,dynamic,img):
     parentNode.childNodes = parentNodes
     return parentNode
     
-def buildHierarchy(boxes,texts,predictedComponents,img):
+def buildHierarchy(boxes,texts,predictedComponents,img,dynamic):
     parentNodes = buildParentNodes(boxes,texts,predictedComponents,img)
     parentNodesForGui = sorted(parentNodes, key=operator.attrgetter('y'))
-    rootNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
+    rootNode = createRoot(parentNodesForGui,img.shape[0],dynamic,img)
     return rootNode,parentNodesForGui
 
 def getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar=False):
@@ -613,8 +613,8 @@ def mapToXml(parentNode,appName,imgH,actionBarOp,boxToGui,predictedToGui,idToGui
     return
 
     
-def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
-    parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img)        
+def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile,dynamic):
+    parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img,dynamic)        
     mapToXml(parentNode,appName,img.shape[0],actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui

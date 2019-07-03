@@ -82,7 +82,7 @@ def extractShapeFeatures(img,resizedImg):
     allShapeFeatures += Utils.detectShapeAndFeature(cnt)
     return allShapeFeatures,slopedLines
         
-def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
+def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy):
     boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual= \
     removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents)
     
@@ -94,7 +94,7 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
     predictedComponentsFiltered = []
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     if ('android.widget.Button' not in predictedComponentsFiltered \
        and 'android.widget.ImageButton' not in predictedComponentsFiltered) \
     and 'android.widget.EditText' in predictedComponentsFiltered:
@@ -231,7 +231,7 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     
 # and specialCaseButton(boxesInBacket,textsInBacket,predictedComponentsInBacket)
 def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
     specialRongEdit = specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy.shape[1])
     if (predictedComponentsInBacket[0] != 'android.widget.ImageView' \
     and predictedComponentsInBacket[0] != 'android.widget.TextView'\
@@ -247,9 +247,9 @@ def stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
         return False
     
 def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab):
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
     stop=stopEntering(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
-                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
+                 boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     if stop==True:
         return
     # Backet the rest of array.
@@ -257,7 +257,7 @@ def filterEachBacket(boxesInBacket,textsInBacket,predictedComponentsInBacket, \
     backetOverlappingBoxes(boxesInBacket[1:len(boxesInBacket)],textsInBacket[1:len(boxesInBacket)],predictedComponentsInBacket[1:len(boxesInBacket)])
     for i in range(len(boxesInBackets)):
         filterEachBacket(boxesInBackets[i],textsInBackets[i],predictedComponentsInBackets[i], \
-                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy,model,invVocab)
+                         boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
            
 def getFirstUnvisitedIndex(visited):
     for i in range(len(visited)):
