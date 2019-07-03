@@ -33,7 +33,7 @@ def processPsd(subdir, file,model,invVocab):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.generateXml(boxes,texts,predictedComponents,imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file[:-4]+'.png' : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    Constants.mapToGui.update( {file[:-4]+'.png' : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
     #print(Constants.mapToGui)
     if Constants.DEBUG_MODE == True :
         j = 0
@@ -64,7 +64,7 @@ def updateImage(subdir,file,valMapFromGui):
     else:
         Constants.DYNAMIC=False
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : (Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,parentNodesForGui)})
+    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
     
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.

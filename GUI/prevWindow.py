@@ -1,13 +1,13 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import os
 import imagesize 
-from GUI.skelPrevWindow import  previewWindowSkel
+from GUI.skelPrevWindow import previewWindowSkel
 #from GUI.tabs import xmlTab
 from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
 import GUI.utils as utils
 import Constants
-import Utils
+# import Utils
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     # updateCompSig = QtCore.pyqtSignal(str)
@@ -15,8 +15,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         super(previewWindow, self).__init__(parent)
         self.setupUi(self)
         self.state = "UpdateCmpts"
-        self.pixmapX = Constants.MONITOR_WIDTH/3
-        self.pixmapY = Constants.MONITOR_HEIGHT*0.87
+        self.pixmapX = Constants.MONITOR_WIDTH*0.3
+        self.pixmapY = Constants.MONITOR_HEIGHT*0.84
         self.updateBtn.clicked.connect(self.updateCompType)
         # self.connectBtn.clicked.connect(self.generateUpdatedXML)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
@@ -24,7 +24,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.changedCompName = None
         self.mapAfterCorrecting = {}
         # The backend output
-        # imgsOutputInfo = Constants.mapToGui
+        # self.imgsOutputInfo = Constants.mapToGui
         self.imgsOutputInfo = {"mainND.jpg": [[[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
                 [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
                 ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
@@ -63,8 +63,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(self.activityHLayout)
             self.verticalLayout.addLayout(self.activityHLayout)
-        mainActivityDir = projDir+"/"+mainActivityName
-        self.activeImgDir = mainActivityDir
+        self.mainActivityDir = projDir+"/"+mainActivityName
+        self.activeImgDir = self.mainActivityDir
         return mainActivityName
 
     def calculateScaledBox(self, originalBox, imgW, imgH):
@@ -83,12 +83,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     @QtCore.pyqtSlot(str)
     def onViewBtnClicked(self, imgPath):
-        if self.activeImgDir==imgPath:
-            return
+        # if self.activeImgDir==imgPath:
+        #     return
         if self.state == "UpdateCmpts":
             self.updateMapAfterCorrecting()
-        # else:
-        #     self.updateConnectMap()
         self.activeImgDir = imgPath
         self.compOriginalLbl.setText("")
         self.compTypeComboBox.setEnabled(False)
@@ -127,8 +125,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.imgsOutputInfo.get(imgName)[2] = compPreds
         if(len(compCorrectedPreds)>0):
             self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
-            # self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds)})
-            #     Constants.mapToGui.get(imgName)[4], Constants.mapToGui.get(imgName)[5]]})
+            # self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
+            #     Constants.mapToGui.get(imgName)[5]]})
 
     def viewCompDetails(self, index, compName):
         self.compTypeComboBox.setEnabled(True)
@@ -139,10 +137,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.compOriginalLbl.setText(compName)
         self.changedCompIdx = index
         self.changedCompName = compName
+        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+        imgName = self.activeImgDir[startI:]
         # componentXML = Utils.getXmlOfComponent(index, imgName)
+        componentXML = "YALL\nLLLLLL\nLL\n\n\n\nLLLLAHWE"
         # curTab = self.xmlTabs.currentWidget()
         for tab in self.activeImgXMLtabs:
-            tab.compXMLBrowser.setPlainText("YAAAAAAAAAAA\nAAAAAAAAAAAA\nAAAAAAAAAAA\nAAAAA\nLAAAAAAAAAAAAAAA")
+            tab.compXMLBrowser.setPlainText(componentXML)
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
@@ -237,3 +238,24 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         del self.xmlTabs
 
 
+    def refreshWindowAfterUpdate(self):
+        # self.imgsOutputInfo = Constants.mapToGui
+        self.imgsOutputInfo = {"mainND.jpg": [[[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
+                [81, 557, 384, 46], [170, 634, 211, 31], [116, 844, 329, 27]],
+                ['ImageButton_0_0_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0', 'ImageView_0_1_0', 'EditText_0_2_0', 'EditText_0_3_0'],
+                ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageButton', 'EditText', 'EditText'],
+                ["activity.xml"]],
+                
+                'switchND.png': [[[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
+                [0, 426, 300, 63], [26, 509, 41, 41], [117, 513, 204, 31], [21, 604, 51, 38], [116, 606, 239, 32], [500, 600, 74, 47], [28, 695, 37, 43],
+                [117, 699, 159, 32], [506, 695, 73, 44],[0, 799, 300, 63], [25, 881, 44, 43], [116, 885, 184, 32]],
+                ['ImageView_0_0_0', 'TextView_0_0_1', 'ImageView_0_0_2', 'ImageView_0_1_0', 'TextView_0_2_0', 'TextView_0_3_0', 'TextView_0_4_0',
+                'ImageView_0_5_0', 'TextView_0_5_1', 'ImageView_0_6_0', 'TextView_0_6_1', 'Switch_0_6_2', 'ImageView_0_7_0', 'TextView_0_7_1',
+                'Switch_0_7_2', 'TextView_0_8_0', 'ImageView_0_9_0', 'TextView_0_9_1'],
+                ['ImageView', 'TextView', 'ImageView', 'ImageButton', 'TextView', 'TextView', 'TextView', 'ImageView', 'TextView', 'ImageView',
+                'TextView', 'Button', 'ImageView', 'TextView', 'Switch', 'TextView', 'ImageView', 'TextView'],
+                ['activity.xml', 'activity2.xml']]
+                }
+        self.mapAfterCorrecting = {}
+        self.onViewBtnClicked(self.mainActivityDir)
+        

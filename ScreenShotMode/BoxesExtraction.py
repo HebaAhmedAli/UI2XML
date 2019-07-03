@@ -31,7 +31,7 @@ def extractBoxes(img):
     addedManuallyBool=[]
     morph,edges=preProcess(img)
     #finding the contours
-    (_, contours , _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
+    (contours , _) = cv2.findContours(morph, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
         cv2.rectangle(img,(x,y),(x+w,y+h),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),2)
