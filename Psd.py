@@ -34,7 +34,7 @@ def processPsd(subdir, file,model,invVocab):
     xmlFilesToGui=[]
     inWhichFile=[]
     parentNodesForGui = XmlGeneration.generateXml(boxes,texts,predictedComponents,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
-    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+    Constants.mapToGui.update( {file[:-4]+'.png'  : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
     #print(Constants.mapToGui)
     if Constants.DEBUG_MODE == True :
         j = 0
