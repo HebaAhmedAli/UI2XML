@@ -19,7 +19,6 @@ def processImage(subdir, file,model,invVocab):
     imgXML = np.array(imgXML,dtype='float32')  
     file = file.replace('.jpeg','.jpg')
     boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
-    print("Time for prediction for "+file+" = ",time.time()-startTime)
     margin = 10
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):

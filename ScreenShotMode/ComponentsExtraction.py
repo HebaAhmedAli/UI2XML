@@ -12,7 +12,6 @@ import Constants
 import time
 from multiprocessing import Process,Manager
 import math
-import copy
 
 heightThrshold1 = 20
 heightThrshold2 = 40
@@ -25,8 +24,15 @@ def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcess
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         text = TextExtraction.extractText(croppedImage)
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
+        resizedImg = cv2.resize(croppedImage, (150,150))
         colorFeatures = Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
-        featuresProcesses[index]=[text,colorFeatures]
+        edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
+        # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
+        linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
+        resizeRatios = Utils.getResizeRatios(croppedImage)
+        hogFeature = Utils.descripeHog(grayImgResized)
+        gray5Feature = Utils.describe5Gray(grayImgResized)
+        featuresProcesses[index]=[text,colorFeatures,linesEdgeFeatures,resizeRatios,hogFeature,gray5Feature]
         index+=1
     
         
@@ -75,7 +81,7 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
             textFeature = 1
         features += featuresProcesses[i][1]
         features.append(textFeature)
-        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg)
+        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg,featuresProcesses[i])
         features += shpeFeatuesList
         ifSquare = features[-6]
         circularity = features[-5]
@@ -102,20 +108,19 @@ def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLine
             return 'android.widget.RadioButton'
     return prediction
 
-def extractShapeFeatures(img,resizedImg):
+def extractShapeFeatures(img,resizedImg,featuresProcessesI):
     allShapeFeatures = []
     edges,_=Preprocessing.preProcessEdges(img)
     edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
     # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
-    linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
-    allShapeFeatures += linesEdgeFeatures
-    slopedLines = linesEdgeFeatures[-1]
+    allShapeFeatures += featuresProcessesI[2]
+    slopedLines = featuresProcessesI[2][-1]
     # widthResizingRatio, hightResizingRatio
-    allShapeFeatures += Utils.getResizeRatios(img)
+    allShapeFeatures += featuresProcessesI[3]
     # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
     allShapeFeatures += Utils.describeLBP(grayImgResized)
-    allShapeFeatures += Utils.descripeHog(grayImgResized)
-    allShapeFeatures += Utils.describe5Gray(grayImgResized)
+    allShapeFeatures += featuresProcessesI[4]
+    allShapeFeatures += featuresProcessesI[5]
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1
