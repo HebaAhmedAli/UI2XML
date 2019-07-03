@@ -24,7 +24,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
-        # self.actionFinish.triggered.connect()
+        self.actionFinish.triggered.connect(self.connectActivitiesResult)
         # self.actionUpdateCmpts.triggered.connect()
         # self.actionUpdateCmpts.triggered.connect()
 
@@ -79,5 +79,14 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.prev.refreshWindowAfterUpdate()
 
     def connectComponents(self):
+        self.actionUpdateCmpts.setEnabled(False)
+        self.actionConnectCmpts.setEnabled(False)
+        self.actionFinish.setEnabled(True)
+        # self.regenerateXMLafterCorrection()
         self.prev.connectCmptsStart()
         self.state = "ConnectCmpts"
+
+    def connectActivitiesResult(self):
+        connectedMap = self.prev.convertConnectMapToLists()
+        print(connectedMap)
+        # self.close()
