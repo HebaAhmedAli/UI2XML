@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import os
 import imagesize 
-from GUI.skelPrevWindow import  previewWindowSkel
+from GUI.skelPrevWindow import previewWindowSkel
 #from GUI.tabs import xmlTab
 from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
@@ -27,7 +27,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.userCorrection = {}
         mainActivityName = self.initActivitiesList()
         # TODO: Handle if mainActivityName is None
-        self.updateActiveImg(Constants.imagesPath+"/"+mainActivityName)
+        self.updateActiveImg(self.mainActivityDir)
         self.updateXMLTab(self.imgsOutputInfo[mainActivityName][3])
 
     def initActivitiesList(self):
@@ -45,8 +45,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.activityHLayout.setAlignment(QtCore.Qt.AlignLeft)
             self.activitysHLayouts.append(self.activityHLayout)
             self.verticalLayout.addLayout(self.activityHLayout)
-        mainActivityDir = projDir+"/"+mainActivityName
-        self.activeImgDir = mainActivityDir
+        self.mainActivityDir = projDir+"/"+mainActivityName
+        self.activeImgDir = self.mainActivityDir
         return mainActivityName
 
     def calculateScaledBox(self, originalBox, imgW, imgH):
@@ -65,8 +65,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     @QtCore.pyqtSlot(str)
     def onViewBtnClicked(self, imgPath):
-        if self.activeImgDir==imgPath:
-            return
+        #if self.activeImgDir==imgPath:
+         #   return
         self.updateMapAfterCorrecting()
         self.activeImgDir = imgPath
         del self.pixmapimage
@@ -181,33 +181,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def generateUpdatedXML(self):
         self.updateMapAfterCorrecting()
-        # for comp in self.highlights:
-        #     comp.setParent(None)
-        #     del comp
-        # for activ in self.activitysHLayouts:
-        #     activ.imageLabel.setParent(None)
-        #     activ.imageNameLine.setParent(None)
-        #     activ.viewImg.setParent(None)
-        #     activ.setParent(None)
-        #     del activ.imageLabel
-        #     del activ.imageNameLine
-        #     del activ
-        # for tab in self.activeImgXMLtabs:
-        #     tab.setParent(None)
-        #     del tab
-        # self.imageLabel.setParent(None)
-        # # self.activitysScrollArea.setParent(None)
-        # # self.activityListVerticalLayoutWidget.setParent(None)
-        # del self.pixmapimage
-        # self.activeImageLayout.removeWidget(self.imageLabel)
-        # self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        # self.listScrolVerticalLayout.removeWidget(self.scrollArea)
-        # self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
-        # del self.imageLabel
-        # del self.activeImageLayout
-        # del self.xmlTabsverticalLayout
-        # del self.xmlTabs
-        # del self.activeImgverticalLayout
-        # del self.scrollArea
-        # del self.listScrolVerticalLayout
         return self.mapAfterCorrecting
+
+    def refreshWindowAfterUpdate(self):
+        self.imgsOutputInfo = Constants.mapToGui
+        self.mapAfterCorrecting = {}
+        self.onViewBtnClicked(self.mainActivityDir)
+        

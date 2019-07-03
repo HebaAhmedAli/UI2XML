@@ -72,7 +72,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
             HandDrawing.updateAllImages(Constants.imagesPath,updatedMap)
         else:
             Psd.updateAllImages(Constants.imagesPath,updatedMap)
-        # self.prev.mainHLayout.setParent(None)
+        self.prev.refreshWindowAfterUpdate()
         # del self.prev.mainHLayout
         # del self.prev
         # self.prev = prevWindow.previewWindow(self)
