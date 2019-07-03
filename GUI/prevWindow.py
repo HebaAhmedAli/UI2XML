@@ -19,6 +19,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
         self.changedCompIdx = None
         self.changedCompName = None
+        self.mapAfterCorrecting = {}
         # The backend output
         # imgsOutputInfo = Constants.mapToGui
         self.imgsOutputInfo = {"mainND.jpg": ([[19, 19, 27, 27], [190, 135, 145, 124], [43, 311, 479, 63], [43, 405, 478, 64],
@@ -73,13 +74,26 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     @QtCore.pyqtSlot(str)
     def onViewBtnClicked(self, imgPath):
-        print("k",imgPath)
         if self.activeImgDir==imgPath:
             return
+        
+        startI = imgPath.rfind('/', 0, len(imgPath))+1
+        imgName = imgPath[startI:]
+        compBoxes = []
+        compIDs = []
+        compPreds = []
+        for component in self.highlights:
+            if(component.changed):
+                compBoxes.append(component.box)
+                compIDs.append(component.idName)
+                compPreds.append('android.widget.'+component.predicted)
+            component.setParent(None)
+            del component
+        
+        self.mapAfterCorrecting.update( {imgName :(compBoxes, compIDs, compPreds,
+            Constants.mapToGui.get(imgName)[4], Constants.mapToGui.get(imgName)[5])})
+        # print(self.mapAfterCorrecting)
         self.activeImgDir = imgPath
-        for h in self.highlights:
-            h.setParent(None)
-            del h
         del self.pixmapimage
         self.activeImageLayout.removeWidget(self.imageLabel)
         del self.imageLabel
@@ -89,13 +103,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
         self.updateActiveImg(imgPath)
 
-    def viewCompDetails(self, idx, compName):
-        idx = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
-        if idx >= 0:
-            self.compTypeComboBox.setCurrentIndex(idx)
+    def viewCompDetails(self, index, compName):
+        compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
+        if compIdxinList >= 0:
+            self.compTypeComboBox.setCurrentIndex(compIdxinList)
         self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
-        self.changedCompIdx = idx
+        self.changedCompIdx = index
         self.changedCompName = compName
 
     def enableUpdateBtn(self):
@@ -104,12 +118,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         
     
     def updateCompType(self):
-        # self.updateCompSig.emit(self.changedCompIdx, self.changedCompName)
-        print(self.highlights[self.changedCompIdx].predicted)
         self.changedCompName = self.compTypeComboBox.currentText()
         self.highlights[self.changedCompIdx].predicted=self.changedCompName
         self.highlights[self.changedCompIdx].changed=True
-        print(self.highlights[self.changedCompIdx].predicted)
+        self.updateBtn.setEnabled(False)
 
 
     def updateXMLTab(self, xmlFiles):
@@ -134,6 +146,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         compPreds = self.imgsOutputInfo[imgName][2]
         self.highlights = []
         imgW, imgH = imagesize.get(imagePath)
+        print(compPreds)
         for idx in range(0,len(compBoxes)):
             compBox =compBoxes[idx]
             compId = compIDs[idx]
@@ -146,4 +159,3 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             high.showComp.connect(self.viewCompDetails)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
-        self.userCorrection[imgName]=[compBoxes,compIDs,compPreds]
