@@ -28,13 +28,16 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     width=image.shape[1]
     timeExtractFeatures = 0
     timePrediction = 0
+    timeText = 0
     for x,y,w,h in extratctedBoxes:
         start1=time.time()
         features = []
+        start3 = time.time()
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         resizedImg = cv2.resize(croppedImage, (150,150))
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
         text = TextExtraction.extractText(croppedImage)
+        timeText += time.time()-start3
         textFeature = 0
         if text != "":
             textFeature = 1
@@ -51,8 +54,9 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         pedictedComponents.append(prediction)
         extractedText.append(text)
         timePrediction+=time.time() - start2
-    print("timeExtractFeatures = ",timeExtractFeatures)
+    print("timeExtractFeatures = ",timeExtractFeatures-timeText)
     print("timePrediction = ",timePrediction)
+    print("timeText = ",timeText)
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
