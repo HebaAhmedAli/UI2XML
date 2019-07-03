@@ -1,18 +1,12 @@
 import sys
 sys.path.append('../')
 from collections import Counter 
-from keras.preprocessing import image
-from colormath.color_objects import sRGBColor, LabColor
-from colormath.color_conversions import convert_color
-from colormath.color_diff import delta_e_cie2000
 import numpy as np
 import cv2
 import copy
 import math
-from skimage.feature import hog,local_binary_pattern
 import Constants
 import Preprocessing
-import re
 
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
@@ -177,6 +171,7 @@ def detectShapeAndFeature(cnt):
 
 # Take gray resized image.
 def describeLBP(gray,numPoints=8,radius=1,eps=1e-7):
+        from skimage.feature import local_binary_pattern
          # compute the Local Binary Pattern representation
 		# of the image, and then use the LBP representation
 		# to build the histogram of patterns
@@ -192,6 +187,7 @@ def describeLBP(gray,numPoints=8,radius=1,eps=1e-7):
     
 # Take gray resized image.  
 def descripeHog(gray):
+    from skimage.feature import hog
     (H, hogImage) = hog(gray, orientations=8, pixels_per_cell=(150,150),
                     cells_per_block=(1,1), visualize=True)
     H = H.astype("float")
@@ -266,6 +262,9 @@ def getNoOfColorsAndBackGroundRGB(img):
     return [(len(dictt)-dictMean)/dictStd,firstRgb[0]/255.0,firstRgb[1]/255.0,firstRgb[2]/255.0]
 
 def getMostAndSecondMostColors(img,firstOnly):
+    from colormath.color_objects import sRGBColor, LabColor
+    from colormath.color_conversions import convert_color
+    from colormath.color_diff import delta_e_cie2000
     B = copy.copy(img)
     B = B.astype(int)
     B = np.reshape(B,(B.shape[0]*B.shape[1],B.shape[2]))

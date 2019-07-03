@@ -18,6 +18,7 @@ MODEL_PRED = ("CheckBox","CheckedTextView","EditText","ImageButton",
               "RadioButton","SeekBar","Switch","ImageView","Button","TextView")
 MONITOR_WIDTH = 0
 MONITOR_HEIGHT = 0
+PROCESSES_NO = 4
 
 # Globals
 boxToGui = []
