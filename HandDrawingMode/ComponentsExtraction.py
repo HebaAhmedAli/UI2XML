@@ -67,8 +67,8 @@ def filterComponentsAndPredict(allBoxes,texts,image):
 # Extract the boxes and text from given image -extracted components-.
 def extractComponents(image,imgCopy,image4Txt,appName): # TODO: Remove appName.
     # TODO: Uncomment after testing and delete the line after this.
-    #extractedText, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
-    extractedTexts,textPositions = getFromAppName(appName)
+    extractedTexts, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
+    #extractedTexts,textPositions = getFromAppName(appName)
     extratctedBoxes,extractedTexts = BoxesExtraction.extractBoxes(image, extractedTexts, textPositions)
     myImageBox = extratctedBoxes[0]
     extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)],imgCopy)
@@ -140,7 +140,7 @@ appDict = {
 "loginND.jpg":
 (['Logm', 'Name', 'Email', 'Save'],
 [[87, 53, 37, 22], [27, 104, 31, 11], [23, 134, 32, 12], [195, 203, 32, 12]]),
- "mainND.jpg":
+ "login2ND.jpg":
 (['Login', 'Email', 'Password', 'Log', 'in'],
 [[677, 745, 219, 143], [330, 1015, 204, 94], [286, 1165, 360, 103], [832, 1516, 102, 80], [949, 1522, 59, 46]]),
  "login3ND.jpg":

@@ -9,6 +9,8 @@ import Preprocessing
 import numpy as np
 import cv2
 import Constants
+import time
+
 heightThrshold1 = 20
 heightThrshold2 = 40
 margin = 10
@@ -16,18 +18,26 @@ margin = 10
 
 # Extract the boxes and text from given image -extracted components- and predict them.
 def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
+    start0 = time.time()
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
+    print("timeBoxesExtraction = ",time.time()-start0)
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
     height=image.shape[0]
     width=image.shape[1]
+    timeExtractFeatures = 0
+    timePrediction = 0
+    timeText = 0
     for x,y,w,h in extratctedBoxes:
+        start1=time.time()
         features = []
+        start3 = time.time()
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         resizedImg = cv2.resize(croppedImage, (150,150))
         croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
         text = TextExtraction.extractText(croppedImage)
+        timeText += time.time()-start3
         textFeature = 0
         if text != "":
             textFeature = 1
@@ -37,16 +47,24 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         features += shpeFeatuesList
         ifSquare = features[-6]
         circularity = features[-5]
+        timeExtractFeatures += time.time()-start1
+        start2 = time.time()
         prediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
         prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model)
         pedictedComponents.append(prediction)
-        extractedText.append(TextExtraction.extractText(croppedImage))
+        extractedText.append(text)
+        timePrediction+=time.time() - start2
+    print("timeExtractFeatures = ",timeExtractFeatures-timeText)
+    print("timePrediction = ",timePrediction)
+    print("timeText = ",timeText)
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
     if ifSquare:
         if slopedLines > 2 and slopedLines < 4:
             return 'android.widget.CheckBox'
+    if prediction == 'android.widget.CheckBox' and (not(slopedLines > 2 and slopedLines < 4) or not ifSquare):
+        return 'android.widget.ImageView'
     if circularity != 0 and (prediction == 'android.widget.ImageView' or prediction == 'android.widget.ImageButton'):
         x,y,w,h = box
         marginNew = 5

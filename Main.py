@@ -13,7 +13,8 @@ import  GUI.utils as utils
 # import LoadDataClassification
 import Constants
 
-class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
+
+class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
     def __init__(self):
         super(mainScreen, self).__init__()
         self.state = "INS_PIC"

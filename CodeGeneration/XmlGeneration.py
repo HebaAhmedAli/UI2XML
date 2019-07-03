@@ -383,7 +383,7 @@ def buildHierarchy(boxes,texts,predictedComponents,img):
     rootNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
     return rootNode,parentNodesForGui
 
-def getTypeAndOriAndID(parentNode,tabsString,myIndex):
+def getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar=False):
     if parentNode.nodeType == 'LinearLayoutVertical':
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "vertical"'\
                 '\n'+tabsString+'\t' 
@@ -392,6 +392,9 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
         return 'LinearLayout\n'+tabsString+'\t'+'android:orientation = "horizontal"'\
                 '\n'+tabsString+'\t' +\
                 'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
+                
+    if parentNode.nodeType == 'android.widget.ImageView' and insideActionBar==True:
+        parentNode.nodeType = 'android.widget.ImageButton'
     parentNode.id = myIndex
     typeN = parentNode.nodeType[15:len(parentNode.nodeType)]
     
@@ -415,7 +418,7 @@ def getTypeAndOriAndID(parentNode,tabsString,myIndex):
        
 def getType(nodeType):
     if nodeType == 'LinearLayoutVertical' or nodeType == 'LinearLayoutHorizontal':
-        return 'LinearLayout'
+        return 'LinearLayout' 
     return nodeType[15:len(nodeType)]
 
 def getWeightWidthHeightGravity(myParentType,height,width,gravity,weight,tabsString):
@@ -502,19 +505,20 @@ def printListViewChildNode(parentNode,myParentType,tabs,imgH,myIndex):
                                     
     return returnString
 
-def appendNodeXml(parentNode,myIndex):
+def appendNodeXml(parentNode,myIndex,listViewId,fTo):
     if len(parentNode.childNodes)==0:
         parentNode.id = myIndex
         typeOfNode = getType(parentNode.nodeType)
         Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
         Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
         Constants.predictedToGui.append(typeOfNode)
+        Constants.inWhichFile.append((listViewId,fTo.name))
         return
     for i in range(len(parentNode.childNodes)):
-        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i))
+        appendNodeXml(parentNode.childNodes[i],myIndex+'_'+str(i),listViewId,fTo)
             
             
-def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None):    
+def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,specialId=None,insideActionBar=False):  
     tabsString=""
     for i in range(tabs):
         tabsString+='\t'
@@ -528,7 +532,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
                   +'\t'+'android:orientation = "vertical"\n'
                   +'\t'+'tools:context = "'+'.'+myParentType.capitalize()+'Activity"'+'>\n')
     else:
-        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex)+\
+        fTo.write(tabsString+'<'+getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar)+\
                   getWeightWidthHeightGravity(myParentType,parentNode.height,parentNode.width\
                                     ,parentNode.gravity,parentNode.weight,tabsString)+\
                                     printSpecialCase(parentNode,tabsString,imgH)+'>\n')
@@ -538,6 +542,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         Constants.boxToGui.append([int(parentNode.x),int(parentNode.y),int(parentNode.width),int(parentNode.height)])
         Constants.idToGui.append(typeOfNode+'_'+parentNode.id)
         Constants.predictedToGui.append(typeOfNode)
+        Constants.inWhichFile.append(("",fTo.name))
         return
     
     if parentNode.nodeType == 'android.widget.ListView':
@@ -557,7 +562,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
         fToListView.close()   
         # Append the rest of chils.
         for i in range(len(parentNode.childNodes)):
-            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId))
+            appendNodeXml(parentNode.childNodes[i],myIndex[:-2]+'_'+str(i+specialId),"ListView"+str(parentNode.id),fTo)
     elif parentNode.nodeType == 'android.widget.RadioGroup':
         for i in range(len(parentNode.childNodes)):
             printNodeXml(fTo,parentNode.childNodes[i],parentNode.nodeType,tabs+1,imgH,actionBarOp,myIndex[:-2]+'_'+str(i+specialId))
@@ -576,7 +581,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
             Constants.myParentColor = parentNode.childNodes[0].backgroundColor
             fToActionBar.write(fileOuput) 
             for i in range(0,len(parentNode.childNodes[0].childNodes)):
-                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i))
+                printNodeXml(fToActionBar,parentNode.childNodes[0].childNodes[i],parentNode.childNodes[0].nodeType,1,imgH,actionBarOp,myIndex+'_'+str(0)+'_'+str(i),insideActionBar=True)
             fToActionBar.write("</LinearLayout>"+'\n')    
             fToActionBar.close() 
             idd = 1
@@ -613,6 +618,7 @@ def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp):
     Constants.predictedToGui = []
     Constants.idToGui = []
     Constants.xmlFilesToGui = []
+    Constants.inWhichFile = []
     parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img)        
     mapToXml(parentNode,appName,img.shape[0],actionBarOp)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
@@ -623,6 +629,7 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
     Constants.predictedToGui = []
     Constants.idToGui = []
     Constants.xmlFilesToGui = []
+    Constants.inWhichFile = []
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
@@ -681,7 +688,7 @@ def groupRadio(groupedNodes,imgH,img):
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:
-            groupedNodesNew.append(createParentNodeVertical(groupedNodes[i],imgH,'android.widget.RadioGroup',img,True))
+            groupedNodesNew.append(createParentNodeVertical([groupedNodes[i]],imgH,'android.widget.RadioGroup',img,True))
             i+=1
             continue        
         lastIndex = getLastPatternIndex(i,groupedNodes,patternToSearch)

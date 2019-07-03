@@ -1,4 +1,6 @@
-'''
+import os
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/feryal/Documents/GP/UI2XML/data/UI2XML-f9d1f0273970.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/UI2XML-f9d1f0273970.json"
 from google.cloud import vision
 
 client = vision.ImageAnnotatorClient()
@@ -22,6 +24,6 @@ def extractText(content):
         h = abs(y-vert[2][1])
         txtBoxes.append([x,y,w,h])
     return textExtracted,txtBoxes
-'''
+
 
     

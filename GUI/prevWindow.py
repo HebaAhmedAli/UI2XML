@@ -29,7 +29,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 ['ImageButton', 'ImageView', 'EditText', 'EditText', 'ImageView', 'EditText', 'EditText'],
                 ["activity.xml"]],
                 
-                'switchAS.png': [[[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
+                'switchND.png': [[[26, 28, 41, 31], [117, 25, 105, 36], [555, 25, 17, 37], [228, 125, 145, 144], [173, 281, 255, 50], [129, 337, 341, 38],
                 [0, 426, 300, 63], [26, 509, 41, 41], [117, 513, 204, 31], [21, 604, 51, 38], [116, 606, 239, 32], [500, 600, 74, 47], [28, 695, 37, 43],
                 [117, 699, 159, 32], [506, 695, 73, 44],[0, 799, 300, 63], [25, 881, 44, 43], [116, 885, 184, 32]],
                 ['ImageView_0_0_0', 'TextView_0_0_1', 'ImageView_0_0_2', 'ImageView_0_1_0', 'TextView_0_2_0', 'TextView_0_3_0', 'TextView_0_4_0',
@@ -152,7 +152,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.updateBtn.setEnabled(False)
 
     def updateXMLTab(self, xmlFiles):
-        xmlDir = Constants.imagesPath + "/output/main/res/layout"
+        xmlDir = Constants.imagesPath[:-5] + Constants.androidPath + "/res/layout"
         self.activeImgXMLtabs = []
         for xmlFile in xmlFiles:
             tab = xmlTab()

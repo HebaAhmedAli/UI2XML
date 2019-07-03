@@ -7,6 +7,7 @@ import GUI.skelCreateProjDialog as skelCreateProjDialog
 import GUI.utils as utils
 import os
 import Constants
+import shutil
 
 class createProjectDialog(QDialog, skelCreateProjDialog.Ui_Dialog):
 
@@ -20,17 +21,25 @@ class createProjectDialog(QDialog, skelCreateProjDialog.Ui_Dialog):
         self.createProjectBtn.clicked.connect(self.startProject)
 
     def startProject(self):
+        '''
         if(len(str(self.projectNameLine.text()).strip())==0):
             self.warningLbl.setText("Insert Project Name, please!")
             return
+        '''
         if(len(str(self.projectDirectoryL.text()).strip())==0):
             self.warningLbl.setText("Insert project Directory, please!")
             return
         if(not os.path.exists(self.projectDirectoryL.text())):
             self.warningLbl.setText("Insert correct project Directory, please!")
             return
-        Constants.PROJECT_NAME = str(self.projectNameLine.text()).strip()
+        directory = str(self.projectDirectoryL.curDir)
+        Constants.PROJECT_NAME = directory.split('/')[-1]
+        if os.path.exists(directory+'/temp'):
+            shutil.rmtree(directory+'/temp')
+            os.makedirs(directory+'/temp')
+        else:
+            os.makedirs(directory+'/temp')
+        Constants.imagesPath = directory+'/temp'
         Constants.PACKAGE = str(self.packageNameLine.text()).strip()
-        Constants.imagesPath = str(self.projectDirectoryL.curDir)+'/'+ Constants.PROJECT_NAME
         Constants.designMode = str(self.designComboBox.currentText())
         self.close()
