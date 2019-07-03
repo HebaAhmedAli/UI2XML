@@ -9,38 +9,89 @@ import Preprocessing
 import numpy as np
 import cv2
 import Constants
+import time
+from multiprocessing import Process,Manager
+import math
+
 heightThrshold1 = 20
 heightThrshold2 = 40
 margin = 10
 
+def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcesses,index):
+    height=image.shape[0]
+    width=image.shape[1]
+    for x,y,w,h in extratctedBoxesPart:
+        croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
+        text = TextExtraction.extractText(croppedImage)
+        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
+        resizedImg = cv2.resize(croppedImage, (150,150))
+        colorFeatures = Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
+        edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
+        # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
+        linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
+        resizeRatios = Utils.getResizeRatios(croppedImage)
+        hogFeature = Utils.descripeHog(grayImgResized)
+        gray5Feature = Utils.describe5Gray(grayImgResized)
+        lbpFeature = Utils.describeLBP(grayImgResized)
+        featuresProcesses[index]=[text,colorFeatures,linesEdgeFeatures,resizeRatios,hogFeature,gray5Feature,lbpFeature]
+        index+=1
+    
+        
+def createProcess(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcesses,index):
+    process = Process(target=extractFeatures, args=(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcesses,index))
+    return (process,index)
 
 # Extract the boxes and text from given image -extracted components- and predict them.
 def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
+    start0 = time.time()
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
+    print("timeBoxesExtraction = ",time.time()-start0)
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
+    timeExtractText = time.time()
+    manager=Manager()
+    # Initialize the vectors of each image with empty vector(this vector is shared between processes)
+    featuresProcesses=manager.list()
+    for i in range(len(extratctedBoxes)):
+        featuresProcesses.append([])
+    step = int(math.ceil(len(extratctedBoxes)/float(Constants.PROCESSES_NO)))
+    processes = [createProcess(image,imageCopy,imageXML,extratctedBoxes[i*step:min(i*step+step,len(extratctedBoxes))],featuresProcesses,i*step) for i in range(Constants.PROCESSES_NO)]
+    for p in processes:
+        p[0].start()
+    for p in processes:
+        p[0].join()
+        p[0].terminate()
+    print("time timeExtractText = ",time.time()-timeExtractText)
+    # featuresProcesses[i][0] features
+    # featuresProcesses[i][1] ifSquare
+    # featuresProcesses[i][2] circularity
+    # featuresProcesses[i][3] slopedLines
+    # featuresProcesses[i][4] text
     height=image.shape[0]
     width=image.shape[1]
-    for x,y,w,h in extratctedBoxes:
+    timePrediction = time.time()
+    for i in range(len(extratctedBoxes)):
         features = []
+        x,y,w,h = extratctedBoxes[i]
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
         resizedImg = cv2.resize(croppedImage, (150,150))
-        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
-        text = TextExtraction.extractText(croppedImage)
         textFeature = 0
+        text = featuresProcesses[i][0]
         if text != "":
             textFeature = 1
-        features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
+        features += featuresProcesses[i][1]
         features.append(textFeature)
-        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg)
+        shpeFeatuesList,slopedLines = extractShapeFeatures(croppedImage,resizedImg,featuresProcesses[i])
         features += shpeFeatuesList
         ifSquare = features[-6]
         circularity = features[-5]
         prediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
         prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model)
         pedictedComponents.append(prediction)
-        extractedText.append(TextExtraction.extractText(croppedImage))
+        extractedText.append(text)
+    print("Time for features and prediction = ",time.time()-timePrediction)
+    del featuresProcesses
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
@@ -58,20 +109,19 @@ def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLine
             return 'android.widget.RadioButton'
     return prediction
 
-def extractShapeFeatures(img,resizedImg):
+def extractShapeFeatures(img,resizedImg,featuresProcessesI):
     allShapeFeatures = []
     edges,_=Preprocessing.preProcessEdges(img)
     edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
     # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
-    linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
-    allShapeFeatures += linesEdgeFeatures
-    slopedLines = linesEdgeFeatures[-1]
+    allShapeFeatures += featuresProcessesI[2]
+    slopedLines = featuresProcessesI[2][-1]
     # widthResizingRatio, hightResizingRatio
-    allShapeFeatures += Utils.getResizeRatios(img)
+    allShapeFeatures += featuresProcessesI[3]
     # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
-    allShapeFeatures += Utils.describeLBP(grayImgResized)
-    allShapeFeatures += Utils.descripeHog(grayImgResized)
-    allShapeFeatures += Utils.describe5Gray(grayImgResized)
+    allShapeFeatures += featuresProcessesI[6]
+    allShapeFeatures += featuresProcessesI[4]
+    allShapeFeatures += featuresProcessesI[5]
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1

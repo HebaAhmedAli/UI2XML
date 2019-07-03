@@ -72,5 +72,6 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         for xmlFile in xmlFiles:
             tab = xmlTab()
             text=open(str(xmlDir+"/"+xmlFile)).read()
+            print(text)
             tab.textBrowser.setPlainText(text)
             self.xmlTabs.addTab(tab, xmlFile[:-4])

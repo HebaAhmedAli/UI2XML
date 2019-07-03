@@ -21,7 +21,7 @@ def filterAndConstructXml(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManual
     xmlFilesToGui=[]
     inWhichFile=[]
     parentNodesForGui = XmlGeneration.generateXml(boxesFiltered,textsFiltered,predictedComponentsFiltered,imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
-    Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
     #parentNodesForGui = XmlGeneration.updateXml(parentNodesForGui,[[19, 18, 44, 42]],['android.widget.'+"TextView"],['ImageView_0_16_1_0_1'],imgXML,file[:-6],file[len(file)-6])
     if Constants.DEBUG_MODE == True :
         height= imgCopy.shape[0]
@@ -49,6 +49,8 @@ def createProcess(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,p
     process = Process(target=filterAndConstructXml, args=(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents))
     return process
 
+
+
 def processImage(subdir, file,model,invVocab):
     img = cv2.imread(subdir+'/' +file)
     imgCopy = copy.copy(img)
@@ -66,23 +68,6 @@ def processImage(subdir, file,model,invVocab):
     # open Process
     return createProcess(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents)
 
-def updateImage(subdir,file,valMapFromGui):
-    imgXML = image.load_img(subdir+'/' +file)
-    imgXML = np.array(imgXML,dtype='float32')  
-    file = file.replace('.jpeg','.jpg')  
-    if file[len(file)-5] == 'D':
-        Constants.DYNAMIC=True
-    else:
-        Constants.DYNAMIC=False
-    boxToGui=[]
-    predictedToGui=[]
-    idToGui=[]
-    xmlFilesToGui=[]
-    inWhichFile=[]
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
-    Constants.mapToGui.update( {file : (boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui)})
-        
-
 def processAllImages(imagesPath,model,invVocab):
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
@@ -98,25 +83,50 @@ def processAllImages(imagesPath,model,invVocab):
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             process = processImage(imagesPath, file,model,invVocab)
             processes.append(process)
-            print("append")
     for p in processes:
         p.start()
-    print("after start")
     for p in processes:
         p.join()
-        print("after join")
         p.terminate()
-    print("after term")
+        
+def updateImage(subdir,file,valMapFromGui):
+    imgXML = image.load_img(subdir+'/' +file)
+    imgXML = np.array(imgXML,dtype='float32')  
+    file = file.replace('.jpeg','.jpg')  
+    if file[len(file)-5] == 'D':
+        Constants.DYNAMIC=True
+    else:
+        Constants.DYNAMIC=False
+    boxToGui=[]
+    predictedToGui=[]
+    idToGui=[]
+    xmlFilesToGui=[]
+    inWhichFile=[]
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+
+def createUpdateProcess(subdir,file,valMapFromGui):
+    process = Process(target=updateImage, args=(subdir,file,valMapFromGui))
+    return process       
 
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
-    mapUpdatedFromGui = {"drND.png":([[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drND.png")[4],Constants.mapToGui.get("drND.png")[5])}
-    Constants.mapToGui = {}
+    mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
+    manager=Manager()
+    # Initialize the vectors of each image with empty vector(this vector is shared between processes)
+    Constants.mapToGui=manager.dict()
+    processes = []
     for (key, val) in mapUpdatedFromGui.items(): 
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            updateImage(imagesPath, key,val)
+            process = createUpdateProcess(imagesPath,key,val)
+            processes.append(process)
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+        p.terminate()
             
 # UI2XMLclassification_224_245000_99_93
 # UI2XMLclassificationAlex_224_245000_99_92 adam with 224 * 224
@@ -132,6 +142,7 @@ imagesPath='data/ScreenShots/ourTest'
 startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
+
 '''
 print(Constants.mapToGui,'\n')
 print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')

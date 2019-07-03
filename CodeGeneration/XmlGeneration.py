@@ -547,7 +547,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     
     if parentNode.nodeType == 'android.widget.ListView':
         fToListView=open(Constants.DIRECTORY+'/res/layout/'+'list_view'+str(Constants.listId)+'_'+myIndex+'.xml', 'w+')
-        Constants.xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
+        xmlFilesToGui.append('list_view'+str(Constants.listId)+'_'+myIndex+'.xml')
         Constants.listId += 1
         fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
         '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
@@ -569,7 +569,7 @@ def printNodeXml(fTo,parentNode,myParentType,tabs,imgH,actionBarOp,myIndex,speci
     else:
         if actionBarOp == 'A' and tabs == 0:
             fToActionBar=open(Constants.DIRECTORY+'/res/layout/'+'action_bar_'+myParentType+'.xml', 'w+')
-            Constants.xmlFilesToGui.append('action_bar_'+myParentType+'.xml')
+            xmlFilesToGui.append('action_bar_'+myParentType+'.xml')
             fileOuput = '<?xml version = "1.0" encoding = "utf-8"?>\n'+\
                 '<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"\n'\
                 +'\t'+'xmlns:app = "http://schemas.android.com/apk/res-auto"\n'\
@@ -607,7 +607,7 @@ def mapToXml(parentNode,appName,imgH,actionBarOp,boxToGui,predictedToGui,idToGui
     if not os.path.exists(Constants.DIRECTORY+'/res/layout'):
             os.makedirs(Constants.DIRECTORY+'/res/layout') 
     fTo=open(Constants.DIRECTORY+'/res/layout/'+'activity_'+appName+'.xml', 'w+')
-    Constants.xmlFilesToGui.append('activity_'+appName+'.xml')
+    xmlFilesToGui.append('activity_'+appName+'.xml')
     Constants.noOfLayouts = len(parentNode.childNodes)
     printNodeXml(fTo,parentNode,appName,0,imgH,actionBarOp,"0",boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile)
     return

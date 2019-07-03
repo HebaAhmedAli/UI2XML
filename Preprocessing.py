@@ -1,10 +1,10 @@
-from keras.preprocessing import image
 import Constants as Constants
 import numpy as np
 import cv2
 
 
 def imageReadAndPreprocessingClassification(imgPath=None,imagee=None):
+        from keras.preprocessing import image
         if imgPath!=None:
             img = image.load_img(imgPath, target_size = (Constants.IMAGE_SIZE_CLASSIFICATION,Constants.IMAGE_SIZE_CLASSIFICATION))
         else:
