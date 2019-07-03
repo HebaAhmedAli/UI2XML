@@ -131,6 +131,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
             # self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds)})
             #     Constants.mapToGui.get(imgName)[4], Constants.mapToGui.get(imgName)[5]]})
+
     def viewCompDetails(self, index, compName):
         self.compTypeComboBox.setEnabled(True)
         compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
@@ -189,4 +190,33 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def generateUpdatedXML(self):
         self.updateMapAfterCorrecting()
+        # for comp in self.highlights:
+        #     comp.setParent(None)
+        #     del comp
+        # for activ in self.activitysHLayouts:
+        #     activ.imageLabel.setParent(None)
+        #     activ.imageNameLine.setParent(None)
+        #     activ.viewImg.setParent(None)
+        #     activ.setParent(None)
+        #     del activ.imageLabel
+        #     del activ.imageNameLine
+        #     del activ
+        # for tab in self.activeImgXMLtabs:
+        #     tab.setParent(None)
+        #     del tab
+        # self.imageLabel.setParent(None)
+        # # self.activitysScrollArea.setParent(None)
+        # # self.activityListVerticalLayoutWidget.setParent(None)
+        # del self.pixmapimage
+        # self.activeImageLayout.removeWidget(self.imageLabel)
+        # self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        # self.listScrolVerticalLayout.removeWidget(self.scrollArea)
+        # self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
+        # del self.imageLabel
+        # del self.activeImageLayout
+        # del self.xmlTabsverticalLayout
+        # del self.xmlTabs
+        # del self.activeImgverticalLayout
+        # del self.scrollArea
+        # del self.listScrolVerticalLayout
         return self.mapAfterCorrecting
