@@ -34,7 +34,6 @@ class activityListItem(QHBoxLayout):
 
     def send(self):
         self.activate.emit(self.imgpath)
-        print("yasatr")
 
 class xmlTab(QWidget):
     def __init__(self):
