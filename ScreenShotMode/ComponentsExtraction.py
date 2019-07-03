@@ -32,7 +32,8 @@ def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcess
         resizeRatios = Utils.getResizeRatios(croppedImage)
         hogFeature = Utils.descripeHog(grayImgResized)
         gray5Feature = Utils.describe5Gray(grayImgResized)
-        featuresProcesses[index]=[text,colorFeatures,linesEdgeFeatures,resizeRatios,hogFeature,gray5Feature]
+        lbpFeature = Utils.describeLBP(grayImgResized)
+        featuresProcesses[index]=[text,colorFeatures,linesEdgeFeatures,resizeRatios,hogFeature,gray5Feature,lbpFeature]
         index+=1
     
         
@@ -118,7 +119,7 @@ def extractShapeFeatures(img,resizedImg,featuresProcessesI):
     # widthResizingRatio, hightResizingRatio
     allShapeFeatures += featuresProcessesI[3]
     # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
-    allShapeFeatures += Utils.describeLBP(grayImgResized)
+    allShapeFeatures += featuresProcessesI[6]
     allShapeFeatures += featuresProcessesI[4]
     allShapeFeatures += featuresProcessesI[5]
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
