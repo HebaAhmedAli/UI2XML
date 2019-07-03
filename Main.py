@@ -21,7 +21,7 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.startUp()
         self.createUploadUI()
         self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
-
+        self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
 
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -35,15 +35,20 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
         self.mainDialoge.activateWindow()
+        self.mainDialoge.createProjectBtn.clicked.connect(self.enableRun)
+
+    def enableRun(self):
+        self.actionGenerateXML.setEnabled(True)
 
     def processImagesAccToMode(self):
         del self.mainDialoge
         self.uploadWidget.populateProjDir()
-        prev = prevWindow.previewWindow(self)
-        # self.centralwidget.setLayout(None)
+        self.actionGenerateXML.setEnabled(False)
+        self.actionUpdateCmpts.setEnabled(True)
+        self.prev = prevWindow.previewWindow(self)
         del self.uploadWidget.layoutScroll
         del self.uploadWidget
-        self.lay.addLayout(prev.mainHLayout)
+        self.lay.addLayout(self.prev.mainHLayout)
         return
         if Constants.designMode == Constants.DESIGN_MODES[0]:
             vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
@@ -54,3 +59,11 @@ class mainScreen (QMainWindow, skelMainscreen.Ui_mainWindow):
         '''
         else:    # TODO : Call psd.
         '''
+
+    def regenerateXMLafterCorrection(self):
+        updatedMap = self.prev.generateUpdatedXML()
+        # self.prev.mainHLayout.setParent(None)
+        # del self.prev.mainHLayout
+        # del self.prev
+        # self.prev = prevWindow.previewWindow(self)
+        # self.actionConnectCmpts.setEnabled(True)

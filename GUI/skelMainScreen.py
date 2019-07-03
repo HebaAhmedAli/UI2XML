@@ -136,5 +136,9 @@ class Ui_mainWindow(object):
         self.actionFinish.setText(_translate("mainWindow", "Finish"))
         self.actionFinish.setShortcut(_translate("mainWindow", "F8"))
         self.actionView_Doccument.setText(_translate("mainWindow", "View Doccument"))
+        self.actionGenerateXML.setEnabled(False)
+        self.actionConnectCmpts.setEnabled(False)
+        self.actionUpdateCmpts.setEnabled(False)
+
 
 #import icons_rc
