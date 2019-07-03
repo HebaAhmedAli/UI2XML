@@ -22,27 +22,9 @@ def extractFeatures(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcess
     height=image.shape[0]
     width=image.shape[1]
     for x,y,w,h in extratctedBoxesPart:
-        features = []
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        resizedImg = cv2.resize(croppedImage, (150,150))
-        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
         text = TextExtraction.extractText(croppedImage)
-        print("after extract shape text")
-        textFeature = 0
-        if text != "":
-            textFeature = 1
-        features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
-        features.append(textFeature)
-        shpeFeatuesList,slopedLines = extractShapeFeatures(copy.copy(croppedImage),copy.copy(resizedImg))
-        print("after extract shape feature")
-        features += shpeFeatuesList
-        ifSquare = features[-6]
-        circularity = features[-5]
-        featuresProcesses[index].append(features)
-        featuresProcesses[index].append(ifSquare)
-        featuresProcesses[index].append(circularity)
-        featuresProcesses[index].append(slopedLines)
-        featuresProcesses[index].append(text)
+        featuresProcesses[index]=text
         index+=1
     
         
@@ -58,23 +40,21 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
-    timeExtractFeatures = time.time()
+    timeExtractText = time.time()
     manager=Manager()
     # Initialize the vectors of each image with empty vector(this vector is shared between processes)
     featuresProcesses=manager.list()
     for i in range(len(extratctedBoxes)):
-        featuresProcesses.append([])
+        featuresProcesses.append("")
     step = int(math.ceil(len(extratctedBoxes)/float(Constants.PROCESSES_NO)))
-    processes = [createProcess(image,imageCopy,imageXML,extratctedBoxes[i*step:i*step+step],featuresProcesses,i) for i in range(Constants.PROCESSES_NO)]
+    processes = [createProcess(image,imageCopy,imageXML,extratctedBoxes[i*step:min(i*step+step,len(extratctedBoxes))],featuresProcesses,i) for i in range(Constants.PROCESSES_NO)]
     for p in processes:
         p[0].start()
-        print("start")
     for p in processes:
         p[0].join()
         print("join")
         p[0].terminate()
-        print("terminate")
-    print(time.time()-timeExtractFeatures)
+    print("time timeExtractText = ",time.time()-timeExtractText)
     # featuresProcesses[i][0] features
     # featuresProcesses[i][1] ifSquare
     # featuresProcesses[i][2] circularity
@@ -84,13 +64,26 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     width=image.shape[1]
     timePrediction = time.time()
     for i in range(len(extratctedBoxes)):
+        features = []
         x,y,w,h = extratctedBoxes[i]
         croppedImage = imageCopy[max(0,y - margin):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
-        prediction = Model.makeAprediction(invVocab,np.array(featuresProcesses[i][0],dtype='float32'),croppedImage,model)
-        prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,featuresProcesses[i][1],featuresProcesses[i][2],featuresProcesses[i][3],featuresProcesses[i][0],invVocab,model)
+        resizedImg = cv2.resize(croppedImage, (150,150))
+        croppedImageColor = imageXML[max(0,y):min(height,y + h), max(x,0):min(width,x + w)]
+        textFeature = 0
+        text = featuresProcesses[i]
+        if text != "":
+            textFeature = 1
+        features += Utils.getNoOfColorsAndBackGroundRGB(croppedImageColor)
+        features.append(textFeature)
+        shpeFeatuesList,slopedLines = extractShapeFeatures(copy.copy(croppedImage),copy.copy(resizedImg))
+        features += shpeFeatuesList
+        ifSquare = features[-6]
+        circularity = features[-5]
+        prediction = Model.makeAprediction(invVocab,np.array(features,dtype='float32'),croppedImage,model)
+        prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model)
         pedictedComponents.append(prediction)
-        extractedText.append(featuresProcesses[i][4])
-    print(time.time()-timePrediction)
+        extractedText.append(text)
+    print("Time for features and prediction = ",time.time()-timePrediction)
     del featuresProcesses
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
@@ -113,22 +106,16 @@ def extractShapeFeatures(img,resizedImg):
     allShapeFeatures = []
     edges,_=Preprocessing.preProcessEdges(img)
     edgesResized,grayImgResized = Preprocessing.preProcessEdges(resizedImg)
-    print("after preprocessing")
     # normalizedNoOfEdges, normalizedNoOfLines, maxHorzLineLength/150, noOfSlopedLines/noOfLines
     linesEdgeFeatures =  Utils.getLinesEdgesFeatures(edgesResized)
-    print("after lines")
     allShapeFeatures += linesEdgeFeatures
     slopedLines = linesEdgeFeatures[-1]
     # widthResizingRatio, hightResizingRatio
     allShapeFeatures += Utils.getResizeRatios(img)
-    print("after resize ratio")
     # LBP hist, HOG hist(hist of gradients 8 directions), 5 gray hist range.
     allShapeFeatures += Utils.describeLBP(grayImgResized)
-    print("after lbp")
     allShapeFeatures += Utils.descripeHog(grayImgResized)
-    print("after hog")
     allShapeFeatures += Utils.describe5Gray(grayImgResized)
-    print("after 5gray")
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1
@@ -137,7 +124,6 @@ def extractShapeFeatures(img,resizedImg):
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
     allShapeFeatures += Utils.detectShapeAndFeature(cnt)
-    print("after detect")
     return allShapeFeatures,slopedLines
         
 def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageCopy,model,invVocab):
