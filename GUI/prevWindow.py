@@ -142,11 +142,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.compOriginalLbl.setText(compName)
         self.changedCompIdx = index
         self.changedCompName = compName
-        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
-        imgName = self.activeImgDir[startI:]
         # componentXML = Utils.getXmlOfComponent(index, imgName)
-        curTab = self.xmlTabs.currentWidget()
-        curTab.compXMLBrowser.setPlainText("YAAAAAAAAAAA\nAAAAAAAAAAAA\nAAAAAAAAAAA\nAAAAA\nLAAAAAAAAAAAAAAA")
+        # curTab = self.xmlTabs.currentWidget()
+        for tab in self.activeImgXMLtabs:
+            tab.compXMLBrowser.setPlainText("YAAAAAAAAAAA\nAAAAAAAAAAAA\nAAAAAAAAAAA\nAAAAA\nLAAAAAAAAAAAAAAA")
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
