@@ -63,8 +63,10 @@ def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLine
     if ifSquare:
         if slopedLines > 2 and slopedLines < 4:
             return 'android.widget.CheckBox'
+    '''
     if prediction == 'android.widget.CheckBox' and (not(slopedLines > 2 and slopedLines < 4) or not ifSquare):
         return 'android.widget.ImageView'
+    '''
     if circularity != 0 and (prediction == 'android.widget.ImageView' or prediction == 'android.widget.ImageButton'):
         x,y,w,h = box
         marginNew = 5

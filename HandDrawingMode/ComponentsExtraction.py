@@ -122,7 +122,7 @@ def getAllText(boxesInBacket,textsInBacket):
         if textsInBacketCopy[i] != "":
             text += (textsInBacketCopy[i] + " ")
     return text
-
+'''
 # For testing.
 appDict = {
 "loadingND.jpg":
@@ -174,3 +174,4 @@ appDict = {
 def getFromAppName(appName):
     return appDict[appName][0],appDict[appName][1]
 # 1126,754,287,64
+'''

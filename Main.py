@@ -23,7 +23,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.createUploadUI()
         self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
-
+        
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
         self.lay = QHBoxLayout()
@@ -42,8 +42,9 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionGenerateXML.setEnabled(True)
 
     def processImagesAccToMode(self):
-        del self.mainDialoge
-        self.uploadWidget.populateProjDir()
+        error = self.uploadWidget.populateProjDir() 
+        if error==-1:
+            return
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
@@ -57,8 +58,6 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
             model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
             Psd.processAllPsds(Constants.imagesPath, model, invVocab)
         self.prev = prevWindow.previewWindow(self)
-        del self.uploadWidget.layoutScroll
-        del self.uploadWidget
         self.lay.addLayout(self.prev.mainHLayout)
         
        
