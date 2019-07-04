@@ -176,6 +176,12 @@ def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBac
                 if Utils.isSliceList(keyStrings[j].split(),lowerStrings):
                     predictedComponentsInBacket[0]='android.widget.Button'
                     return True
+            if textsInBacket[0]!="":
+                 predictedComponentsInBacket[0]='android.widget.TextView'
+                 return True
+            else:
+                predictedComponentsInBacket[0]='android.widget.ImageView'
+                return True
         return False
     else:
         return True
