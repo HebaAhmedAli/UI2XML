@@ -26,6 +26,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
         self.actionFinish.triggered.connect(self.connectActivitiesResult)
+        self.actionExit.triggered.connect(self.endProg)
 
 
     def createUploadUI(self):
@@ -92,6 +93,9 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.state = "ConnectCmpts"
 
     def connectActivitiesResult(self):
+        self.actionFinish.setEnabled(False)
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
-        # self.close()
+    
+    def endProg(self):
+        exit()

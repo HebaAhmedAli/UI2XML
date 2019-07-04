@@ -5,9 +5,7 @@ import os
 import copy
 import numpy as np
 import time
-from keras.models import load_model
 from keras.preprocessing import image
-import LoadDataClassification
 import ScreenShotMode.ComponentsExtraction as ComponentsExtraction
 import CodeGeneration.XmlGeneration as XmlGeneration
     
