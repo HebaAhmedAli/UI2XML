@@ -71,6 +71,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.connectBtn.setEnabled(False)
 
         if self.connectBtnState :
+            endI = imgName.rfind('.', 0, len(imgName))
+            self.connectingActivityLbl.setText(imgName[:endI-2]+imgName[endI:])
             startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
             activeImgName = self.activeImgDir[startI:]
             self.mapConnect.update({self.highlights[self.changedCompIdx].idName:[activeImgName, imgName]})
@@ -83,13 +85,21 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if self.state == "UpdateCmpts":
                 self.updateMapAfterCorrecting(self.activeImgDir)
             self.compOriginalLbl.setText("")
-            self.compTypeComboBox.setEnabled(False)
             self.clearActiveImg()
             self.activeImgDir = imgPath
+            if self.state == "UpdateCmpts":
+                self.compTypeComboBox.setEnabled(False)
+                self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
+                self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
+                    "border: 5px solid  rgb(66, 138, 255);\n"
+                    "color: rgb(45, 123, 250);\n"
+                    "font-weight: bold;\n"
+                    "border-radius: 20%;")                 
+                self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
 
             self.updateActiveImg(imgPath)
             self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
-            self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
+            self.xmlTabsHLayout.addWidget(self.xmlTabs)
             self.updateXMLTab(self.imgsOutputInfo[imgName][3])
 
     def updateMapAfterCorrecting(self, imgpath):
@@ -129,22 +139,19 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
             if compIdxinList >= 0:
                 self.compTypeComboBox.setCurrentIndex(compIdxinList)
+            startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+            imgName = self.activeImgDir[startI:]
+            componentXML = Utils.getXmlOfComponent(index, imgName)
+            self.compXMLBrowser.setPlainText(componentXML)
         elif (self.state == "ConnectCmpts"):
             self.connectBtnState = False
             for activ in self.activitysHLayouts:
                 activ.viewImg.setText("View")
                 activ.viewImg.setEnabled(True)
-            self.compTypeComboBox.setEnabled(False)
             self.connectBtn.setEnabled(True)
 
         self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
-        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
-        imgName = self.activeImgDir[startI:]
-        componentXML = Utils.getXmlOfComponent(index, imgName)
-        # curTab = self.xmlTabs.currentWidget()
-        for tab in self.activeImgXMLtabs:
-            tab.compXMLBrowser.setPlainText(componentXML)
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
@@ -202,7 +209,16 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def connectCmptsStart(self):
         self.state = "ConnectCmpts"
-        self.mapConnect = {}   
+        self.mapConnect = {}
+        self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
+        del self.compXMLBrowser
+
+        self.compTypeComboBox.setParent(None)
+        del self.compTypeComboBox
+        self.connectingActivityLbl = QtWidgets.QLabel()
+        self.compoBoxLayout.addWidget(self.connectingActivityLbl)
+        self.compNewTypeLbl.setText("Connected To :")
+        self.connectingActivityLbl.setText("")
         self.onViewBtnClicked(self.mainActivityDir)
 
     def convertConnectMapToLists(self):
@@ -218,11 +234,15 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.activeImageLayout.removeWidget(self.imageLabel)
         del self.imageLabel
         self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
+        self.xmlTabsHLayout.removeWidget(self.xmlTabs)
         for tab in self.activeImgXMLtabs:
             tab.setParent(None)
             del tab
         del self.xmlTabs
+        if self.state != "ConnectCmpts": # Connect mode doesn't have component xml browser
+            self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
+            del self.compXMLBrowser
+
 
     def refreshWindowAfterUpdate(self):
         for (key, val) in Constants.mapToGui.items():

@@ -55,13 +55,6 @@ def processImage(subdir, file,model,invVocab):
         j=0
         edit = 0
         for x,y,w,h in boxesFiltered:
-            # testing: print the cropped in folder
-            '''
-            if predictedComponentsFiltered[j] == "android.widget.EditText":
-                edit = 10
-            else:
-                edit = 0
-            '''
             crop_img = imgCopy[max(0,y - margin - edit):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
             fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
@@ -81,6 +74,7 @@ def updateImage(subdir,file,valMapFromGui):
         
 
 def processAllImages(imagesPath,model,invVocab):
+    startTime = time.time()
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
@@ -89,9 +83,11 @@ def processAllImages(imagesPath,model,invVocab):
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            startTime = time.time()
+            start = time.time()
             processImage(imagesPath, file,model,invVocab)
-            print("Time for "+file+" = ",time.time()-startTime)
+            print("Time for "+file+" = ",time.time()-start)
+    print("Total time = ",time.time()-startTime)
+
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
@@ -101,6 +97,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
+    print(Constants.mapToGui)
             
 # UI2XMLclassification_224_245000_99_93
 # UI2XMLclassificationAlex_224_245000_99_92 adam with 224 * 224

@@ -13,9 +13,23 @@ class previewWindowSkel(object):
     def setupUi(self, prev):
         self.mainHLayout = QtWidgets.QHBoxLayout()
         self.xmlTabsverticalLayoutWidget = QtWidgets.QWidget(prev)
-        self.xmlTabsverticalLayout = QtWidgets.QVBoxLayout()
+        self.allxmlVerticalLayout = QtWidgets.QVBoxLayout()
+        self.xmlTabsHLayout = QtWidgets.QHBoxLayout()
         self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
-        self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
+        self.xmlTabsHLayout.addWidget(self.xmlTabs)
+
+        self.xmlcomponentHLayout = QtWidgets.QHBoxLayout()
+        self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
+        self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
+            "border: 5px solid  rgb(66, 138, 255);\n"
+            "color: rgb(45, 123, 250);\n"
+            "font-weight: bold;\n"
+            "border-radius: 20%;")
+        # self.compXMLBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*0.3, Constants.MONITOR_HEIGHT*0.65))
+        self.compXMLBrowser.setAlignment(QtCore.Qt.AlignCenter)                      
+        self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
+        self.allxmlVerticalLayout.addLayout(self.xmlTabsHLayout)
+        self.allxmlVerticalLayout.addLayout(self.xmlcomponentHLayout)
 
         self.activeImgVerticalLayoutWidget = QtWidgets.QWidget(prev)
         self.activeImgverticalLayout = QtWidgets.QVBoxLayout()
@@ -42,7 +56,7 @@ class previewWindowSkel(object):
         self.verticalLayoutWidget = QtWidgets.QWidget()
         self.lblVLayout = QtWidgets.QVBoxLayout()
         self.compTypeLbl = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.compTypeLbl.setText("Component Name:")
+        self.compTypeLbl.setText("Component Type:")
         self.lblVLayout.addWidget(self.compTypeLbl)
         self.compNewTypeLbl = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.compNewTypeLbl.setText("Component New Type:")
@@ -79,4 +93,4 @@ class previewWindowSkel(object):
 
         self.mainHLayout.addLayout(self.rightHLayout)
         self.mainHLayout.addLayout(self.activeImgverticalLayout)
-        self.mainHLayout.addLayout(self.xmlTabsverticalLayout)
+        self.mainHLayout.addLayout(self.allxmlVerticalLayout)

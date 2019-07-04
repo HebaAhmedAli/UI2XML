@@ -5,7 +5,10 @@ import os
 
 def addIntentToJava(buttonsToActivities):
     for buttonId,fromActivity,toActivity in buttonsToActivities:
-        buttonId = buttonId[7:]
+        if "Image" in buttonId:
+            buttonId = buttonId[12:]
+        else:
+            buttonId = buttonId[7:]
         fromActivity = fromActivity[:-6]
         fromActivityFile = Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
         toActivity = toActivity[:-6]

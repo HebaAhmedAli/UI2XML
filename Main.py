@@ -26,6 +26,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
         self.actionFinish.triggered.connect(self.connectActivitiesResult)
+        self.actionExit.triggered.connect(self.endProg)
 
 
     def createUploadUI(self):
@@ -40,9 +41,13 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.mainDialoge.show()
         self.mainDialoge.activateWindow()
         self.mainDialoge.createProjectBtn.clicked.connect(self.enableRun)
+        self.statusbar.clearMessage()
+        self.statusbar.showMessage("Choose the Android Studio project you already created")
 
     def enableRun(self):
         self.actionGenerateXML.setEnabled(True)
+        self.statusbar.clearMessage()
+        self.statusbar.showMessage("Drag and Drop or Click to upload your "+ Constants.designMode+ " Files")
 
     def processImagesAccToMode(self):
         error = self.uploadWidget.populateProjDir() 
@@ -60,11 +65,15 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
              vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
              model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
              Psd.processAllPsds(Constants.imagesPath, model, invVocab)
+        self.statusbar.clearMessage()
+        self.statusbar.showMessage("Click on component to know/change its type")
         self.prev = prevWindow.previewWindow(self)
         self.lay.addLayout(self.prev.mainHLayout)
         self.actionConnectCmpts.setEnabled(True)
 
     def regenerateXMLafterCorrection(self):
+        self.statusbar.clearMessage()
+        self.statusbar.showMessage("Continue Updating types or Connect Activities")
         updatedMap = self.prev.generateUpdatedXML()
         self.actionConnectCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
@@ -76,6 +85,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.prev.refreshWindowAfterUpdate()
 
     def connectComponents(self):
+        self.statusbar.showMessage("Choose buttons or image buttons connecting between activities")
         self.actionUpdateCmpts.setEnabled(False)
         self.actionConnectCmpts.setEnabled(False)
         self.actionFinish.setEnabled(True)
@@ -83,6 +93,9 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.state = "ConnectCmpts"
 
     def connectActivitiesResult(self):
+        self.actionFinish.setEnabled(False)
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
-        # self.close()
+    
+    def endProg(self):
+        exit()
