@@ -81,13 +81,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 activ.viewImg.setText("View")
                 if(activ.imgpath == self.activeImgDir):
                     activ.viewImg.setEnabled(True)
+            self.connectingActivityLbl.setText("")
         else:    
             if self.state == "UpdateCmpts":
                 self.updateMapAfterCorrecting(self.activeImgDir)
-            self.compOriginalLbl.setText("")
-            self.clearActiveImg()
-            self.activeImgDir = imgPath
-            if self.state == "UpdateCmpts":
                 self.compTypeComboBox.setEnabled(False)
                 self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
                 self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
@@ -96,6 +93,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                     "font-weight: bold;\n"
                     "border-radius: 20%;")                 
                 self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
+            self.compOriginalLbl.setText("")
+            self.clearActiveImg()
+            self.activeImgDir = imgPath
 
             self.updateActiveImg(imgPath)
             self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
@@ -149,6 +149,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 activ.viewImg.setText("View")
                 activ.viewImg.setEnabled(True)
             self.connectBtn.setEnabled(True)
+            self.connectingActivityLbl.setText("")
 
         self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
