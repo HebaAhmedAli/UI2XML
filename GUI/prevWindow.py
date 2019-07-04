@@ -128,8 +128,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             del component
         self.imgsOutputInfo.get(imgName)[2] = compPreds
         if(len(compCorrectedPreds)>0):
-            #self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
+            if Constants.HAND_DRAWN == True:
              self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
+                Constants.mapToGui.get(imgName)[5],Constants.mapToGui.get(imgName)[6]]})
+            else:
+                self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
                 Constants.mapToGui.get(imgName)[5]]})
 
     def viewCompDetails(self, index, compName):

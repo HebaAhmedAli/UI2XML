@@ -55,13 +55,6 @@ def processImage(subdir, file,model,invVocab):
         j=0
         edit = 0
         for x,y,w,h in boxesFiltered:
-            # testing: print the cropped in folder
-            '''
-            if predictedComponentsFiltered[j] == "android.widget.EditText":
-                edit = 10
-            else:
-                edit = 0
-            '''
             crop_img = imgCopy[max(0,y - margin - edit):min(height,y + h + margin), max(x - margin,0):min(width,x + w + margin)]
             cv2.imwrite(subdir + "/compOutputs"+file[:-4]+'/'+str(j)+'-'+ predictedComponentsFiltered[j] + str(file[len(file)-4:len(file)]),crop_img)
             fTo.write(str(j)+'- '+textsFiltered[j]+" "+str(boxesFiltered[j])+'\n')
@@ -81,7 +74,7 @@ def updateImage(subdir,file,valMapFromGui):
         
 
 def processAllImages(imagesPath,model,invVocab):
-    
+    startTime = time.time()
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
@@ -93,6 +86,8 @@ def processAllImages(imagesPath,model,invVocab):
             start = time.time()
             processImage(imagesPath, file,model,invVocab)
             print("Time for "+file+" = ",time.time()-start)
+    print("Total time = ",time.time()-startTime)
+
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     startTime=time.time()
@@ -111,7 +106,6 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
-
 '''
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
@@ -120,6 +114,7 @@ startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
 '''
+
 '''
 print(Constants.mapToGui,'\n')
 print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
