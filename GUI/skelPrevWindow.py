@@ -56,7 +56,7 @@ class previewWindowSkel(object):
         self.verticalLayoutWidget = QtWidgets.QWidget()
         self.lblVLayout = QtWidgets.QVBoxLayout()
         self.compTypeLbl = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.compTypeLbl.setText("Component Name:")
+        self.compTypeLbl.setText("Component Type:")
         self.lblVLayout.addWidget(self.compTypeLbl)
         self.compNewTypeLbl = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.compNewTypeLbl.setText("Component New Type:")

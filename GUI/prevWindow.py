@@ -35,7 +35,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         projDir = Constants.imagesPath
         mainActivityName = "main"
         for imgName in self.imgsOutputInfo:
-            endI = imgName.rfind('.', 0, len(imgName))
+            endI = imgName.rfind('.', 0, len(imgName))+1
             if(mainActivityName==imgName[:endI-2]):
                 mainActivityName = imgName
             imgDir = projDir+"/"+imgName
@@ -71,6 +71,8 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.connectBtn.setEnabled(False)
 
         if self.connectBtnState :
+            endI = imgName.rfind('.', 0, len(imgName))+1
+            self.connectingActivityLbl.setText(imgName[:endI-2]+imgName[endI:])
             startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
             activeImgName = self.activeImgDir[startI:]
             self.mapConnect.update({self.highlights[self.changedCompIdx].idName:[activeImgName, imgName]})
@@ -83,10 +85,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if self.state == "UpdateCmpts":
                 self.updateMapAfterCorrecting(self.activeImgDir)
             self.compOriginalLbl.setText("")
-            self.compTypeComboBox.setEnabled(False)
             self.clearActiveImg()
             self.activeImgDir = imgPath
             if self.state == "UpdateCmpts":
+                self.compTypeComboBox.setEnabled(False)
                 self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
                 self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
                     "border: 5px solid  rgb(66, 138, 255);\n"
@@ -146,7 +148,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             for activ in self.activitysHLayouts:
                 activ.viewImg.setText("View")
                 activ.viewImg.setEnabled(True)
-            self.compTypeComboBox.setEnabled(False)
+            # self.compTypeComboBox.setEnabled(False)
             self.connectBtn.setEnabled(True)
 
         self.updateBtn.setEnabled(False)
@@ -211,6 +213,13 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.mapConnect = {}
         self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
         del self.compXMLBrowser
+
+        self.compTypeComboBox.setParent(None)
+        del self.compTypeComboBox
+        self.connectingActivityLbl = QtWidgets.QLabel()
+        self.compoBoxLayout.addWidget(self.connectingActivityLbl)
+        self.compNewTypeLbl.setText("Connected To :")
+        self.connectingActivityLbl.setText("")
         self.onViewBtnClicked(self.mainActivityDir)
 
     def convertConnectMapToLists(self):
@@ -231,7 +240,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             tab.setParent(None)
             del tab
         del self.xmlTabs
-        if self.state != "ConnectCmpts":
+        if self.state != "ConnectCmpts": # Connect mode doesn't have component xml browser
             self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
             del self.compXMLBrowser
 
