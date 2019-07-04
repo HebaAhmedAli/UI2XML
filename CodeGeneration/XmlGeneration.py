@@ -631,13 +631,10 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
     Constants.xmlFilesToGui = []
     Constants.inWhichFile = []
     for i in range(len(idUpdated)):
-        print(idUpdated[i],appName)
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])]
-            print(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].nodeType)
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)
-            print(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].nodeType)
         elif len(indices) == 5: # 5 horizontal vertical leaf
             parentNode = parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])]
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])] = createLeafNode(boxUpdated[i],parentNode.text,predictedUpdated[i],img,parentNode.weight)

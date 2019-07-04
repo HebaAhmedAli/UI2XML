@@ -36,7 +36,7 @@ def processImage(subdir, file):
     for i in range(len(Constants.boxToGui)):
         Constants.boxToGui[i] = [Constants.boxToGui[i][0]+myImageBox[0],Constants.boxToGui[i][1]+myImageBox[1],Constants.boxToGui[i][2],Constants.boxToGui[i][3]]
             
-    Constants.mapToGui.update( {file :[Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
+    Constants.mapToGui.update( {file :[Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui,myImageBox]})
     margin = 10
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
@@ -65,8 +65,17 @@ def updateImage(subdir,file,valMapFromGui):
         Constants.DYNAMIC=True
     else:
         Constants.DYNAMIC=False
-    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6])
-    Constants.mapToGui.update( {file : [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui]})
+    # Translate x and y and handle outside range.
+    for i in range(len(valMapFromGui[0])):
+        valMapFromGui[0][i] = [ valMapFromGui[0][i][0]-valMapFromGui[4][0], valMapFromGui[0][i][1]-valMapFromGui[4][1],valMapFromGui[0][i][2], valMapFromGui[0][i][3]]
+            
+    parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6]) 
+    
+    # Translate x and y and handle outside range.
+    for i in range(len(Constants.boxToGui)):
+        Constants.boxToGui[i] = [Constants.boxToGui[i][0]+valMapFromGui[4][0],Constants.boxToGui[i][1]+valMapFromGui[4][1],Constants.boxToGui[i][2],Constants.boxToGui[i][3]]
+     
+    Constants.mapToGui.update( {file: [Constants.boxToGui,Constants.idToGui,Constants.predictedToGui,Constants.xmlFilesToGui,Constants.inWhichFile,parentNodesForGui,valMapFromGui[4]]})
 
 
 def processAllImages(imagesPath):
