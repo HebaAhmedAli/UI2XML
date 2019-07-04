@@ -97,7 +97,6 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
-    print(Constants.mapToGui)
             
 # UI2XMLclassification_224_245000_99_93
 # UI2XMLclassificationAlex_224_245000_99_92 adam with 224 * 224
