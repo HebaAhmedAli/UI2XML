@@ -52,13 +52,13 @@ class xmlTab(QWidget):
         self.textBrowser.setAlignment(Qt.AlignCenter)                      
         vBoxlayout.addWidget(self.textBrowser)
         self.setLayout(vBoxlayout)
-        self.compXMLBrowser = QTextBrowser(self.xmlWidget)
-        self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
-            "border: 5px solid  rgb(66, 138, 255);\n"
-            "color: rgb(45, 123, 250);\n"
-            "font-weight: bold;\n"
-            "border-radius: 20%;")
-        # self.compXMLBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*0.3, Constants.MONITOR_HEIGHT*0.65))
-        self.compXMLBrowser.setAlignment(Qt.AlignCenter)                      
-        vBoxlayout.addWidget(self.compXMLBrowser)
+        # self.compXMLBrowser = QTextBrowser(self.xmlWidget)
+        # self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
+        #     "border: 5px solid  rgb(66, 138, 255);\n"
+        #     "color: rgb(45, 123, 250);\n"
+        #     "font-weight: bold;\n"
+        #     "border-radius: 20%;")
+        # # self.compXMLBrowser.setGeometry(QRect(0, 0, Constants.MONITOR_WIDTH*0.3, Constants.MONITOR_HEIGHT*0.65))
+        # self.compXMLBrowser.setAlignment(Qt.AlignCenter)                      
+        # vBoxlayout.addWidget(self.compXMLBrowser)
         # self.setLayout(vBoxlayout)

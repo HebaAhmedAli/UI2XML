@@ -89,7 +89,14 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
             self.updateActiveImg(imgPath)
             self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
-            self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
+            self.xmlTabsHLayout.addWidget(self.xmlTabs)
+            self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
+            self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
+                "border: 5px solid  rgb(66, 138, 255);\n"
+                "color: rgb(45, 123, 250);\n"
+                "font-weight: bold;\n"
+                "border-radius: 20%;")                 
+            self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
             self.updateXMLTab(self.imgsOutputInfo[imgName][3])
 
     def updateMapAfterCorrecting(self, imgpath):
@@ -142,9 +149,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
         imgName = self.activeImgDir[startI:]
         componentXML = Utils.getXmlOfComponent(index, imgName)
-        # curTab = self.xmlTabs.currentWidget()
-        for tab in self.activeImgXMLtabs:
-            tab.compXMLBrowser.setPlainText(componentXML)
+        self.compXMLBrowser.setPlainText(componentXML)
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
@@ -218,11 +223,14 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.activeImageLayout.removeWidget(self.imageLabel)
         del self.imageLabel
         self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
+        self.xmlTabsHLayout.removeWidget(self.xmlTabs)
         for tab in self.activeImgXMLtabs:
             tab.setParent(None)
             del tab
         del self.xmlTabs
+        self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
+        del self.compXMLBrowser
+
 
     def refreshWindowAfterUpdate(self):
         for (key, val) in Constants.mapToGui.items():
