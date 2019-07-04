@@ -1,5 +1,5 @@
 import os
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="../UI2XML/data/UI2XML-f9d1f0273970.json"
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="../UI2XML/data/UI2XML-f9d1f0273970.json"
 
 from google.cloud import vision
 
