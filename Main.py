@@ -6,12 +6,13 @@ import GUI.uploadWindow as uploadWindow
 from GUI.createProjDialog import createProjectDialog
 import  GUI.prevWindow as prevWindow
 import  GUI.utils as utils
-# from keras.models import load_model
-# import ScreenShots
-# import HandDrawing
-# import Psd
-# import LoadDataClassification
+from keras.models import load_model
+import ScreenShots
+import HandDrawing
+import Psd
+import LoadDataClassification
 import Constants
+import CodeGeneration.SwitchingActivities as SwitchingActivities
 
 
 class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
@@ -25,6 +26,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
         self.actionFinish.triggered.connect(self.connectActivitiesResult)
+
 
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -43,35 +45,34 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionGenerateXML.setEnabled(True)
 
     def processImagesAccToMode(self):
-        del self.mainDialoge
-        self.uploadWidget.populateProjDir()
+        error = self.uploadWidget.populateProjDir() 
+        if error==-1:
+            return
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
-        # if Constants.designMode == Constants.DESIGN_MODES[0]:
-        #     vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-        #     model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
-        #     ScreenShots.processAllImages(Constants.imagesPath, model, invVocab)
-        # elif Constants.designMode == Constants.DESIGN_MODES[1]:
-        #     HandDrawing.processAllImages(Constants.imagesPath)
-        # else:
-        #     vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-        #     model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
-        #     Psd.processAllPsds(Constants.imagesPath, model, invVocab)
+        if Constants.designMode == Constants.DESIGN_MODES[0]:
+             vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+             model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
+             ScreenShots.processAllImages(Constants.imagesPath, model, invVocab)
+        elif Constants.designMode == Constants.DESIGN_MODES[1]:
+             HandDrawing.processAllImages(Constants.imagesPath)
+        else:
+             vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+             model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
+             Psd.processAllPsds(Constants.imagesPath, model, invVocab)
         self.prev = prevWindow.previewWindow(self)
-        del self.uploadWidget.layoutScroll
-        del self.uploadWidget
         self.lay.addLayout(self.prev.mainHLayout)
         self.actionConnectCmpts.setEnabled(True)
 
     def regenerateXMLafterCorrection(self):
         updatedMap = self.prev.generateUpdatedXML()
         self.actionConnectCmpts.setEnabled(True)
-        # if Constants.designMode == Constants.DESIGN_MODES[0]:
-        #     ScreenShots.updateAllImages(Constants.imagesPath,updatedMap)
-        # elif Constants.designMode == Constants.DESIGN_MODES[1]:
-        #     HandDrawing.updateAllImages(Constants.imagesPath,updatedMap)
-        # else:
-        #     Psd.updateAllImages(Constants.imagesPath,updatedMap)
+        if Constants.designMode == Constants.DESIGN_MODES[0]:
+            ScreenShots.updateAllImages(Constants.imagesPath,updatedMap)
+        elif Constants.designMode == Constants.DESIGN_MODES[1]:
+            HandDrawing.updateAllImages(Constants.imagesPath,updatedMap)
+        else:
+            Psd.updateAllImages(Constants.imagesPath,updatedMap)
         self.prev.refreshWindowAfterUpdate()
 
     def connectComponents(self):
@@ -83,5 +84,5 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
 
     def connectActivitiesResult(self):
         connectedMap = self.prev.convertConnectMapToLists()
-        print(connectedMap)
+        SwitchingActivities.switchActivities(connectedMap)
         # self.close()

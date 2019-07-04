@@ -21,11 +21,6 @@ class createProjectDialog(QDialog, skelCreateProjDialog.Ui_Dialog):
         self.createProjectBtn.clicked.connect(self.startProject)
 
     def startProject(self):
-        '''
-        if(len(str(self.projectNameLine.text()).strip())==0):
-            self.warningLbl.setText("Insert Project Name, please!")
-            return
-        '''
         if(len(str(self.projectDirectoryL.text()).strip())==0):
             self.warningLbl.setText("Insert project Directory, please!")
             return
@@ -43,3 +38,4 @@ class createProjectDialog(QDialog, skelCreateProjDialog.Ui_Dialog):
         Constants.PACKAGE = str(self.packageNameLine.text()).strip()
         Constants.designMode = str(self.designComboBox.currentText())
         self.close()
+        return

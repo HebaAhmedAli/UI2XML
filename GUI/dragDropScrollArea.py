@@ -178,7 +178,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.boxUploadImages.setMaximumHeight(self.imageBox_H + 165)
         self.addBoxLayout = QtWidgets.QVBoxLayout(self.boxUploadImages)
         self.addButton = QtWidgets.QPushButton()
-        self.addButton.setText("ADD\nImages")
+        self.addButton.setText("Add\nImages")
         self.addButton.clicked.connect(self.addImages_onClick)
         self.addBoxLayout.addWidget(self.addButton)
         return self.boxUploadImages
