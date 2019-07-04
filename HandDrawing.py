@@ -114,6 +114,7 @@ def createUpdateProcess(subdir,file,valMapFromGui):
     return process    
 
 
+
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     Constants.HAND_DRAWN = True
     manager=Manager()

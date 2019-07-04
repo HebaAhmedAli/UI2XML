@@ -13,7 +13,9 @@ import Psd
 import LoadDataClassification
 import Constants
 import CodeGeneration.SwitchingActivities as SwitchingActivities
-
+import subprocess
+import os
+import signal
 
 class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
     def __init__(self):
@@ -53,6 +55,8 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         error = self.uploadWidget.populateProjDir() 
         if error==-1:
             return
+        proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
+        print(proc.pid)
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
@@ -66,6 +70,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
              model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
              Psd.processAllPsds(Constants.imagesPath, model, invVocab)
         self.statusbar.clearMessage()
+        os.kill(proc.pid, signal.SIGTERM)
         self.statusbar.showMessage("Click on component to know/change its type")
         self.prev = prevWindow.previewWindow(self)
         self.lay.addLayout(self.prev.mainHLayout)
@@ -96,6 +101,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionFinish.setEnabled(False)
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
+        self.close()
     
     def endProg(self):
         exit()

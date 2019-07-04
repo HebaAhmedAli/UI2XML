@@ -108,6 +108,7 @@ def createUpdateProcess(subdir,file,valMapFromGui):
 
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
+    startTime=time.time()
     # TODO: Comment after testing.
     #mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
     manager=Manager()
