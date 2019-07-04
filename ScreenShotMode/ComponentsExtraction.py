@@ -130,15 +130,19 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
     if predictedComponentsInBacket[0] == 'android.widget.ImageView' \
     or predictedComponentsInBacket[0] == 'android.widget.TextView':
         baseArea = boxesInBacket[0][2]*boxesInBacket[0][3]
-        sumAreaPos = 0
+        sumAreaText = 0 
+        sumAreaImg = 0
         sumAreaNeg = 0
         for i in range(1,len(predictedComponentsInBacket)):
-            if predictedComponentsInBacket[i] == 'android.widget.TextView' \
-            or predictedComponentsInBacket[i] == 'android.widget.ImageView':
-                sumAreaPos+= (boxesInBacket[i][2]*boxesInBacket[i][3])
+            if predictedComponentsInBacket[i] == 'android.widget.TextView':
+                sumAreaText+= (boxesInBacket[i][2]*boxesInBacket[i][3])
+            elif predictedComponentsInBacket[i] == 'android.widget.ImageView':
+                sumAreaImg+= (boxesInBacket[i][2]*boxesInBacket[i][3])
             else:
                 sumAreaNeg+= (boxesInBacket[i][2]*boxesInBacket[i][3])
-        if (sumAreaPos+(baseArea-(sumAreaPos+sumAreaNeg))>sumAreaNeg and (baseArea/imageArea<0.1)) or (sumAreaPos>sumAreaNeg and (baseArea/imageArea<0.5) and (baseArea/imageArea>0.1)):
+        if sumAreaText+sumAreaImg>sumAreaNeg and baseArea/imageArea<0.3 and predictedComponentsInBacket[0] == 'android.widget.TextView':
+            return True
+        elif sumAreaImg>sumAreaText and sumAreaText+sumAreaImg>sumAreaNeg and baseArea/imageArea<0.3 and predictedComponentsInBacket[0] == 'android.widget.ImageView':
             return True
         else:
             return False
