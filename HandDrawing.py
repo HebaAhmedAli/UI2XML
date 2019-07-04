@@ -10,7 +10,7 @@ import copy
 import Utils
 import io
 from PIL import Image
-
+import time
 
 def processImage(subdir, file):
     xImage = np.array(Utils.genTable(300,300))
@@ -66,6 +66,7 @@ def createProcess(imagesPath, file):
 
 
 def processAllImages(imagesPath):
+    startTime = time.time()
     Constants.HAND_DRAWN = True
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     manager=Manager()
@@ -83,6 +84,7 @@ def processAllImages(imagesPath):
     for p in processes:
         p.join()
         p.terminate()
+    print("Total time = ",time.time()-startTime)
 
 def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
