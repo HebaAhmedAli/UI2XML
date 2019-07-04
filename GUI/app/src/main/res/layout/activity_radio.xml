@@ -1,0 +1,233 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<LinearLayout xmlns:android = "http://schemas.android.com/apk/res/android"
+	xmlns:app = "http://schemas.android.com/apk/res-auto"
+	xmlns:tools = "http://schemas.android.com/tools"
+	android:layout_width = "match_parent"
+	android:layout_height = "match_parent"
+	android:orientation = "vertical"
+	tools:context = ".RadioActivity">
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<TextView
+			android:id = "@+id/TextView_0_1_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "wrap_content"
+			android:text = "Checkboxes"
+			android:textColor = "#262626"
+			android:background = "#ffffff"
+			>
+		</TextView>
+	</LinearLayout>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<CheckBox
+			android:id = "@+id/CheckBox_0_2_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "1"
+			>
+		</CheckBox>
+		<TextView
+			android:id = "@+id/TextView_0_2_1"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "5"
+			android:text = "Line item selected"
+			android:textColor = "#252525"
+			android:background = "#ffffff"
+			>
+		</TextView>
+	</LinearLayout>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<CheckBox
+			android:id = "@+id/CheckBox_0_3_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "1"
+			>
+		</CheckBox>
+		<TextView
+			android:id = "@+id/TextView_0_3_1"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "5"
+			android:text = "Line item unselected"
+			android:textColor = "#202020"
+			android:background = "#ffffff"
+			>
+		</TextView>
+	</LinearLayout>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<TextView
+			android:id = "@+id/TextView_0_4_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "wrap_content"
+			android:text = "Radio buttons"
+			android:textColor = "#252525"
+			android:background = "#ffffff"
+			>
+		</TextView>
+	</LinearLayout>
+	<RadioGroup
+		android:id = "@+id/RadioGroup_0_5"
+		android:padding="5dp"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "2"
+		>
+		<LinearLayout
+			android:orientation = "horizontal"
+			android:background = "#ffffff"
+			android:layout_width = "match_parent"
+			android:layout_height = "0dp"
+			android:layout_weight = "1"
+			>
+			<RadioButton
+				android:id = "@+id/RadioButton_0_5_0"
+				android:padding="5dp"
+				android:layout_height = "wrap_content"
+				android:layout_width = "0dp"
+				android:layout_weight = "1"
+				>
+			</RadioButton>
+			<TextView
+				android:id = "@+id/TextView_0_5_1"
+				android:padding="5dp"
+				android:layout_height = "wrap_content"
+				android:layout_width = "0dp"
+				android:layout_weight = "5"
+				android:text = "Line item selected"
+				android:textColor = "#202020"
+				android:background = "#ffffff"
+				>
+			</TextView>
+		</LinearLayout>
+		<LinearLayout
+			android:orientation = "horizontal"
+			android:background = "#ffffff"
+			android:layout_width = "match_parent"
+			android:layout_height = "0dp"
+			android:layout_weight = "1"
+			>
+			<RadioButton
+				android:id = "@+id/RadioButton_0_6_0"
+				android:padding="5dp"
+				android:layout_height = "wrap_content"
+				android:layout_width = "0dp"
+				android:layout_weight = "1"
+				>
+			</RadioButton>
+			<TextView
+				android:id = "@+id/TextView_0_6_1"
+				android:padding="5dp"
+				android:layout_height = "wrap_content"
+				android:layout_width = "0dp"
+				android:layout_weight = "5"
+				android:text = "Line item unselected"
+				android:textColor = "#202020"
+				android:background = "#ffffff"
+				>
+			</TextView>
+		</LinearLayout>
+	</RadioGroup>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<TextView
+			android:id = "@+id/TextView_0_7_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "wrap_content"
+			android:text = "Switches"
+			android:textColor = "#333333"
+			android:background = "#ffffff"
+			>
+		</TextView>
+	</LinearLayout>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<TextView
+			android:id = "@+id/TextView_0_8_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "5"
+			android:text = "Line item on"
+			android:textColor = "#2e2e2e"
+			android:background = "#ffffff"
+			>
+		</TextView>
+		<Switch
+			android:id = "@+id/Switch_0_8_1"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "1"
+			>
+		</Switch>
+	</LinearLayout>
+	<LinearLayout
+		android:orientation = "horizontal"
+		android:background = "#ffffff"
+		android:layout_width = "match_parent"
+		android:layout_height = "0dp"
+		android:layout_weight = "1"
+		>
+		<TextView
+			android:id = "@+id/TextView_0_9_0"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "4"
+			android:text = "Line item off"
+			android:textColor = "#222222"
+			android:background = "#ffffff"
+			>
+		</TextView>
+		<Switch
+			android:id = "@+id/Switch_0_9_1"
+			android:padding="5dp"
+			android:layout_height = "wrap_content"
+			android:layout_width = "0dp"
+			android:layout_weight = "1"
+			>
+		</Switch>
+	</LinearLayout>
+</LinearLayout>

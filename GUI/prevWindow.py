@@ -2,7 +2,6 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import os
 import imagesize 
 from GUI.skelPrevWindow import previewWindowSkel
-#from GUI.tabs import xmlTab
 from GUI.prevObjects import xmlTab, activityListItem
 from GUI.componentHighlight import componentHighlight
 import GUI.utils as utils
@@ -10,14 +9,15 @@ import Constants
 import Utils
 
 class previewWindow(QtWidgets.QWidget, previewWindowSkel):
-    # updateCompSig = QtCore.pyqtSignal(str)
     def __init__(self, parent):
         super(previewWindow, self).__init__(parent)
         self.setupUi(self)
+        self.state = "UpdateCmpts"
+        self.connectBtnState = False
         self.pixmapX = Constants.MONITOR_WIDTH*0.3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.8
         self.updateBtn.clicked.connect(self.updateCompType)
-        # self.connectBtn.clicked.connect(self.generateUpdatedXML)
+        self.connectBtn.clicked.connect(self.connectToActivity)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
         self.changedCompIdx = None
         self.changedCompName = None
@@ -25,10 +25,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         # The backend output
         self.imgsOutputInfo = Constants.mapToGui
         self.userCorrection = {}
-        mainActivityName = self.initActivitiesList()
-        # TODO: Handle if mainActivityName is None
+        self.mapConnect = {}
+        mainName = self.initActivitiesList()
+        self.mainActivityDir = Constants.imagesPath+"/"+ mainName
         self.updateActiveImg(self.mainActivityDir)
-        self.updateXMLTab(self.imgsOutputInfo[mainActivityName][3])
+        self.updateXMLTab(self.imgsOutputInfo[mainName][3])
 
     def initActivitiesList(self):
         projDir = Constants.imagesPath
@@ -65,32 +66,35 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     @QtCore.pyqtSlot(str)
     def onViewBtnClicked(self, imgPath):
-        #if self.activeImgDir==imgPath:
-         #   return
-        self.updateMapAfterCorrecting()
-        self.activeImgDir = imgPath
-        del self.pixmapimage
-        self.activeImageLayout.removeWidget(self.imageLabel)
-        del self.imageLabel
-        self.compOriginalLbl.setText("")
-        self.compTypeComboBox.setEnabled(False)
         startI = imgPath.rfind('/', 0, len(imgPath))+1
         imgName = imgPath[startI:]
+        self.connectBtn.setEnabled(False)
 
-        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
-        self.updateActiveImg(imgPath)
-        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
-        for tab in self.activeImgXMLtabs:
-            tab.setParent(None)
-            del tab
-        del self.xmlTabs
-        self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
-        self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
-        self.updateXMLTab(self.imgsOutputInfo[imgName][3])
+        if self.connectBtnState :
+            startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+            activeImgName = self.activeImgDir[startI:]
+            self.mapConnect.update({self.highlights[self.changedCompIdx].idName:[activeImgName, imgName]})
+            self.connectBtnState = False
+            for activ in self.activitysHLayouts:
+                activ.viewImg.setText("View")
+                if(activ.imgpath == self.activeImgDir):
+                    activ.viewImg.setEnabled(True)
+        else:    
+            if self.state == "UpdateCmpts":
+                self.updateMapAfterCorrecting(self.activeImgDir)
+            self.compOriginalLbl.setText("")
+            self.compTypeComboBox.setEnabled(False)
+            self.clearActiveImg()
+            self.activeImgDir = imgPath
 
-    def updateMapAfterCorrecting(self):
-        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
-        imgName = self.activeImgDir[startI:]
+            self.updateActiveImg(imgPath)
+            self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
+            self.xmlTabsverticalLayout.addWidget(self.xmlTabs)
+            self.updateXMLTab(self.imgsOutputInfo[imgName][3])
+
+    def updateMapAfterCorrecting(self, imgpath):
+        startI = imgpath.rfind('/', 0, len(imgpath))+1
+        imgName = imgpath[startI:]
         compBoxes = []
         compIDs = []
         compCorrectedPreds = []
@@ -114,18 +118,27 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.imgsOutputInfo.get(imgName)[2] = compPreds
         if(len(compCorrectedPreds)>0):
             #self.mapAfterCorrecting.update({imgName :(compBoxes, compIDs, compCorrectedPreds)})
-            self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
+             self.mapAfterCorrecting.update( {imgName :[compBoxes, compIDs, compCorrectedPreds,
                 Constants.mapToGui.get(imgName)[5]]})
 
     def viewCompDetails(self, index, compName):
-        self.compTypeComboBox.setEnabled(True)
-        compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
-        if compIdxinList >= 0:
-            self.compTypeComboBox.setCurrentIndex(compIdxinList)
-        self.updateBtn.setEnabled(False)
-        self.compOriginalLbl.setText(compName)
         self.changedCompIdx = index
         self.changedCompName = compName
+        if(self.state == "UpdateCmpts"):
+            self.compTypeComboBox.setEnabled(True)
+            compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
+            if compIdxinList >= 0:
+                self.compTypeComboBox.setCurrentIndex(compIdxinList)
+        elif (self.state == "ConnectCmpts"):
+            self.connectBtnState = False
+            for activ in self.activitysHLayouts:
+                activ.viewImg.setText("View")
+                activ.viewImg.setEnabled(True)
+            self.compTypeComboBox.setEnabled(False)
+            self.connectBtn.setEnabled(True)
+
+        self.updateBtn.setEnabled(False)
+        self.compOriginalLbl.setText(compName)
         startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
         imgName = self.activeImgDir[startI:]
         componentXML = Utils.getXmlOfComponent(index, imgName)
@@ -167,6 +180,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.highlights = []
         imgW, imgH = imagesize.get(imagePath)
         for idx in range(0,len(compBoxes)):
+            if self.state == "ConnectCmpts" and \
+                    not (compPreds[idx] == "Button" or compPreds[idx] == "ImageButton"):
+                continue
             compBox =compBoxes[idx]
             compId = compIDs[idx]
             compPred = compPreds[idx]
@@ -174,17 +190,51 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if compPreds[idx] == Constants.MODEL_PRED[2]:
                 scaledCompBox[1] = scaledCompBox[1] - 15
                 scaledCompBox[3] = scaledCompBox[3] + 15
-            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred, idx)
+            high = componentHighlight(self.activeImageWidget, scaledCompBox, compBox, compId, compPred, len(self.highlights))
+            
             high.showComp.connect(self.viewCompDetails)
             self.highlights.append(high)
         self.activeImgverticalLayout.addWidget(self.activeImageWidget)
 
     def generateUpdatedXML(self):
-        self.updateMapAfterCorrecting()
+        self.updateMapAfterCorrecting(self.activeImgDir)
         return self.mapAfterCorrecting
 
+    def connectCmptsStart(self):
+        self.state = "ConnectCmpts"
+        self.mapConnect = {}   
+        self.onViewBtnClicked(self.mainActivityDir)
+
+    def convertConnectMapToLists(self):
+        connectedActivities = []
+        for key, value in self.mapConnect.items():
+            lst = [key, value[0], value[1]]
+            connectedActivities.append(lst)
+        return connectedActivities
+
+    def clearActiveImg(self):
+        self.imageLabel.setParent(None)
+        del self.pixmapimage
+        self.activeImageLayout.removeWidget(self.imageLabel)
+        del self.imageLabel
+        self.activeImgverticalLayout.removeWidget(self.activeImageWidget)
+        self.xmlTabsverticalLayout.removeWidget(self.xmlTabs)
+        for tab in self.activeImgXMLtabs:
+            tab.setParent(None)
+            del tab
+        del self.xmlTabs
+
     def refreshWindowAfterUpdate(self):
-        self.imgsOutputInfo = Constants.mapToGui
+        for (key, val) in Constants.mapToGui.items():
+            self.imgsOutputInfo.update({key:val})
+        Constants.mapToGui = self.imgsOutputInfo
         self.mapAfterCorrecting = {}
         self.onViewBtnClicked(self.mainActivityDir)
         
+    def connectToActivity(self):
+        for activ in self.activitysHLayouts:
+            activ.viewImg.setText("Connect")
+            if(activ.imgpath == self.activeImgDir):
+                activ.viewImg.setEnabled(False)
+        self.connectBtnState=True
+        # self.changedCompIdx
