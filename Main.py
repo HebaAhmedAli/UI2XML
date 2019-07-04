@@ -12,6 +12,7 @@ import HandDrawing
 import Psd
 import LoadDataClassification
 import Constants
+import CodeGeneration.SwitchingActivities as SwitchingActivities
 
 
 class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
@@ -23,13 +24,15 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.createUploadUI()
         self.actionGenerateXML.triggered.connect(self.processImagesAccToMode)
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
-        
+        self.actionConnectCmpts.triggered.connect(self.connectComponents)
+        self.actionFinish.triggered.connect(self.connectActivitiesResult)
+
+
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
         self.lay = QHBoxLayout()
         self.centralwidget.setLayout(self.lay)
         self.lay.addLayout(self.uploadWidget.layoutScroll)
-        # self.lay.addDockWidget(Qt.DockWidgetArea(2), self.uploadWidget.dockDesign)
     
     def startUp(self):
         Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
@@ -48,19 +51,18 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
-            vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-            model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
-            ScreenShots.processAllImages(Constants.imagesPath, model, invVocab)
+             vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+             model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
+             ScreenShots.processAllImages(Constants.imagesPath, model, invVocab)
         elif Constants.designMode == Constants.DESIGN_MODES[1]:
-            HandDrawing.processAllImages(Constants.imagesPath)
+             HandDrawing.processAllImages(Constants.imagesPath)
         else:
-            vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
-            model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
-            Psd.processAllPsds(Constants.imagesPath, model, invVocab)
+             vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
+             model = load_model('data/ourModel/' + Constants.MODEL_NAME)  # 150 * 150
+             Psd.processAllPsds(Constants.imagesPath, model, invVocab)
         self.prev = prevWindow.previewWindow(self)
         self.lay.addLayout(self.prev.mainHLayout)
-        
-       
+        self.actionConnectCmpts.setEnabled(True)
 
     def regenerateXMLafterCorrection(self):
         updatedMap = self.prev.generateUpdatedXML()
@@ -72,6 +74,15 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         else:
             Psd.updateAllImages(Constants.imagesPath,updatedMap)
         self.prev.refreshWindowAfterUpdate()
-        # del self.prev.mainHLayout
-        # del self.prev
-        # self.prev = prevWindow.previewWindow(self)
+
+    def connectComponents(self):
+        self.actionUpdateCmpts.setEnabled(False)
+        self.actionConnectCmpts.setEnabled(False)
+        self.actionFinish.setEnabled(True)
+        self.prev.connectCmptsStart()
+        self.state = "ConnectCmpts"
+
+    def connectActivitiesResult(self):
+        connectedMap = self.prev.convertConnectMapToLists()
+        SwitchingActivities.switchActivities(connectedMap)
+        # self.close()

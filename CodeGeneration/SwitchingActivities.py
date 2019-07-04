@@ -7,7 +7,7 @@ def addIntentToJava(buttonsToActivities):
     for buttonId,fromActivity,toActivity in buttonsToActivities:
         buttonId = buttonId[7:]
         fromActivity = fromActivity[:-6]
-        fromActivityFile = "../"+Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
+        fromActivityFile = Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
         toActivity = toActivity[:-6]
         intent = "\n\t\tIntent intent = new Intent("+fromActivity.capitalize()+"Activity.this, "+toActivity.capitalize()+"Activity.class);\n"+"\t\tstartActivity(intent);\n\t\t"
         with open(fromActivityFile, 'r') as file:
@@ -18,13 +18,15 @@ def addIntentToJava(buttonsToActivities):
             file.write(filedata)
 
 def addIntentToMainifest(buttonsToActivities):
-    if not os.path.exists('../'+Constants.DIRECTORY):
-            os.makedirs('../'+Constants.DIRECTORY) 
-    fTo=open('../'+Constants.DIRECTORY+'/'+'AndroidManifest.xml', 'w+')
+    if not os.path.exists(Constants.DIRECTORY):
+            os.makedirs(Constants.DIRECTORY) 
+    print(Constants.DIRECTORY+'/'+'AndroidManifest.xml')
+    fTo=open(Constants.DIRECTORY+'/'+'AndroidManifest.xml', 'w+')
     newActivities = ""
     for i in range(len(buttonsToActivities)):
-        newActivities += '\t'+'\t'+'<activity android:name=".'+buttonsToActivities[i][2][:-6].capitalize()+'Activity"'+ '>\n'+\
-        '\t'+'\t'+'</activity>'+'\n'
+        if buttonsToActivities[i][2][:-6].capitalize()!= "Main":
+            newActivities += '\t'+'\t'+'<activity android:name=".'+buttonsToActivities[i][2][:-6].capitalize()+'Activity"'+ '>\n'+\
+            '\t'+'\t'+'</activity>'+'\n'
     
     fTo.write('<?xml version="1.0" encoding="utf-8"?>'+'\n'+
               '<manifest xmlns:android="http://schemas.android.com/apk/res/android"'+'\n'
