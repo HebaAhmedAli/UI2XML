@@ -33,7 +33,7 @@ def addIntentToMainifest(buttonsToActivities):
     
     fTo.write('<?xml version="1.0" encoding="utf-8"?>'+'\n'+
               '<manifest xmlns:android="http://schemas.android.com/apk/res/android"'+'\n'
-              +'\t'+'package="com.example.gp">\n'
+              +'\t'+'package="com.example.'+Constants.PROJECT_NAME.lower()+'">\n'
               +'\t'+'<application'+'\n'
               +'\t'+'\t'+'android:allowBackup="true"'+'\n'
               +'\t'+'\t'+'android:icon="@mipmap/ic_launcher"'+'\n'
