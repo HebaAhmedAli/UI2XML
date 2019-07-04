@@ -314,8 +314,8 @@ def backetOverlappingBoxes(boxesRemovingManual,textsRemovingManual,predictedComp
         textsInBackets.append(backetTexts)
         predictedComponentsInBackets.append(backetPredicted)
         indexUnvisited=getFirstUnvisitedIndex(visited)
-    print(predictedComponentsInBackets)
-    print('\n')
+    # print(predictedComponentsInBackets)
+    # print('\n')
     return boxesInBackets,textsInBackets,predictedComponentsInBackets
 
 def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents):
