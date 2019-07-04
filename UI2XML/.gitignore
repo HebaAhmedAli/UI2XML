@@ -1,0 +1,9 @@
+dataToPush/
+data/
+__pycache__/
+*/__pycache__/
+.DS_Store
+.idea/
+.vscode/
+*.pyc
+
