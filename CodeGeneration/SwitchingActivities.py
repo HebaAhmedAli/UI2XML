@@ -5,15 +5,20 @@ import os
 
 def addIntentToJava(buttonsToActivities):
     for buttonId,fromActivity,toActivity in buttonsToActivities:
-        buttonId = buttonId[7:]
+        if "Image" in buttonId:
+            buttonId = buttonId[12:]
+        else:
+            buttonId = buttonId[7:]
         fromActivity = fromActivity[:-6]
         fromActivityFile = Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+fromActivity.capitalize()+"Activity.java"
         toActivity = toActivity[:-6]
+        print(buttonId,fromActivity,toActivity)
         intent = "\n\t\tIntent intent = new Intent("+fromActivity.capitalize()+"Activity.this, "+toActivity.capitalize()+"Activity.class);\n"+"\t\tstartActivity(intent);\n\t\t"
         with open(fromActivityFile, 'r') as file:
             filedata = file.read()
         file.close()
         filedata = filedata.replace("\n\t// onClick logic_"+buttonId+"\n\t\t", intent)
+        print(filedata)
         with open(fromActivityFile, 'w') as file:
             file.write(filedata)
 
