@@ -9,7 +9,7 @@ import copy
 import Utils
 import io
 from PIL import Image
-
+import time
 
 def processImage(subdir, file):
     xImage = np.array(Utils.genTable(300,300))
@@ -70,6 +70,7 @@ def updateImage(subdir,file,valMapFromGui):
 
 
 def processAllImages(imagesPath):
+    startTime = time.time()
     Constants.HAND_DRAWN = True
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     Constants.mapToGui = {}
@@ -78,7 +79,8 @@ def processAllImages(imagesPath):
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             processImage(imagesPath, file)
-
+    print("Total time = = ",time.time()-startTime)
+    
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     Constants.HAND_DRAWN = True
     Constants.mapToGui = {}
