@@ -74,6 +74,7 @@ def updateImage(subdir,file,valMapFromGui):
         
 
 def processAllImages(imagesPath,model,invVocab):
+    startTime = time.time()
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
@@ -82,9 +83,11 @@ def processAllImages(imagesPath,model,invVocab):
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            startTime = time.time()
+            start = time.time()
             processImage(imagesPath, file,model,invVocab)
-            print("Time for "+file+" = ",time.time()-startTime)
+            print("Time for "+file+" = ",time.time()-start)
+    print("Total time = ",time.time()-startTime)
+
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
