@@ -52,11 +52,11 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.statusbar.showMessage("Drag and Drop or Click to upload your "+ Constants.designMode+ " Files")
 
     def processImagesAccToMode(self):
-        proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
-        print(proc.pid)
         error = self.uploadWidget.populateProjDir() 
         if error==-1:
             return
+        proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
+        print(proc.pid)
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
