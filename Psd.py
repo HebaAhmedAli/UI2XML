@@ -27,7 +27,6 @@ def processPsd(subdir, file,model,invVocab):
     
     if Constants.DEBUG_MODE == True :
         fTo=open(subdir+'/compOutputs'+file[:-4]+'/texts.txt', 'w+')
-
     boxToGui=[]
     predictedToGui=[]
     idToGui=[]
@@ -67,6 +66,7 @@ def updateImage(subdir,file,valMapFromGui):
     inWhichFile=[]
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[4],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
     Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.

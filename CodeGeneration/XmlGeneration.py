@@ -366,21 +366,22 @@ def buildParentNodes(boxes,texts,predictedComponents,img):
     parentNodes = createLeavesParents(groupedNodes,img)
     return parentNodes
 
-def createRoot(parentNodes,imgH,dynamic,img):
+def createRoot(parentNodes,imgH,dynamic,img,actionBarOp):
     parentNode = node()
     parentNode.nodeType = "LinearLayoutVertical"
     if dynamic == True:
-        parentNodes = groupListViewAndRadio(parentNodes,imgH,img)
+        parentNodes = groupListViewAndRadio(parentNodes,imgH,img,actionBarOp)
     else:
-        parentNodes = groupRadio(parentNodes,imgH,img)
+        parentNodes = groupRadio(parentNodes,imgH,img,actionBarOp)
     parentNodes = setWeights(parentNodes,'y',imgH,True,img,True)
     parentNode.childNodes = parentNodes
     return parentNode
     
-def buildHierarchy(boxes,texts,predictedComponents,img,dynamic):
+
+def buildHierarchy(boxes,texts,predictedComponents,img,dynamic,actionBarOp):
     parentNodes = buildParentNodes(boxes,texts,predictedComponents,img)
     parentNodesForGui = sorted(parentNodes, key=operator.attrgetter('y'))
-    rootNode = createRoot(parentNodesForGui,img.shape[0],dynamic,img)
+    rootNode = createRoot(parentNodesForGui,img.shape[0],dynamic,img,actionBarOp)
     return rootNode,parentNodesForGui
 
 def getTypeAndOriAndID(parentNode,tabsString,myIndex,insideActionBar=False):
@@ -613,13 +614,14 @@ def mapToXml(parentNode,appName,imgH,actionBarOp,boxToGui,predictedToGui,idToGui
     return
 
     
+
 def generateXml(boxes,texts,predictedComponents,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile,dynamic):
-    parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img,dynamic)        
+    parentNode,parentNodesForGui=buildHierarchy(boxes,texts,predictedComponents,img,dynamic,actionBarOp)        
     mapToXml(parentNode,appName,img.shape[0],actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile)
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 
-def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile):
+def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appName,actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile,dynamic):
     for i in range(len(idUpdated)):
         indices = idUpdated[i].split('_')
         if len(indices) == 4: # horizontal leaf
@@ -638,14 +640,18 @@ def updateXml(parentNodesForGui,boxUpdated,predictedUpdated,idUpdated,img,appNam
             parentNodesForGui[int(indices[2])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes,img)
         elif len(indices) == 6: # 6 horizontal vertical horizontal leaf
             parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes = groupTextViewsOfSameWord(parentNodesForGui[int(indices[2])].childNodes[int(indices[3])].childNodes[int(indices[4])].childNodes,img) 
-    parentNode = createRoot(parentNodesForGui,img.shape[0],Constants.DYNAMIC,img)
+
+    parentNode = createRoot(parentNodesForGui,img.shape[0],dynamic,img,actionBarOp)
     mapToXml(parentNode,appName,img.shape[0],actionBarOp,boxToGui,predictedToGui,idToGui,xmlFilesToGui,inWhichFile) 
     JavaGeneration.generateJava(parentNode,appName,actionBarOp)
     return parentNodesForGui
 
-def groupListViewAndRadio(groupedNodes,imgH,img):
+def groupListViewAndRadio(groupedNodes,imgH,img,actionBarOp):
     groupedNodesNew = []
     i = 0
+    if actionBarOp == 'A':
+        groupedNodesNew.append(groupedNodes[0])
+        i = 1
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:
@@ -672,9 +678,12 @@ def groupListViewAndRadio(groupedNodes,imgH,img):
         i+=1
     return groupedNodesNew
 
-def groupRadio(groupedNodes,imgH,img):
+def groupRadio(groupedNodes,imgH,img,actionBarOp):
     groupedNodesNew = []
     i = 0
+    if actionBarOp == 'A':
+        groupedNodesNew.append(groupedNodes[0])
+        i = 1
     while i<len(groupedNodes):
         patternToSearch,radioHorizontal = extractPatternOfNode(groupedNodes[i])
         if 'android.widget.RadioButton' in patternToSearch  and radioHorizontal:

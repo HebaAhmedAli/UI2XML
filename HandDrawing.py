@@ -36,9 +36,10 @@ def processImage(subdir, file):
     parentNodesForGui = XmlGeneration.generateXml(boxesTranslated,texts,predictedComponents,myImage,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
     # Translate x and y and handle outside range.
     for i in range(len(boxToGui)):
-        boxToGui[i] = [boxToGui[i][0]+myImageBox[0],boxToGui[i][1]+myImageBox[1],boxToGui[i][2],boxToGui[i][3]]
-            
+        boxToGui[i] = [boxToGui[i][0]+myImageBox[0],boxToGui[i][1]+myImageBox[1],boxToGui[i][2],boxToGui[i][3]]     
+    
     Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
             os.makedirs(subdir+'/compOutputs'+file[:-4])
@@ -57,6 +58,7 @@ def processImage(subdir, file):
             fTo.write(str(j)+'- '+texts[j]+'\n')
             j+=1
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
+
 
 def createProcess(imagesPath, file):
     process = Process(target=processImage, args=(imagesPath, file))

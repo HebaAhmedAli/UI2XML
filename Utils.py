@@ -8,6 +8,7 @@ import math
 import Constants
 import Preprocessing
 
+
 def genTable (rows, columns):
         matrix = [[[255,255,255]] * columns for _i in range(rows)]
         #Indexes of first diagonal

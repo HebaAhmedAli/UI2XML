@@ -68,7 +68,9 @@ def processImage(subdir, file,model,invVocab):
     # open Process
     return createProcess(subdir,file,img,imgCopy,imgXML,boxes,texts,addedManuallyBool,predictedComponents)
 
+
 def processAllImages(imagesPath,model,invVocab):
+    startTime = time.time()
     Constants.DIRECTORY = imagesPath[:-5] + Constants.androidPath
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY)
@@ -88,6 +90,7 @@ def processAllImages(imagesPath,model,invVocab):
     for p in processes:
         p.join()
         p.terminate()
+    print("Total time = ",time.time()-startTime)
         
 def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
@@ -108,7 +111,7 @@ def createUpdateProcess(subdir,file,valMapFromGui):
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     # TODO: Comment after testing.
-    mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
+    #mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
     manager=Manager()
     # Initialize the vectors of each image with empty vector(this vector is shared between processes)
     Constants.mapToGui=manager.dict()
@@ -123,7 +126,7 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
     for p in processes:
         p.join()
         p.terminate()
-            
+
 # UI2XMLclassification_224_245000_99_93
 # UI2XMLclassificationAlex_224_245000_99_92 adam with 224 * 224
 # UI2XMLclassification245000_98_91 decay with 150 * 150
