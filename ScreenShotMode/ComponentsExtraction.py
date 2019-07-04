@@ -209,9 +209,10 @@ def DeleteVerticalAndHorizontalProgressBar(boxesFiltered,textsFiltered,predicted
         textsFilteredNew.append(textsFiltered[i])
     return boxesFilteredNew,textsFilteredNew,predictedComponentsFilteredNew
             
-def checkSeekProgress(boxesInBacket,imageCopy):
+def checkSeekProgress(predictedComponentsInBacket,boxesInBacket,imageCopy):
     if boxesInBacket[0][2]/imageCopy.shape[1] < 0.2:
-        return False
+        predictedComponentsInBacket[0] = 'android.widget.Switch'
+        return True
     croppedImage = imageCopy[max(0,boxesInBacket[0][1] - margin):min(imageCopy.shape[0],boxesInBacket[0][1] + boxesInBacket[0][3] + margin), max(boxesInBacket[0][0] - margin,0):min(imageCopy.shape[1],boxesInBacket[0][0] + boxesInBacket[0][2] + margin)]
     colors = Image.fromarray(croppedImage).convert('RGB').getcolors()
     if colors != None:
@@ -229,7 +230,7 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
     
     # Case wrong line classified as SeekBar or ProgressBar.
     if (predictedComponentsInBacket[0] == 'android.widget.SeekBar' \
-        and not checkSeekProgress(boxesInBacket,imageCopy)):
+        and not checkSeekProgress(predictedComponentsInBacket,boxesInBacket,imageCopy)):
         return True
 
     # Case textView that don't have text so wrong classification.
@@ -237,8 +238,8 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
         textsInBacket[0] == '':
         return True
     
-    if predictedComponentsInBacket[0] == 'android.widget.Button' and \
-        textsInBacket[0] == '':
+    if predictedComponentsInBacket[0] == 'android.widget.Button' and  boxesInBacket[0][3]/boxesInBacket[0][2]< 0.1 and \
+            boxesInBacket[0][2]/imageCopy.shape[1] and textsInBacket[0] == '':
         return True
     
     # Taaief ll edit text aly kan ta3bny whwa fasl.
@@ -313,6 +314,8 @@ def backetOverlappingBoxes(boxesRemovingManual,textsRemovingManual,predictedComp
         textsInBackets.append(backetTexts)
         predictedComponentsInBackets.append(backetPredicted)
         indexUnvisited=getFirstUnvisitedIndex(visited)
+    print(predictedComponentsInBackets)
+    print('\n')
     return boxesInBackets,textsInBackets,predictedComponentsInBackets
 
 def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedComponents):
@@ -332,6 +335,6 @@ def changeUnDesiredComponents(pedictedComponents):
         pedictedComponents[i] =='android.widget.RatingBar':
             pedictedComponents[i] = 'android.widget.ImageView'
         elif pedictedComponents[i] =='android.widget.ToggleButton':
-            pedictedComponents[i] = 'android.widget.Switch'
+            pedictedComponents[i] = 'android.widget.Button'
         elif pedictedComponents[i] =='android.widget.Spinner':
             pedictedComponents[i] = 'android.widget.ImageButton'
