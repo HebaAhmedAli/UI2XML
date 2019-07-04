@@ -38,7 +38,8 @@ def processImage(subdir, file):
     for i in range(len(boxToGui)):
         boxToGui[i] = [boxToGui[i][0]+myImageBox[0],boxToGui[i][1]+myImageBox[1],boxToGui[i][2],boxToGui[i][3]]     
     
-    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui,myImageBox]})
+
 
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputs'+file[:-4]):
@@ -63,6 +64,7 @@ def processImage(subdir, file):
 def createProcess(imagesPath, file):
     process = Process(target=processImage, args=(imagesPath, file))
     return process    
+
 
 
 def processAllImages(imagesPath):
@@ -95,7 +97,15 @@ def updateImage(subdir,file,valMapFromGui):
     idToGui=[]
     xmlFilesToGui=[]
     inWhichFile=[]
+     # Translate x and y and handle outside range.
+    for i in range(len(valMapFromGui[0])):
+        valMapFromGui[0][i] = [ valMapFromGui[0][i][0]-valMapFromGui[4][0], valMapFromGui[0][i][1]-valMapFromGui[4][1],valMapFromGui[0][i][2], valMapFromGui[0][i][3]]
+    
     parentNodesForGui = XmlGeneration.updateXml(valMapFromGui[3],valMapFromGui[0],valMapFromGui[2],valMapFromGui[1],imgXML,file[:-6],file[len(file)-6],boxToGui=boxToGui,predictedToGui=predictedToGui,idToGui=idToGui,xmlFilesToGui=xmlFilesToGui,inWhichFile=inWhichFile,dynamic=file[len(file)-5] == 'D')
+     # Translate x and y and handle outside range.
+    for i in range(len(boxToGui)):
+        boxToGui[i] = [boxToGui[i][0]+valMapFromGui[4][0],boxToGui[i][1]+valMapFromGui[4][1],boxToGui[i][2],boxToGui[i][3]]     
+    
     Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
 
 

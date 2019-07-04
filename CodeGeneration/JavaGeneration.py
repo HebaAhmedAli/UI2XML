@@ -268,14 +268,16 @@ def generateJava(rootNode,appName,actionBarOp):
     if len(listViews) >0:
         imports+= "import android.widget.ListView;\nimport java.util.ArrayList;\n"
     classBody+= printArrayList(len(listViews),appName)
-    addedListItems=""
+    addedListItems = ""
+    allListItems = ""
+
     for i in range(len(listViews)):
         #listItems,leavesType,selectedVarNames= printListItems(listViews[i],i)
         #classBody+=listItems
         addedListItems,leavesType,selectedIds,selectedVarNames = printAddingItems(listViews[i],i,appName)
         printListViewBean(leavesType,i,appName,package)
         printListViewBaseAdapter(listViews[i],leavesType,selectedIds,i,appName,package)
-
+        allListItems+= addedListItems
     groupsRadiosDef = ""
     groupsRadiosOnClick = ""
     radiosDef = "" 
@@ -305,7 +307,7 @@ def generateJava(rootNode,appName,actionBarOp):
             imports+= 'import androidx.appcompat.widget.Toolbar;\n'
         onCreateBody+= printActionBar(appName)   
     
-    onCreateBody+= addedListItems
+    onCreateBody+= allListItems
     onCreateBody+= groupsRadiosOnClick
     onCreateClose="\t}\n"
         
