@@ -86,17 +86,18 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.compTypeComboBox.setEnabled(False)
             self.clearActiveImg()
             self.activeImgDir = imgPath
+            if self.state == "UpdateCmpts":
+                self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
+                self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
+                    "border: 5px solid  rgb(66, 138, 255);\n"
+                    "color: rgb(45, 123, 250);\n"
+                    "font-weight: bold;\n"
+                    "border-radius: 20%;")                 
+                self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
 
             self.updateActiveImg(imgPath)
             self.xmlTabs = QtWidgets.QTabWidget(self.xmlTabsverticalLayoutWidget)
             self.xmlTabsHLayout.addWidget(self.xmlTabs)
-            self.compXMLBrowser = QtWidgets.QTextBrowser(self.xmlTabsverticalLayoutWidget)
-            self.compXMLBrowser.setStyleSheet("background-color: \"white\";\n"           
-                "border: 5px solid  rgb(66, 138, 255);\n"
-                "color: rgb(45, 123, 250);\n"
-                "font-weight: bold;\n"
-                "border-radius: 20%;")                 
-            self.xmlcomponentHLayout.addWidget(self.compXMLBrowser)
             self.updateXMLTab(self.imgsOutputInfo[imgName][3])
 
     def updateMapAfterCorrecting(self, imgpath):
@@ -136,6 +137,10 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             compIdxinList = self.compTypeComboBox.findText(compName, QtCore.Qt.MatchFixedString)
             if compIdxinList >= 0:
                 self.compTypeComboBox.setCurrentIndex(compIdxinList)
+            startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
+            imgName = self.activeImgDir[startI:]
+            componentXML = Utils.getXmlOfComponent(index, imgName)
+            self.compXMLBrowser.setPlainText(componentXML)
         elif (self.state == "ConnectCmpts"):
             self.connectBtnState = False
             for activ in self.activitysHLayouts:
@@ -146,10 +151,6 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
         self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
-        startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
-        imgName = self.activeImgDir[startI:]
-        componentXML = Utils.getXmlOfComponent(index, imgName)
-        self.compXMLBrowser.setPlainText(componentXML)
 
     def enableUpdateBtn(self):
         self.updateBtn.setEnabled(True)
@@ -207,7 +208,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
 
     def connectCmptsStart(self):
         self.state = "ConnectCmpts"
-        self.mapConnect = {}   
+        self.mapConnect = {}
+        self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
+        del self.compXMLBrowser
         self.onViewBtnClicked(self.mainActivityDir)
 
     def convertConnectMapToLists(self):
@@ -228,8 +231,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             tab.setParent(None)
             del tab
         del self.xmlTabs
-        self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
-        del self.compXMLBrowser
+        if self.state != "ConnectCmpts":
+            self.xmlcomponentHLayout.removeWidget(self.compXMLBrowser)
+            del self.compXMLBrowser
 
 
     def refreshWindowAfterUpdate(self):
