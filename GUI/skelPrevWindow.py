@@ -68,7 +68,9 @@ class previewWindowSkel(object):
         self.compOriginalLbl.setText("")
         self.compoBoxLayout.addWidget(self.compOriginalLbl)
         self.compTypeComboBox = QtWidgets.QComboBox(self.verticalLayoutWidget_2)
-        self.compTypeComboBox.addItems(Constants.MODEL_PRED)
+        model_pred = [ k for k in Constants.MODEL_PRED]
+        model_pred.sort()
+        self.compTypeComboBox.addItems(model_pred)
         self.compoBoxLayout.addWidget(self.compTypeComboBox)
         self.compTypeComboBox.setEnabled(False)
         self.compInfoLayout.addLayout(self.compoBoxLayout)

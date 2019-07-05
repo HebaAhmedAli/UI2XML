@@ -30,6 +30,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
 
         Dialog.resize(400, 274)
+        # Dialog.setStyleSheet("""background-color:#515790;""")
         self.verticalLayoutWidget = QtWidgets.QWidget(Dialog)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 17, 160, 161))
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
