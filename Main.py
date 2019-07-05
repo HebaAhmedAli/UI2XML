@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
 from GUI.createProjDialog import createProjectDialog
+from GUI.createFinishDialog import createFinishDialog
 import  GUI.prevWindow as prevWindow
 import  GUI.utils as utils
 from keras.models import load_model
@@ -107,7 +108,17 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
         print("MAP", connectedMap)
-        self.close()
+        self.finishDialog = createFinishDialog()
+        self.setEnabled(False)
+        self.finishDialog.closeProgBtn.clicked.connect(self.endProg)
+        # self.finishDialog.startProgBtn.clicked.connect(self.startOver)
+        self.finishDialog.show()
+
+    # def startOver(self):
+    #     self.close()
+    #     mainScreen()
 
     def endProg(self):
+        self.finishDialog.close()
+        self.close()
         exit()

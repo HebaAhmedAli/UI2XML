@@ -76,18 +76,6 @@ class previewWindowSkel(object):
         self.compInfoLayout.addLayout(self.compoBoxLayout)
         self.correctionLayout.addLayout(self.compInfoLayout)
 
-        # self.buttonsLayout = QtWidgets.QHBoxLayout()
-        # self.updateBtn = QtWidgets.QPushButton()
-        # self.updateBtn.setText("Change")
-        # self.updateBtn.setEnabled(False)
-        # self.buttonsLayout.addWidget(self.updateBtn)
-        # self.connectBtn = QtWidgets.QPushButton()
-        # self.connectBtn.setText("Connect")
-        # self.connectBtn.setEnabled(False)
-        # self.buttonsLayout.addWidget(self.connectBtn)
-        # self.correctionLayout.addLayout(self.buttonsLayout)
-        # self.verticalLayoutWidget.setMinimumHeight(Constants.MONITOR_HEIGHT/3)
-
         self.rightWidget = QtWidgets.QWidget(prev)
         self.rightHLayout = QtWidgets.QVBoxLayout()
         self.rightHLayout.addLayout(self.correctionLayout)
