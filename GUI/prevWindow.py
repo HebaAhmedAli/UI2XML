@@ -16,7 +16,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.connectBtnState = False
         self.pixmapX = Constants.MONITOR_WIDTH*0.3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.8
-        self.updateBtn.clicked.connect(self.updateCompType)
+        # self.updateBtn.clicked.connect(self.updateCompType)
         # self.connectBtn.clicked.connect(self.connectToActivity)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
         self.changedCompIdx = None
@@ -153,17 +153,12 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
                 activ.viewImg.setText("Connect")
                 if(activ.imgpath == self.activeImgDir):
                     activ.viewImg.setEnabled(False)
-        self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
 
     def enableUpdateBtn(self):
-        self.updateBtn.setEnabled(True)
-   
-    def updateCompType(self):
         self.changedCompName = self.compTypeComboBox.currentText()
         self.highlights[self.changedCompIdx].predicted=self.changedCompName
         self.highlights[self.changedCompIdx].changed=True
-        self.updateBtn.setEnabled(False)
 
     def updateXMLTab(self, xmlFiles):
         xmlDir = Constants.imagesPath[:-5] + Constants.androidPath + "/res/layout"
@@ -260,4 +255,3 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             if(activ.imgpath == self.activeImgDir):
                 activ.viewImg.setEnabled(False)
         self.connectBtnState=True
-        # self.changedCompIdx

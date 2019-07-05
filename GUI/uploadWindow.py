@@ -67,8 +67,6 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
     def removeUploadWid(self):
         for image in self.scrollarea.imageBoxes:
             image.deleteImage.click()
-        # self.scrollarea.UploadButton.setParent(None)
-        # del self.scrollarea.UploadButton
         for horizontalLayout in self.scrollarea.horizontalLayouts:
             horizontalLayout.setParent(None)
             del horizontalLayout

@@ -32,6 +32,10 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def createImgsArea(self):
         self.gridData = QtWidgets.QWidget()
+        # self.gridData.setStyleSheet("""background-image: url("Resources/Images/drag_drop.png");
+        #                                 background-repeat: no-repeat;
+        #                                 background-origin: content-box;
+        #                                 background-position: center;""")
         self.imgsHLayoutsContainer = QtWidgets.QVBoxLayout()
         self.imgsHLayoutsContainer.setAlignment(QtCore.Qt.AlignTop)
         self.gridData.setLayout(self.imgsHLayoutsContainer)
