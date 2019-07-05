@@ -8,6 +8,7 @@ app = QApplication(sys.argv)
 window = mainScreen()
 window.showMaximized()
 
+
 # setup stylesheet
 app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 

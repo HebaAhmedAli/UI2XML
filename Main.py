@@ -25,6 +25,10 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionUpdateCmpts.triggered.connect(self.regenerateXMLafterCorrection)
         self.actionConnectCmpts.triggered.connect(self.connectComponents)
         self.actionFinish.triggered.connect(self.connectActivitiesResult)
+        self.actionAdd_Images.triggered.connect(self.AddImages)
+        self.action4_images_per_row.triggered.connect(self.ChangeGrid4)
+        self.action6_images_per_row.triggered.connect(self.ChangeGrid6)
+        self.action8_images_per_row.triggered.connect(self.ChangeGrid8)
 
     def createUploadUI(self):
         self.uploadWidget = uploadWindow.uploadWindow()
@@ -85,3 +89,20 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         connectedMap = self.prev.convertConnectMapToLists()
         print(connectedMap)
         # self.close()
+    def AddImages(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        paths, _ = QFileDialog.getOpenFileNames(self, "Select images to add", "main",
+                                                          "All Files (*);;JPG (*.JPG);;PNG (*.PNG)",
+                                                          options=options)
+        if paths:
+            self.uploadWidget.scrollarea.pictureDropped(paths)
+
+    def ChangeGrid4(self):
+        self.uploadWidget.scrollarea.chanageGridSize(4)
+
+    def ChangeGrid6(self):
+        self.uploadWidget.scrollarea.chanageGridSize(6)
+
+    def ChangeGrid8(self):
+        self.uploadWidget.scrollarea.chanageGridSize(8)
