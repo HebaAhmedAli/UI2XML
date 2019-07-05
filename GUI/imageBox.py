@@ -69,6 +69,10 @@ class imageBox(QWidget):
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         return self.groupBox
 
+    def changeImge(selfself, imagePath):
+        print("tl3t")
+        # pixmapimage = QPixmap(self.srcPath).scaled(width, height)
+        # self.imageLabel.setPixmap(QPixmap(pixmapimage))
 
 class delButton(QPushButton):
     deleted = pyqtSignal(int)
@@ -105,3 +109,4 @@ class cropButton(QPushButton):
 
     def cropImageBox(self):
         self.crop.emit(self.index)
+

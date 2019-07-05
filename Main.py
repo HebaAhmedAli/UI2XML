@@ -36,6 +36,10 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.lay = QHBoxLayout()
         self.centralwidget.setLayout(self.lay)
         self.lay.addLayout(self.uploadWidget.layoutScroll)
+        self.actionAdd_Images.triggered.connect(self.uploadWidget.scrollarea.AddImages)
+        self.action4_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid4)
+        self.action6_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid6)
+        self.action8_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid8)
     
     def startUp(self):
         Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
@@ -56,7 +60,6 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         if error==-1:
             return
         proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
-        print(proc.pid)
         self.actionGenerateXML.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:

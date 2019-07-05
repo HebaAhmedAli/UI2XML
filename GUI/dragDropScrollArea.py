@@ -5,6 +5,7 @@ import GUI.utils as utils
 from GUI.imageBox import imageBox
 import Constants
 import os
+import GUI.cropImage as cropImage
 
 class dragDropScroll(QtWidgets.QScrollArea):
     donePopulating = QtCore.pyqtSignal
@@ -15,17 +16,17 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.horizontalLayouts = []
         self.imageBoxes = []
         self.numOfImages = 0
-        self.maxRowSize = 7
+        self.maxRowSize = 4
 
-        self.imageBox_W = (Constants.MONITOR_WIDTH - 440 - 7* self.maxRowSize)/self.maxRowSize - 20         #201
+        self.imageBox_W = (Constants.MONITOR_WIDTH - 30 * self.maxRowSize)/self.maxRowSize - 20         #201
         if self.imageBox_W < 180:
             self.imageBox_W = 180
-            self.maxRowSize = 7
+            self.maxRowSize = 4
         self.imageBox_H = int(self.imageBox_W *4/3)    #268        
 
         # Placement of the uploaded image
         self.IsGrid = 1
-        self.indexColumn = 1
+        self.indexColumn = 0
         self.indexRow = 0
         self.createImgsArea()
 
@@ -39,8 +40,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.horizontalLayouts.append(firstHLay)
         self.horizontalLayouts[0].setAlignment(QtCore.Qt.AlignLeft)        
         self.imgsHLayoutsContainer.addLayout(self.horizontalLayouts[0])
-        self.UploadButton = self.createUploadButton()
-        self.horizontalLayouts[0].addWidget(self.UploadButton)
 
 
     def dragEnterEvent(self, event):
@@ -115,21 +114,20 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
         maxRowSize = noImgPerRow
-        imageBox_W = (Constants.MONITOR_WIDTH - 440 - 7 * noImgPerRow) / noImgPerRow - 20  # 201
+        imageBox_W = (Constants.MONITOR_WIDTH - 7* self.maxRowSize)/self.maxRowSize - 20  # 201
         if imageBox_W < 180:
             imageBox_W = 180
             maxRowSize = 7
         imageBox_H = int(imageBox_W * 4 / 3)  # 268
 
         indexRow = 0
-        indexCol = 1
+        indexCol = 0
         newIndexRow = 0
-        newIndexCol = 1
+        newIndexCol = 0
         newHorLayouts = []
         newLine = QtWidgets.QHBoxLayout()
         newHorLayouts.append(newLine)
         newHorLayouts[0].setAlignment(QtCore.Qt.AlignLeft)
-        newHorLayouts[0].addWidget(self.UploadButton)
 
         for imagebox in self.imageBoxes:
             imagebox.groupBox.setParent(None)
@@ -168,26 +166,25 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.chanageGridSize(self.maxRowSize)
 
     def on_cropButton_clicked(self, index):
-        print("2na 2das 3laia")
+        self.cropDialog = cropImage.cropImageDialog(self.imageBoxes[index].srcPath, index)
+        self.cropDialog.show()
+        self.cropDialog.activateWindow()
+        self.chanageGridSize(self.maxRowSize)
 
-    def createUploadButton(self):
-        self.boxUploadImages = QtWidgets.QGroupBox()
-        self.boxUploadImages.setMinimumWidth(self.imageBox_W + 45)
-        self.boxUploadImages.setMinimumHeight(self.imageBox_H + 165)
-        self.boxUploadImages.setMaximumWidth(self.imageBox_W + 45)
-        self.boxUploadImages.setMaximumHeight(self.imageBox_H + 165)
-        self.addBoxLayout = QtWidgets.QVBoxLayout(self.boxUploadImages)
-        self.addButton = QtWidgets.QPushButton()
-        self.addButton.setText("Add\nImages")
-        self.addButton.clicked.connect(self.addImages_onClick)
-        self.addBoxLayout.addWidget(self.addButton)
-        return self.boxUploadImages
-
-    def addImages_onClick(self):
+    def AddImages(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
         paths, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select images to add", "main",
-                                                          "All Files (*);;JPG (*.JPG);;PNG (*.PNG)", options=options)
+                                                          "All Files (*);;JPG (*.JPG);;PNG (*.PNG)",
+                                                          options=options)
         if paths:
             self.pictureDropped(paths)
 
+    def ChangeGrid4(self):
+        self.chanageGridSize(4)
+
+    def ChangeGrid6(self):
+        self.chanageGridSize(6)
+
+    def ChangeGrid8(self):
+        self.chanageGridSize(8)
