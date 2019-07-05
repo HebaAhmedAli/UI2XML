@@ -15,7 +15,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName("Dialog")
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(140, 140, 231, 51))
-        Dialog.setStyleSheet("""background-color:#515781;""")
+        # Dialog.setStyleSheet("""background-color:#515781;""")
         
         font = QtGui.QFont()
         font.setFamily("URW Gothic L")
@@ -35,7 +35,7 @@ class Ui_Dialog(object):
         self.label_2.setObjectName("label_2")
 
         self._gif = QtWidgets.QLabel(Dialog)
-        movie = QtGui.QMovie("Resources/Images/load.gif")
+        movie = QtGui.QMovie("Resources/Images/loading.gif")
         self._gif.setMovie(movie)
         self._gif.move(400, 300)
         movie.start()
