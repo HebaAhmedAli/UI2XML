@@ -103,16 +103,16 @@ def printListViewBean(leavesType,idx,appName,package):
         "\t\treturn "+varName[leavesType[i]]+str(i)+";\n\t}\n"+\
         "\tpublic void set"+varName[leavesType[i]].capitalize()+str(i)+"("+varType[leavesType[i]] +" "+varName[leavesType[i]]+str(i)+") {\n"+\
         "\t\tthis."+varName[leavesType[i]]+str(i)+" = "+varName[leavesType[i]]+str(i)+";\n\t}\n"
-                
+
     listViewBean+= "\tpublic "+appName.capitalize()+"ListViewBean"+str(idx)+"() {\n\t}\n"+\
     "\tpublic "+appName.capitalize()+"ListViewBean"+str(idx)+"("+params+") {\n"+\
     "\t\tsuper();\n"+constructor + "\t}\n" +  getterAndSetter+"}\n"
-        
-    fTo.write("package "+package+";\n"+listViewBean)    
-    
+
+    fTo.write("package "+package+";\n"+listViewBean)
+
     return
-    
-    
+
+
 def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package):
     listViewBean = ""
     if Constants.PACKAGE != '':
@@ -122,7 +122,7 @@ def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package
 
     imports = "import android.content.Context;\nimport android.view.LayoutInflater;\nimport android.view.View;\n"+\
     "import android.view.ViewGroup;\nimport android.widget.BaseAdapter;\nimport java.util.ArrayList;\nimport java.util.List;\n"
-    
+
     listViewBean += "public class "+appName.capitalize()+"ListViewBaseAdapter"+str(idx)+" extends BaseAdapter {\n"+\
     "\tpublic ArrayList<"+appName.capitalize()+"ListViewBean"+str(idx)+"> arrayListListener;\n"+\
     "\tprivate List<"+appName.capitalize()+"ListViewBean"+str(idx)+"> mListenerList;\n\tContext mContext;\n"+\
@@ -138,7 +138,7 @@ def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package
               'android.widget.TextView': 'setText', 'android.widget.Button': 'setText','android.widget.CheckedTextView':'CheckedTextView'}
     getter = {'android.widget.ImageButton': 'getIcon' ,'android.widget.ImageView': 'getImage',\
               'android.widget.TextView': 'getText', 'android.widget.Button': 'getButtonText','android.widget.CheckedTextView':'getCheckedText'}
-    
+
     holderItems=""
     setHolderItems=""
     for i in range(len(leavesType)):
@@ -149,7 +149,7 @@ def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package
         #if leavesType[i] == 'android.widget.ImageButton' or leavesType[i] == 'android.widget.Button':
         #    setHolderItems += "\t\t\tholder."+varName[leavesType[i]]+str(i)+".setOnClickListener(new View.OnClickListener() {\n"+\
         #   "\t\t\t\t@Override\n\t\t\t\tpublic void onClick(View v) {\n\t\t\t\t\t// onClick logic \t\t\t\t}\n\t\t\t});\n"
-    
+
     listViewBean+= "\t}\n\t@Override\n\tpublic int getCount() {\n\t\treturn mListenerList.size();\n\t}\n"+\
         "\t@Override\n\tpublic Object getItem(int position) {\n\t\treturn mListenerList.get(position);\n\t}\n"+\
         "\t@Override\n\tpublic long getItemId(int position) {\n\t\treturn position;\n\t}\n\t@Override\n"+\
@@ -159,11 +159,11 @@ def printListViewBaseAdapter(listView,leavesType,selectedIds,idx,appName,package
         "\t\t\tholder = new ViewHolder();\n"+holderItems+"\t\t\tview.setTag(holder);\n\t\t}\n"+\
         "\t\telse {\n\t\t\tholder = (ViewHolder) view.getTag();\n\t\t}\n\t\ttry {\n"+\
         setHolderItems+"\t\t} catch (Exception ex){\n\t\t}\n\t\treturn view;\n\t}\n}"
-    
+
     fTo.write("package "+package+";\n"+imports+listViewBean)
     return listViewBean
-       
-  
+
+
 def findButtons(rootNode,buttonsIds):
     if len(rootNode.childNodes) == 0:
         if(rootNode.nodeType == 'android.widget.ImageButton' or rootNode.nodeType == 'android.widget.Button'):
@@ -171,7 +171,7 @@ def findButtons(rootNode,buttonsIds):
         return
     for childNode in rootNode.childNodes:
         findButtons(childNode,buttonsIds)
-            
+
 def printButtons(buttonsId):
     onClick = ""
     for buttonId in  buttonsId:
@@ -205,7 +205,7 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
     radioId = ""
     if len(radioGroup.childNodes) > 1 : # VerticalRadioGroup
         for i in range(len(radioGroup.childNodes)):
-            for child in radioGroup.childNodes[i].childNodes: 
+            for child in radioGroup.childNodes[i].childNodes:
                 if child.nodeType == "android.widget.RadioButton":
                     radioId = child.id
                     break
@@ -218,7 +218,7 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
             onClicks+= setCheckedVertical(radioGroup,radioGroupIdx,i)
             onClicks+="\t\t\t}\n\t\t});"
         radioButtons+= ";\n"
-        
+
     else: # HorizontalRadioGroup containing only one horizontal Linearlayout
        radioButtonCount = 0
        for i in range(len(radioGroup.childNodes[0].childNodes)):
@@ -231,21 +231,22 @@ def printRadiosAndOnClicks(radioGroup,radioGroupIdx):
                 onClicks+= setCheckedHorizontal(radioGroup.childNodes[0],radioGroupIdx,radioButtonCount)
                 onClicks+="\t\t\t}\n\t\t});\n"
                 radioButtonCount += 1
-       radioButtons = radioButtons[:-2]         
+       radioButtons = radioButtons[:-2]
        radioButtons+= ";\n"
-       
+
     return radioButtons, findViews+onClicks
 
 def generateJava(rootNode,appName,actionBarOp):
+    Constants.PROJECT_NAME = Constants.PROJECT_NAME.lower()
     if Constants.PACKAGE != '':
         if not os.path.exists(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"):
-                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/") 
+                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/")
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PACKAGE+"/"+Constants.PROJECT_NAME+"/"+appName.capitalize()+"Activity"+'.java', 'w+')
     else:
         if not os.path.exists(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"):
-                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/") 
+                os.makedirs(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/")
         fTo=open(Constants.DIRECTORY+'/java/com/example/'+Constants.PROJECT_NAME+"/"+appName.capitalize()+"Activity"+'.java', 'w+')
-   
+
     package = "com.example."+Constants.PACKAGE+"."+Constants.PROJECT_NAME
     if Constants.PACKAGE == '':
         package = "com.example."+Constants.PROJECT_NAME
