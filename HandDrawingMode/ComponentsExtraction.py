@@ -3,9 +3,7 @@ sys.path.append('../')
 import HandDrawingMode.BoxesExtraction as BoxesExtraction
 import HandDrawingMode.TextExtraction as TextExtraction
 import Utils
-import Constants
-import os
-import cv2
+import time
 
 def getFirstTextBoxAndRatio(boxesInBacket,textsInBacket):
     text = ""
@@ -67,11 +65,17 @@ def filterComponentsAndPredict(allBoxes,texts,image):
 # Extract the boxes and text from given image -extracted components-.
 def extractComponents(image,imgCopy,image4Txt,appName): # TODO: Remove appName.
     # TODO: Uncomment after testing and delete the line after this.
+    textTime = time.time()
     extractedTexts, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
+    print("Time for text = ",time.time()-textTime)
     #extractedTexts,textPositions = getFromAppName(appName)
+    timeExtract = time.time()
     extratctedBoxes,extractedTexts = BoxesExtraction.extractBoxes(image, extractedTexts, textPositions)
+    print("Time for boxes = ",time.time()-timeExtract)
     myImageBox = extratctedBoxes[0]
+    timePredict = time.time()
     extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)],imgCopy)
+    print("Time for predict = ",time.time()-timePredict)
     # Translate x and y and handle outside range.
     extratctedBoxesTranslated = []
     i = 0
@@ -140,7 +144,7 @@ appDict = {
 "loginND.jpg":
 (['Logm', 'Name', 'Email', 'Save'],
 [[87, 53, 37, 22], [27, 104, 31, 11], [23, 134, 32, 12], [195, 203, 32, 12]]),
- "login2ND.jpg":
+ "mainND.jpg":
 (['Login', 'Email', 'Password', 'Log', 'in'],
 [[677, 745, 219, 143], [330, 1015, 204, 94], [286, 1165, 360, 103], [832, 1516, 102, 80], [949, 1522, 59, 46]]),
  "login3ND.jpg":
