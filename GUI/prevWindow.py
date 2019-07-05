@@ -17,7 +17,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.pixmapX = Constants.MONITOR_WIDTH*0.3
         self.pixmapY = Constants.MONITOR_HEIGHT*0.8
         self.updateBtn.clicked.connect(self.updateCompType)
-        self.connectBtn.clicked.connect(self.connectToActivity)
+        # self.connectBtn.clicked.connect(self.connectToActivity)
         self.compTypeComboBox.currentIndexChanged.connect(self.enableUpdateBtn)
         self.changedCompIdx = None
         self.changedCompName = None
@@ -68,7 +68,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def onViewBtnClicked(self, imgPath):
         startI = imgPath.rfind('/', 0, len(imgPath))+1
         imgName = imgPath[startI:]
-        self.connectBtn.setEnabled(False)
+        # self.connectBtn.setEnabled(False)
 
         if self.connectBtnState :
             endI = imgName.rfind('.', 0, len(imgName))
@@ -148,13 +148,11 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             componentXML = Utils.getXmlOfComponent(index, imgName)
             self.compXMLBrowser.setPlainText(componentXML)
         elif (self.state == "ConnectCmpts"):
-            self.connectBtnState = False
+            self.connectBtnState = True
             for activ in self.activitysHLayouts:
-                activ.viewImg.setText("View")
-                activ.viewImg.setEnabled(True)
-            self.connectBtn.setEnabled(True)
-            # self.connectingActivityLbl.setText("")
-
+                activ.viewImg.setText("Connect")
+                if(activ.imgpath == self.activeImgDir):
+                    activ.viewImg.setEnabled(False)
         self.updateBtn.setEnabled(False)
         self.compOriginalLbl.setText(compName)
 

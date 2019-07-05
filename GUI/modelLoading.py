@@ -13,7 +13,6 @@ import qdarkstyle
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(400, 160)
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(20, 30, 231, 51))
         font = QtGui.QFont()
@@ -32,6 +31,10 @@ class Ui_Dialog(object):
         font.setWeight(75)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
+        self.progressBar = QtWidgets.QProgressBar(Dialog)
+        self.progressBar.setGeometry(QtCore.QRect(80, 400, 800, 31))
+        self.progressBar.setRange(0, 100)
+        self.progressBar.setObjectName("progressBar")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
