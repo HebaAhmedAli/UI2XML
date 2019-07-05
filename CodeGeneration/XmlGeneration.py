@@ -456,7 +456,7 @@ def printSpecialCase(parentNode,tabsString,imgH):
         'android:textColor = "'+parentNode.textColor+'"'+'\n'+tabsString+'\t'+\
         'android:background = "'+parentNode.backgroundColor+'"'+'\n'+tabsString+'\t'
         
-    if (parentNode.nodeType == 'android.widget.RadioButton' or parentNode.nodeType == 'android.widget.CheckBox')\
+    if (parentNode.nodeType == 'android.widget.RadioButton' or parentNode.nodeType == 'android.widget.CheckBox' or parentNode.nodeType == 'android.widget.CheckedTextView')\
     and parentNode.text != "":
         attributeString += "android:text = "+'"'+parentNode.text.replace('"','t')+'"'+'\n'+tabsString+'\t'
         
