@@ -121,7 +121,7 @@ def filterComponents(boxes, texts ,addedManuallyBool ,predictedComponents,imageC
         or 'android.widget.ProgressBarHorizontal' in predictedComponentsFiltered: # TODO : Try to find alternative sol.
         boxesFiltered,textsFiltered,predictedComponentsFiltered = DeleteVerticalAndHorizontalProgressBar(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy)
     buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy) # TODO : Comment in case change.
-    changeUnDesiredComponents(predictedComponentsFiltered)
+    changeUnDesiredComponents(predictedComponentsFiltered,textsFiltered)
     return boxesFiltered,textsFiltered,predictedComponentsFiltered
 
 # Case image containing all image or text inside.
@@ -140,9 +140,10 @@ def specialCaseImageText(boxesInBacket,textsInBacket,predictedComponentsInBacket
                 sumAreaImg+= (boxesInBacket[i][2]*boxesInBacket[i][3])
             else:
                 sumAreaNeg+= (boxesInBacket[i][2]*boxesInBacket[i][3])
-        if sumAreaText+sumAreaImg>sumAreaNeg and baseArea/imageArea<0.3 and predictedComponentsInBacket[0] == 'android.widget.TextView':
+        sumAreaPos = sumAreaText+sumAreaImg
+        if ((sumAreaPos+(baseArea-(sumAreaPos+sumAreaNeg))>sumAreaNeg and (baseArea/imageArea<0.1)) or (sumAreaPos>sumAreaNeg and baseArea/imageArea<0.3 and baseArea/imageArea>=0.1)) and predictedComponentsInBacket[0] == 'android.widget.TextView':
             return True
-        elif sumAreaImg>sumAreaText and sumAreaText+sumAreaImg>sumAreaNeg and baseArea/imageArea<0.3 and predictedComponentsInBacket[0] == 'android.widget.ImageView':
+        elif ((sumAreaPos+(baseArea-(sumAreaPos+sumAreaNeg))>sumAreaNeg and (baseArea/imageArea<0.1)) or (sumAreaPos>sumAreaNeg and baseArea/imageArea<0.3 and baseArea/imageArea>=0.1)) and predictedComponentsInBacket[0] == 'android.widget.ImageView':
             return True
         else:
             return False
@@ -170,7 +171,7 @@ def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBac
             return True
         # Check Change to button.
         if len(boxesInBacket)==1:
-            keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']
+            keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy','sign']
             lowerStrings=textsInBacket[0].lower().split()
             for j in range(len(keyStrings)):
                 if Utils.isSliceList(keyStrings[j].split(),lowerStrings):
@@ -189,7 +190,7 @@ def specialCaseRongEditText(boxesInBacket,textsInBacket,predictedComponentsInBac
 
     
 def buttonsKeyWords(boxesFiltered,textsFiltered,predictedComponentsFiltered,imageCopy):
-    keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy']
+    keyStrings=['register','login','log','create','forget','change password','change picture','submit','buy','sign']
     for i in range(len(textsFiltered)):
         if boxesFiltered[i][1] < (imageCopy.shape[0]/3.0):
             continue
@@ -244,8 +245,10 @@ def neglect(boxesInBacket,textsInBacket,predictedComponentsInBacket,imageCopy):
         return True
 
     # Case textView that don't have text so wrong classification.
+    
     if predictedComponentsInBacket[0] == 'android.widget.TextView' and \
-        textsInBacket[0] == '':
+        textsInBacket[0] == '' and (boxesInBacket[0][3]<heightThrshold1 or\
+        (boxesInBacket[0][3]<heightThrshold2 and boxesInBacket[0][2]>imageCopy.shape[1]*0.6)):
         return True
     
     if predictedComponentsInBacket[0] == 'android.widget.Button' and  boxesInBacket[0][3]/boxesInBacket[0][2]< 0.1 and \
@@ -339,7 +342,7 @@ def removenonEditTextThatAddedManually(boxes,texts,addedManuallyBool,predictedCo
             predictedComponentsRemovingManual.append(predictedComponents[i])
     return boxesRemovingManual,textsRemovingManual,predictedComponentsRemovingManual
 
-def changeUnDesiredComponents(pedictedComponents):
+def changeUnDesiredComponents(pedictedComponents,textsFiltered):
     for i in range(len(pedictedComponents)):
         if pedictedComponents[i]== 'android.widget.NumberPicker' or\
         pedictedComponents[i] =='android.widget.RatingBar':
@@ -348,3 +351,5 @@ def changeUnDesiredComponents(pedictedComponents):
             pedictedComponents[i] = 'android.widget.Button'
         elif pedictedComponents[i] =='android.widget.Spinner':
             pedictedComponents[i] = 'android.widget.ImageButton'
+        elif pedictedComponents[i] =='android.widget.TextView' and textsFiltered[i] == '':
+            pedictedComponents[i] = 'android.widget.ImageView'

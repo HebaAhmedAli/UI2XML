@@ -9,7 +9,6 @@ import copy
 import numpy as np
 from keras.preprocessing import image
 import time
-import Utils
 
 def processImage(subdir, file,model,invVocab):
     startTime = time.time()
@@ -81,6 +80,7 @@ def processAllImages(imagesPath,model,invVocab):
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
+        print(file)
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             start = time.time()
@@ -106,14 +106,14 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
 # UI2XMLclassification245000_98_91 decay with 150 * 150
 # UI2XMLclassification245000_98_90 adam with 150 * 150
 # UI2XMLclassification245000_97_87 with 64 * 64
-'''
+
 vocab,invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
 model = load_model('data/ourModel/'+Constants.MODEL_NAME) # 150 * 150
-imagesPath='data/ScreenShots/ourTest'
+imagesPath='dataToPush/ScreenShots/ourTest'
 startTime = time.time()
 processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
-'''
+
 
 '''
 print(Constants.mapToGui,'\n')
