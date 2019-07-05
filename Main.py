@@ -52,6 +52,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
 
     def enableRun(self):
         self.actionGenerateXML.setEnabled(True)
+        self.actionAdd_Images.setEnabled(True)
         self.statusbar.clearMessage()
         self.statusbar.showMessage("Drag and Drop or Click to upload your "+ Constants.designMode+ " Files")
 
@@ -61,6 +62,7 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
             return
         proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
         self.actionGenerateXML.setEnabled(False)
+        self.actionAdd_Images.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
              vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')

@@ -16,7 +16,7 @@ class Ui_mainWindow(object):
         mainWindow.resize(800, 600)
         # mainWindow.setStyleSheet("""background-color:#515781;""")
         iconLogo = QtGui.QIcon()
-        iconLogo.addPixmap(QtGui.QPixmap(Constants.ICONS_PATH + "finish-white.png"), QtGui.QIcon.Normal,
+        iconLogo.addPixmap(QtGui.QPixmap(Constants.ICONS_PATH + "logo.png"), QtGui.QIcon.Normal,
                            QtGui.QIcon.Off)
         mainWindow.setWindowIcon(iconLogo)
         mainWindow.setWindowTitle("TagIt")
@@ -94,6 +94,7 @@ class Ui_mainWindow(object):
         self.actionAdd_Images = QtWidgets.QAction(mainWindow)
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(Constants.ICONS_PATH +"addImages.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionAdd_Images.setEnabled(False)
         self.actionAdd_Images.setIcon(icon5)
         self.actionAdd_Images.setObjectName("actionAdd_Images")
         self.menuFile.addAction(self.actionAdd_Images)
