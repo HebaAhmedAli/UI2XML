@@ -12,21 +12,8 @@ import io
 from PIL import Image
 import time
 
-def processImage(subdir, file):
-    xImage = np.array(Utils.genTable(300,300))
-    if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
-        os.makedirs(Constants.DIRECTORY+'/res/drawable')
-    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_x.png")
-    path = subdir+'/' +file
-    img = cv2.imread(path)
-    imgCopy = copy.copy(img)
-    imgXML = image.load_img(subdir+'/' +file)
-    imgXML = np.array(imgXML,dtype='float32')
-    with io.open(path, 'rb') as image_file:
-        img4Txt = image_file.read()
-    file = file.replace('.jpeg','.jpg')
-    # TODO: Remove last parameter after testing.
-    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,imgCopy,img4Txt,file)
+
+def constructXml(subdir,file,img,imgCopy,imgXML,myImageBox,boxes,boxesTranslated,texts,predictedComponents):
     myImage = imgXML[myImageBox[1]:myImageBox[1]+myImageBox[3]+1,myImageBox[0]:myImageBox[0]+myImageBox[2]+1]
     boxToGui=[]
     predictedToGui=[]
@@ -61,9 +48,26 @@ def processImage(subdir, file):
         cv2.imwrite(subdir+"/boxOutputs/"+file,img)
 
 
-def createProcess(imagesPath, file):
-    process = Process(target=processImage, args=(imagesPath, file))
-    return process    
+def createProcess(subdir,file,img,imgCopy,imgXML,myImageBox,boxes,boxesTranslated,texts,predictedComponents):
+    process = Process(target=constructXml, args=(subdir,file,img,imgCopy,imgXML,myImageBox,boxes,boxesTranslated,texts,predictedComponents))
+    return process 
+
+def processImage(subdir, file):
+    xImage = np.array(Utils.genTable(300,300))
+    if not os.path.exists(Constants.DIRECTORY+'/res/drawable'):
+        os.makedirs(Constants.DIRECTORY+'/res/drawable')
+    Image.fromarray(xImage.astype(np.uint8)).save(Constants.DIRECTORY+'/res/drawable/'+"pic_x.png")
+    path = subdir+'/' +file
+    img = cv2.imread(path)
+    imgCopy = copy.copy(img)
+    imgXML = image.load_img(subdir+'/' +file)
+    imgXML = np.array(imgXML,dtype='float32')
+    with io.open(path, 'rb') as image_file:
+        img4Txt = image_file.read()
+    file = file.replace('.jpeg','.jpg')
+    # TODO: Remove last parameter after testing.
+    boxes, boxesTranslated, texts, predictedComponents,myImageBox = ComponentsExtraction.extractComponents(img,imgCopy,img4Txt,file)
+    return createProcess(subdir,file,img,imgCopy,imgXML,myImageBox,boxes,boxesTranslated,texts,predictedComponents)   
 
 
 
@@ -79,7 +83,7 @@ def processAllImages(imagesPath):
     for file in files:
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
-            process = createProcess(imagesPath, file)
+            process = processImage(imagesPath, file)
             processes.append(process)
     for p in processes:
         p.start()
@@ -106,7 +110,7 @@ def updateImage(subdir,file,valMapFromGui):
     for i in range(len(boxToGui)):
         boxToGui[i] = [boxToGui[i][0]+valMapFromGui[4][0],boxToGui[i][1]+valMapFromGui[4][1],boxToGui[i][2],boxToGui[i][3]]     
     
-    Constants.mapToGui.update( {file : [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui]})
+    Constants.mapToGui.update( {file: [boxToGui,idToGui,predictedToGui,xmlFilesToGui,inWhichFile,parentNodesForGui,valMapFromGui[4]]})
 
 
 def createUpdateProcess(subdir,file,valMapFromGui):
