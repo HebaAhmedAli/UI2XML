@@ -34,6 +34,9 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
             if name[:endI] in names:
                 utils.alertUser("Duplicates", name+" exists more than one time")
                 return -1
+            if name[:endI] == "":
+                utils.alertUser("Empty Name", "Every file should have a name.")
+                return -1
             names.append(name[:endI])
         print (names)
         if (not "main" in names):
