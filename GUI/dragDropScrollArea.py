@@ -18,12 +18,13 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.numOfImages = 0
         self.maxRowSize = 4
 
-        self.imageBox_W = (Constants.MONITOR_WIDTH - 30 * self.maxRowSize)/self.maxRowSize - 20         #201
+        self.imageBox_W = (Constants.MONITOR_WIDTH - 40 * self.maxRowSize)/self.maxRowSize - 40        
+        print("K", self.imageBox_W )
         if self.imageBox_W < 180:
             self.imageBox_W = 180
             self.maxRowSize = 4
         self.imageBox_H = int(self.imageBox_W *4/3)    #268        
-
+        print(self.imageBox_W )
         # Placement of the uploaded image
         self.IsGrid = 1
         self.indexColumn = 0
@@ -118,7 +119,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
         maxRowSize = noImgPerRow
-        imageBox_W = (Constants.MONITOR_WIDTH - 7* self.maxRowSize)/self.maxRowSize - 20  # 201
+        imageBox_W =  (Constants.MONITOR_WIDTH - 40 * self.maxRowSize)/self.maxRowSize - 40   
         if imageBox_W < 180:
             imageBox_W = 180
             maxRowSize = 7
@@ -137,11 +138,11 @@ class dragDropScroll(QtWidgets.QScrollArea):
             imagebox.groupBox.setParent(None)
 
         for idx in range (0, self.numOfImages):
-            if (idx +1) / (indexRow +1) >= self.maxRowSize:
+            if idx / (indexRow +1) >= self.maxRowSize:
                 indexRow = indexRow + 1
                 indexCol = 0
             imagebox = self.imageBoxes[idx].resizeImg(idx,  newIndexRow, newIndexCol, imageBox_W, imageBox_H)
-            if (idx +1) / (newIndexRow +1) >= maxRowSize :
+            if idx / (newIndexRow +1) >= maxRowSize :
                 newIndexRow = newIndexRow + 1
                 newIndexCol = 0
                 newLine = QtWidgets.QHBoxLayout()
