@@ -75,7 +75,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
             self.connectingActivityLbl.setText(imgName[:endI-2]+imgName[endI:])
             startI = self.activeImgDir.rfind('/', 0, len(self.activeImgDir))+1
             activeImgName = self.activeImgDir[startI:]
-            self.mapConnect.update({self.highlights[self.changedCompIdx].idName:[activeImgName, imgName]})
+            self.mapConnect.update({self.highlights[self.changedCompIdx].idName+','+activeImgName:[activeImgName, imgName]})
             self.connectBtnState = False
             for activ in self.activitysHLayouts:
                 activ.viewImg.setText("View")
@@ -160,6 +160,7 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
         self.highlights[self.changedCompIdx].predicted=self.changedCompName
         self.highlights[self.changedCompIdx].changed=True
 
+
     def updateXMLTab(self, xmlFiles):
         xmlDir = Constants.imagesPath[:-5] + Constants.androidPath + "/res/layout"
         self.activeImgXMLtabs = []
@@ -222,7 +223,9 @@ class previewWindow(QtWidgets.QWidget, previewWindowSkel):
     def convertConnectMapToLists(self):
         connectedActivities = []
         for key, value in self.mapConnect.items():
-            lst = [key, value[0], value[1]]
+            idx = key.rfind(',', 0, len(key))
+            btnID = key[:idx]
+            lst = [btnID, value[0], value[1]]
             connectedActivities.append(lst)
         return connectedActivities
 
