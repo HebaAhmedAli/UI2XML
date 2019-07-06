@@ -20,6 +20,7 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
 
     def populateProjDir(self):
         names = []
+        fullNames = []
         for image in self.scrollarea.imageBoxes:
             name = str(image.imageNameLine.text())
             name = name.replace('.jpeg','.jpg')
@@ -28,6 +29,13 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
                                                                                            endI + 1:].lower() != "psd"):
                 utils.alertUser("File name Error", name + " File name or extension not correct")
                 return -1
+            if "main" in names:
+                utils.alertUser("Multiple main", "Choose only one of the files as your Main Activity")
+                return -1
+            if name in fullNames:
+                utils.alertUser("Duplicates", name+" exists more than one time")
+                return -1
+            fullNames.append(name)
             names.append(name[:endI])
         if (not "main" in names):
             utils.alertUser("Missing main", "Choose one of the files as your Main Activity")
