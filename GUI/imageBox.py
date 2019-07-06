@@ -29,9 +29,9 @@ class imageBox(QWidget):
         self.checkBoxs.addWidget(self.staticList)
         self.deleteImage = delButton(self, index)
 
-        self.cropImage = cropButton(self, index)
+        # self.cropImage = cropButton(self, index)
         self.buttonsLayout.addWidget(self.deleteImage)
-        self.buttonsLayout.addWidget(self.cropImage)
+        # self.buttonsLayout.addWidget(self.cropImage)
         self.checkboxsLay.setLayout(self.checkBoxs)
         self.buttonsBox.setLayout(self.buttonsLayout)
         self.Hor.addWidget(self.checkboxsLay)
@@ -69,6 +69,10 @@ class imageBox(QWidget):
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         return self.groupBox
 
+    def changeImge(selfself, imagePath):
+        print("tl3t")
+        # pixmapimage = QPixmap(self.srcPath).scaled(width, height)
+        # self.imageLabel.setPixmap(QPixmap(pixmapimage))
 
 class delButton(QPushButton):
     deleted = pyqtSignal(int)
@@ -105,3 +109,4 @@ class cropButton(QPushButton):
 
     def cropImageBox(self):
         self.crop.emit(self.index)
+

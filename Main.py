@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 import GUI.skelMainScreen as skelMainscreen
 import GUI.uploadWindow as uploadWindow
 from GUI.createProjDialog import createProjectDialog
+from GUI.createFinishDialog import createFinishDialog
 import  GUI.prevWindow as prevWindow
 import  GUI.utils as utils
 from keras.models import load_model
@@ -36,18 +37,22 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.lay = QHBoxLayout()
         self.centralwidget.setLayout(self.lay)
         self.lay.addLayout(self.uploadWidget.layoutScroll)
+        self.actionAdd_Images.triggered.connect(self.uploadWidget.scrollarea.AddImages)
     
     def startUp(self):
         Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
+        self.setEnabled(False)
         self.mainDialoge.activateWindow()
         self.mainDialoge.createProjectBtn.clicked.connect(self.enableRun)
         self.statusbar.clearMessage()
         self.statusbar.showMessage("Choose the Android Studio project you already created")
 
     def enableRun(self):
+        self.setEnabled(True)
         self.actionGenerateXML.setEnabled(True)
+        self.actionAdd_Images.setEnabled(True)
         self.statusbar.clearMessage()
         self.statusbar.showMessage("Drag and Drop or Click to upload your "+ Constants.designMode+ " Files")
 
@@ -56,8 +61,8 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         if error==-1:
             return
         proc = subprocess.Popen(args = ["python3", "GUI/modelLoading.py"])
-        print(proc.pid)
         self.actionGenerateXML.setEnabled(False)
+        self.actionAdd_Images.setEnabled(False)
         self.actionUpdateCmpts.setEnabled(True)
         if Constants.designMode == Constants.DESIGN_MODES[0]:
              vocab, invVocab = LoadDataClassification.loadVocab('data/vocab_classification.txt')
@@ -101,7 +106,12 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionFinish.setEnabled(False)
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
-        self.close()
-    
+        print("MAP", connectedMap)
+        self.finishDialog = createFinishDialog()
+        self.setEnabled(False)
+        self.finishDialog.closeProgBtn.clicked.connect(self.endProg)
+        self.finishDialog.show()
+
     def endProg(self):
+        self.close()
         exit()

@@ -4,6 +4,8 @@ EPOCHS = 5#15
 VOCAB_SIZE_CLASSIFICATION =  16
 IMAGE_SIZE_CLASSIFICATION = 150
 DIRECTORY = 'data/ScreenShots/ourTest/output'
+ICONS_PATH = 'Resources/Images/'
+
 ID = 0
 PACKAGE = ''
 PROJECT_NAME = "gp"

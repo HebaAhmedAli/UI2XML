@@ -13,9 +13,10 @@ import qdarkstyle
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(400, 160)
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(20, 30, 231, 51))
+        self.label.setGeometry(QtCore.QRect(140, 140, 231, 51))
+        # Dialog.setStyleSheet("""background-color:#515781;""")
+        
         font = QtGui.QFont()
         font.setFamily("URW Gothic L")
         font.setPointSize(26)
@@ -24,7 +25,7 @@ class Ui_Dialog(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(80, 80, 600, 70))
+        self.label_2.setGeometry(QtCore.QRect(240, 180, 600, 70))
         font = QtGui.QFont()
         font.setFamily("URW Gothic L")
         font.setPointSize(26)
@@ -32,6 +33,12 @@ class Ui_Dialog(object):
         font.setWeight(75)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
+
+        self._gif = QtWidgets.QLabel(Dialog)
+        movie = QtGui.QMovie("Resources/Images/loading.gif")
+        self._gif.setMovie(movie)
+        self._gif.move(400, 300)
+        movie.start()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

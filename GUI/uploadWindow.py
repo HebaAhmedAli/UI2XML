@@ -28,7 +28,17 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
                                                                                            endI + 1:].lower() != "psd"):
                 utils.alertUser("File name Error", name + " File name or extension not correct")
                 return -1
+            if "main" in names and "main" == name[:endI]:
+                utils.alertUser("Multiple main", "Choose only one of the files as your Main Activity")
+                return -1
+            if name[:endI] in names:
+                utils.alertUser("Duplicates", name+" exists more than one time")
+                return -1
+            if name[:endI] == "":
+                utils.alertUser("Empty Name", "Every file should have a name.")
+                return -1
             names.append(name[:endI])
+        print (names)
         if (not "main" in names):
             utils.alertUser("Missing main", "Choose one of the files as your Main Activity")
             return -1
@@ -67,8 +77,6 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
     def removeUploadWid(self):
         for image in self.scrollarea.imageBoxes:
             image.deleteImage.click()
-        self.scrollarea.UploadButton.setParent(None)
-        del self.scrollarea.UploadButton
         for horizontalLayout in self.scrollarea.horizontalLayouts:
             horizontalLayout.setParent(None)
             del horizontalLayout
@@ -79,4 +87,3 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
         del self.scrollarea
         self.dockDesign.setParent(None)
         del self.dockDesign
-
