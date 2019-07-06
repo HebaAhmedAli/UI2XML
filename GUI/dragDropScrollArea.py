@@ -16,11 +16,12 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.horizontalLayouts = []
         self.imageBoxes = []
         self.numOfImages = 0
-        self.maxRowSize = 4
+        self.maxRowSize = 6
 
-        self.imageBox_W = (Constants.MONITOR_WIDTH - 30 * self.maxRowSize)/self.maxRowSize - 20         #201
-        if self.imageBox_W < 180:
-            self.imageBox_W = 180
+        self.imageBox_W = (Constants.MONITOR_WIDTH - 10 * self.maxRowSize)/self.maxRowSize - 40         #201
+        print(self.imageBox_W)
+        if self.imageBox_W < 190:
+            self.imageBox_W = (Constants.MONITOR_WIDTH - 10 * 4) / self.maxRowSize - 40
             self.maxRowSize = 4
         self.imageBox_H = int(self.imageBox_W *4/3)    #268        
 
@@ -114,10 +115,12 @@ class dragDropScroll(QtWidgets.QScrollArea):
 
     def chanageGridSize(self, noImgPerRow, imgWidth=0, imgHight = 0):
         maxRowSize = noImgPerRow
-        imageBox_W = (Constants.MONITOR_WIDTH - 7* self.maxRowSize)/self.maxRowSize - 20  # 201
-        if imageBox_W < 180:
-            imageBox_W = 180
-            maxRowSize = 7
+
+        imageBox_W = (Constants.MONITOR_WIDTH - 10 * maxRowSize) / maxRowSize - 40  # 190
+        if imageBox_W < 190:
+            imageBox_W = (Constants.MONITOR_WIDTH - 10 * 4) / maxRowSize - 40
+            maxRowSize = 4
+
         imageBox_H = int(imageBox_W * 4 / 3)  # 268
 
         indexRow = 0
@@ -133,11 +136,11 @@ class dragDropScroll(QtWidgets.QScrollArea):
             imagebox.groupBox.setParent(None)
 
         for idx in range (0, self.numOfImages):
-            if (idx +1) / (indexRow +1) >= self.maxRowSize:
+            if (idx) / (indexRow +1) >= self.maxRowSize:
                 indexRow = indexRow + 1
                 indexCol = 0
             imagebox = self.imageBoxes[idx].resizeImg(idx,  newIndexRow, newIndexCol, imageBox_W, imageBox_H)
-            if (idx +1) / (newIndexRow +1) >= maxRowSize :
+            if (idx ) / (newIndexRow +1) >= maxRowSize :
                 newIndexRow = newIndexRow + 1
                 newIndexCol = 0
                 newLine = QtWidgets.QHBoxLayout()
@@ -180,5 +183,3 @@ class dragDropScroll(QtWidgets.QScrollArea):
                                                           "All Files (*);;JPG (*.JPG);;PNG (*.PNG)", options=options)
         if paths:
             self.pictureDropped(paths)
-
-

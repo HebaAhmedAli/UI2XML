@@ -7,10 +7,11 @@ class imageBox(QWidget):
         super(imageBox, self).__init__()
         self.srcPath = ""
         self.groupBox = QGroupBox()
-        self.groupBox.setMinimumWidth(width + 45)
-        self.groupBox.setMinimumHeight(height + 165)
+        # self.groupBox.setMinimumWidth(width + 45)
+        # self.groupBox.setMinimumHeight(height + 165)
         self.groupBox.setMaximumWidth(width + 40)
         self.groupBox.setMaximumHeight(height + 165)
+
         #self.groupBox.setStyleSheet("""background-color: #acf3da;
         #border: 1px solid #4d0056""")
         self.fullImageBoxLay = QVBoxLayout()
@@ -67,6 +68,10 @@ class imageBox(QWidget):
         self.col = col
         pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
+        self.fullImageBoxLay.addLayout(self.Hor)
+        self.groupBox.setLayout(self.fullImageBoxLay)
+        self.groupBox.setMaximumWidth(width + 40)
+        self.groupBox.setMaximumHeight(height + 165)
         return self.groupBox
 
     def changeImge(selfself, imagePath):

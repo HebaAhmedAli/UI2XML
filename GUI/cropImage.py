@@ -117,7 +117,7 @@ class cropImageDialog(QtWidgets.QDialog):
             x = point.x()
             y = point.y()
 
-            if x >= 25 and x <= 25 + self.new_imgW and y >= 25 and y <= 20+ self.new_imgH:
+            if x >= 25 and x <= 29 + self.new_imgW and y >= 25 and y <= 15+ self.new_imgH:
                 if self.dragState == "Left":
                     y = self.RubberPosition_Y
                     diff_x = self.RubberPosition_X - x
