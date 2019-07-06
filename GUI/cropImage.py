@@ -30,7 +30,7 @@ class cropImageDialog(QtWidgets.QDialog):
     def buildDialog(self):
         iconImage = QtGui.QIcon()
         iconImage.addPixmap(QtGui.QPixmap("Resources/Images/crop-white.png"))
-        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+        #self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
         self.setWindowTitle("Crop Image")
         self.setWindowIcon(iconImage)
         self.setFixedSize(self.new_imgW + 180, self.new_imgH + 40)
