@@ -29,9 +29,9 @@ class imageBox(QWidget):
         self.checkBoxs.addWidget(self.staticList)
         self.deleteImage = delButton(self, index)
 
-        self.cropImage = cropButton(self, index)
+        # self.cropImage = cropButton(self, index)
         self.buttonsLayout.addWidget(self.deleteImage)
-        self.buttonsLayout.addWidget(self.cropImage)
+        # self.buttonsLayout.addWidget(self.cropImage)
         self.checkboxsLay.setLayout(self.checkBoxs)
         self.buttonsBox.setLayout(self.buttonsLayout)
         self.Hor.addWidget(self.checkboxsLay)

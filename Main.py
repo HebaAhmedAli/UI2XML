@@ -38,20 +38,19 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.centralwidget.setLayout(self.lay)
         self.lay.addLayout(self.uploadWidget.layoutScroll)
         self.actionAdd_Images.triggered.connect(self.uploadWidget.scrollarea.AddImages)
-        self.action4_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid4)
-        self.action6_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid6)
-        self.action8_images_per_row.triggered.connect(self.uploadWidget.scrollarea.ChangeGrid8)
     
     def startUp(self):
         Constants.MONITOR_WIDTH, Constants.MONITOR_HEIGHT = utils.getScreenDims()
         self.mainDialoge = createProjectDialog()
         self.mainDialoge.show()
+        self.setEnabled(False)
         self.mainDialoge.activateWindow()
         self.mainDialoge.createProjectBtn.clicked.connect(self.enableRun)
         self.statusbar.clearMessage()
         self.statusbar.showMessage("Choose the Android Studio project you already created")
 
     def enableRun(self):
+        self.setEnabled(True)
         self.actionGenerateXML.setEnabled(True)
         self.actionAdd_Images.setEnabled(True)
         self.statusbar.clearMessage()
@@ -111,14 +110,8 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.finishDialog = createFinishDialog()
         self.setEnabled(False)
         self.finishDialog.closeProgBtn.clicked.connect(self.endProg)
-        # self.finishDialog.startProgBtn.clicked.connect(self.startOver)
         self.finishDialog.show()
 
-    # def startOver(self):
-    #     self.close()
-    #     mainScreen()
-
     def endProg(self):
-        self.finishDialog.close()
         self.close()
         exit()

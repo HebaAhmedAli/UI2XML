@@ -5,7 +5,7 @@ import GUI.utils as utils
 from GUI.imageBox import imageBox
 import Constants
 import os
-import GUI.cropImage as cropImage
+# import GUI.cropImage as cropImage
 
 class dragDropScroll(QtWidgets.QScrollArea):
     donePopulating = QtCore.pyqtSignal
@@ -99,7 +99,7 @@ class dragDropScroll(QtWidgets.QScrollArea):
             HLayoutCnt = len(self.horizontalLayouts)
             newimage = imageBox(self.numOfImages, self.imageBox_W, self.imageBox_H)
             newimage.deleteImage.deleted.connect(self.on_deleteButton_clicked)
-            newimage.cropImage.crop.connect(self.on_cropButton_clicked)
+            # newimage.cropImage.crop.connect(self.on_cropButton_clicked)
             self.numOfImages = self.numOfImages + 1
             if (self.horizontalLayouts[HLayoutCnt -1]).count() >= self.maxRowSize  :
                 self.indexColumn = 0
