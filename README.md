@@ -12,3 +12,8 @@ Converting the UI image to XML code and its corresponding Java classes with basi
 
 # Running Instructions:
 		to run the project: python3 App.py
+
+# You may need to run these commands in case you have problems in keras version or pytesseract:
+		pip3 install --upgrade keras
+		sudo apt install tesseract-ocr
+		pip3 install pytesseract
