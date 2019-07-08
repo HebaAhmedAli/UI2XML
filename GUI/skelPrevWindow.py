@@ -47,7 +47,7 @@ class previewWindowSkel(object):
         self.scrollArea.setWidget(self.activitiesList)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.activitiesList)
         self.activitiesList.setLayout(self.verticalLayout)
-
+        self.verticalLayout.setAlignment(QtCore.Qt.AlignTop)
 
         self.correctionWidget = QtWidgets.QWidget(prev)
         self.correctionLayout = QtWidgets.QVBoxLayout()
