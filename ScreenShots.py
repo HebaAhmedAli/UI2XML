@@ -88,8 +88,8 @@ def processAllImages(imagesPath,model,invVocab):
     for p in processes:
         p.join()
         p.terminate()
-    print("Total time = ",time.time()-startTime)
-        
+    Constants.timeFile.write("Total time = "+str(time.time()-startTime)+"\n")
+    Constants.timeFile.close()
 def updateImage(subdir,file,valMapFromGui):
     imgXML = image.load_img(subdir+'/' +file)
     imgXML = np.array(imgXML,dtype='float32')  
@@ -108,7 +108,6 @@ def createUpdateProcess(subdir,file,valMapFromGui):
 
          
 def updateAllImages(imagesPath,mapUpdatedFromGui):
-    startTime=time.time()
     # TODO: Comment after testing.
     #mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
     manager=Manager()
@@ -142,10 +141,3 @@ processAllImages(imagesPath,model,invVocab)
 print("Total time = ",time.time()-startTime)
 '''
 
-'''
-print(Constants.mapToGui,'\n')
-print(Utils.getXmlOfComponent(0,'face3AD.jpg'),'\n')
-print(Utils.getXmlOfComponent(2,'face3AD.jpg'),'\n')
-print(Utils.getXmlOfComponent(3,'face3AD.jpg'),'\n')
-'''
-#updateAllImages(imagesPath,{})

@@ -45,7 +45,7 @@ def createProcess(image,imageCopy,imageXML,extratctedBoxesPart,featuresProcesses
 def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     start0 = time.time()
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
-    print("timeBoxesExtraction = ",time.time()-start0)
+    Constants.timeFile.write("timeBoxesExtraction = "+str(time.time()-start0)+"\n")
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
@@ -62,7 +62,7 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     for p in processes:
         p[0].join()
         p[0].terminate()
-    print("time timeExtractText = ",time.time()-timeExtractText)
+    Constants.timeFile.write("time timeExtractText = "+str(time.time()-timeExtractText)+"\n")
     # featuresProcesses[i][0] features
     # featuresProcesses[i][1] ifSquare
     # featuresProcesses[i][2] circularity
@@ -90,7 +90,7 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         prediction = handleRadioAndCheck(prediction,[x,y,w,h],imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model)
         pedictedComponents.append(prediction)
         extractedText.append(text)
-    print("Time for features and prediction = ",time.time()-timePrediction)
+    Constants.timeFile.write("Time for features and prediction = "+str(time.time()-timePrediction)+"\n")
     del featuresProcesses
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
@@ -127,7 +127,6 @@ def extractShapeFeatures(img,resizedImg,featuresProcessesI):
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1
-      print("noContors: ",str(Constants.noContors))
       return allShapeFeatures+[0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
