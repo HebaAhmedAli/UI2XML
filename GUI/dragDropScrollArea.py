@@ -18,13 +18,12 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.numOfImages = 0
         self.maxRowSize = 4
 
-        self.imageBox_W = (Constants.MONITOR_WIDTH - 40 * self.maxRowSize)/self.maxRowSize - 40        
-        print("K", self.imageBox_W )
+        self.imageBox_W = (Constants.MONITOR_WIDTH - 40 * self.maxRowSize)/self.maxRowSize - 40       
         if self.imageBox_W < 180:
             self.imageBox_W = 180
             self.maxRowSize = 4
         self.imageBox_H = int(self.imageBox_W *4/3)    #268        
-        print(self.imageBox_W )
+      
         # Placement of the uploaded image
         self.IsGrid = 1
         self.indexColumn = 0
@@ -75,7 +74,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
         endIdx = filePath.rfind('.', 0, len(filePath)) + 1
         fileExten = filePath[endIdx:]
         fileExten = fileExten.lower()
-        print(fileExten,Constants.designMode)
         if( Constants.designMode == Constants.DESIGN_MODES[0] or Constants.designMode == Constants.DESIGN_MODES[1]):
             if( not (fileExten in Constants.IMG_EXTN)):
                 utils.alertUser("Format Error", str(filePath) + " has inappropriate Image format.")
@@ -164,7 +162,6 @@ class dragDropScroll(QtWidgets.QScrollArea):
         self.indexRow = newIndexRow
 
     def on_deleteButton_clicked(self, index):
-        print("Deleting Image num " + str(index))
         self.imageBoxes[index].groupBox.setParent(None)
         del self.imageBoxes[index]
         self.numOfImages = self.numOfImages -1

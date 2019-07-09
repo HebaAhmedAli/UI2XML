@@ -7,7 +7,6 @@ import screeninfo
 def alertUser(header, error):
     windDialog = QWidget()
     QMessageBox.critical(windDialog, header, error)
-    print(error)
 
 def getFileNameFromPath(fileDir):
     startI = fileDir.rfind('/', 0, len(fileDir)) + 1

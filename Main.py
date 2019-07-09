@@ -106,7 +106,6 @@ class mainScreen(QMainWindow, skelMainscreen.Ui_mainWindow):
         self.actionFinish.setEnabled(False)
         connectedMap = self.prev.convertConnectMapToLists()
         SwitchingActivities.switchActivities(connectedMap)
-        print("MAP", connectedMap)
         self.finishDialog = createFinishDialog()
         self.setEnabled(False)
         self.finishDialog.closeProgBtn.clicked.connect(self.endProg)

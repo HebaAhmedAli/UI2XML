@@ -209,14 +209,12 @@ def describe5Gray(gray):
 def getResizeRatios(img):
     ratios = []
     if img.shape[1] == 0:
-      print("image 0 ratio")
       ratios.append(0)
     elif img.shape[1]<Constants.IMAGE_SIZE_CLASSIFICATION:
         ratios.append(img.shape[1]/Constants.IMAGE_SIZE_CLASSIFICATION)
     else:
         ratios.append(-1*(Constants.IMAGE_SIZE_CLASSIFICATION/img.shape[1]))
     if img.shape[0] == 0:
-      print("image 0 ratio")
       ratios.append(0)
     elif img.shape[0]<Constants.IMAGE_SIZE_CLASSIFICATION:
         ratios.append(img.shape[0]/Constants.IMAGE_SIZE_CLASSIFICATION)
@@ -365,24 +363,4 @@ def getXmlOfComponent(index,appName): # index of component in the list of ids in
         toPrint += '</'+'ListView'+'>'
     return toPrint
     
-# For Testing.
-'''
-img = image.load_img('/home/heba/Documents/cmp/fourth_year/gp/UI2XML/data/17-android.widget.ImageView.jpg')
-img = np.array(img)  
-print(getNoOfColors(img[10:img.shape[0]-10,10:img.shape[1]-10]))
-'''
-'''
-first = "000000"
-firstRgb = tuple(int(first[i:i+2], 16) for i in (0, 2, 4))
-firstRgbs = sRGBColor(firstRgb[0]/255.0,firstRgb[1]/255.0,firstRgb[2]/255.0)
-color1Lab = convert_color(firstRgbs, LabColor)
-second = "556b2f"
-secondRgb = tuple(int(second[i:i+2], 16) for i in (0, 2, 4))
 
-secondRgbs = sRGBColor(secondRgb[0]/255.0,secondRgb[1]/255.0,secondRgb[2]/255.0)
-# Convert from RGB to Lab Color Space
-color2Lab = convert_color(secondRgbs, LabColor)
-# Find the color difference
-deltaE = delta_e_cie2000(color1Lab, color2Lab)
-print(deltaE)
-'''
