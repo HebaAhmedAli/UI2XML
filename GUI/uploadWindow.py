@@ -38,14 +38,12 @@ class uploadWindow(QWidget, skelUploadWindow.Ui_uploadWindow):
                 utils.alertUser("Empty Name", "Every file should have a name.")
                 return -1
             names.append(name[:endI])
-        print (names)
         if (not "main" in names):
             utils.alertUser("Missing main", "Choose one of the files as your Main Activity")
             return -1
 
         # Creating Input folder for recognition
         fullProjDir = Constants.imagesPath
-        print("Directory of project" + fullProjDir)
         if (not os.path.exists(fullProjDir)):
             os.mkdir(fullProjDir)
         # TODO: Handle PSD

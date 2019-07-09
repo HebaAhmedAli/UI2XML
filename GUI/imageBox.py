@@ -40,14 +40,12 @@ class imageBox(QWidget):
         # self.checked = False
         self.row = 0
         self.col = 0
-        # print(index)
         self.index = index
     # TODO: row and column can be calculated from the index
     def setImage (self, image, label, row, col, width, height, isGrid =0):
         self.row = row
         self.col = col
         self.srcPath = image
-        print(self.srcPath)
         pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         self.imageLabel.setPixmap(QPixmap(pixmapimage))
         self.imageNameLine.setText(label)
@@ -70,7 +68,7 @@ class imageBox(QWidget):
         return self.groupBox
 
     def changeImge(selfself, imagePath):
-        print("tl3t")
+        1
         # pixmapimage = QPixmap(self.srcPath).scaled(width, height)
         # self.imageLabel.setPixmap(QPixmap(pixmapimage))
 

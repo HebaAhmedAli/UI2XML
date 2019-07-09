@@ -35,7 +35,6 @@ def extractShapeFeatures(img,resizedImg):
     allShapeFeatures += Utils.describe5Gray(grayImgResized)
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
-      print("noContors: ")
       return allShapeFeatures+[0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio
@@ -54,8 +53,6 @@ def loadVocab(vocabPath):
             keyStrings.update([line[:-1]])
     invVocab = dict(enumerate(sorted(keyStrings)))
     vocab = {v:k for k,v in invVocab.items()}
-    print("vocabulary length = "+str(len(vocab)))
-    print("inv vocabulary length = "+str(len(invVocab)))
     return vocab, invVocab
 
 def loadData(imagesPath,vocab,start,end):

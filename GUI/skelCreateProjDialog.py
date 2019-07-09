@@ -79,8 +79,6 @@ class Ui_Dialog(object):
         exit()
 
     def selectionchange(self,i):
-        print("Items in the list are :")
-            
+        1            
         for count in range(self.designComboBox.count()):
-            print(self.designComboBox.itemText(count))
-        print("Current index",i,"selection changed ",self.designComboBox.currentText())
+            1

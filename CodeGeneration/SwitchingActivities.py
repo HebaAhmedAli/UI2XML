@@ -23,7 +23,6 @@ def addIntentToJava(buttonsToActivities):
 def addIntentToMainifest(buttonsToActivities):
     if not os.path.exists(Constants.DIRECTORY):
             os.makedirs(Constants.DIRECTORY) 
-    print(Constants.DIRECTORY+'/'+'AndroidManifest.xml')
     fTo=open(Constants.DIRECTORY+'/'+'AndroidManifest.xml', 'w+')
     newActivities = ""
     for i in range(len(buttonsToActivities)):
