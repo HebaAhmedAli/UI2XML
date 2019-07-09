@@ -1,0 +1,7 @@
+Time for text = 8.020976305007935
+Time for boxes = 1.0028138160705566
+Time for predict = 0.001956939697265625
+Time for text = 4.195192575454712
+Time for boxes = 9.74714994430542
+Time for predict = 0.005509853363037109
+Total time = 23.336884021759033

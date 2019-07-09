@@ -88,7 +88,8 @@ def processAllImages(imagesPath):
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             processImage(imagesPath, file)
-    print("Total time = = ",time.time()-startTime)
+    Constants.timeFile.write("Total time = "+str(time.time()-startTime)+"\n")
+    Constants.timeFile.close()
     
 def updateAllImages(imagesPath,mapUpdatedFromGui):
     Constants.HAND_DRAWN = True

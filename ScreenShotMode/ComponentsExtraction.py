@@ -20,7 +20,7 @@ margin = 10
 def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
     start0 = time.time()
     extratctedBoxes,addedManuallyBool=BoxesExtraction.extractBoxes(image)
-    print("timeBoxesExtraction = ",time.time()-start0)
+    Constants.timeFile.write("timeBoxesExtraction = "+str(time.time()-start0)+"\n")
     extractedText=[] # List of strings coreesponding to the text in each box.
     pedictedComponents=[]
     # Note: If the box doesn't contain text its index in the extractedText list should contains empty string.
@@ -54,9 +54,9 @@ def extractComponentsAndPredict(image,imageCopy,imageXML,model,invVocab):
         pedictedComponents.append(prediction)
         extractedText.append(text)
         timePrediction+=time.time() - start2
-    print("timeExtractFeatures = ",timeExtractFeatures-timeText)
-    print("timePrediction = ",timePrediction)
-    print("timeText = ",timeText)
+    Constants.timeFile.write("timeExtractFeatures = "+str(timeExtractFeatures-timeText)+"\n")
+    Constants.timeFile.write("timePrediction = "+str(timePrediction)+"\n")
+    Constants.timeFile.write("timeText = "+str(timeText)+"\n")
     return extratctedBoxes,extractedText,addedManuallyBool,pedictedComponents
 
 def handleRadioAndCheck(prediction,box,imageCopy,ifSquare,circularity,slopedLines,features,invVocab,model):
@@ -93,7 +93,6 @@ def extractShapeFeatures(img,resizedImg):
     (_, contours , _) = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
     if len(contours) == 0:
       Constants.noContors+=1
-      print("noContors: ",str(Constants.noContors))
       return allShapeFeatures+[0,0,0,0,0,0]
     cnt = max(contours, key = cv2.contourArea)
     # ifSquare, circularity, noOfVerNormalized, areaCntRatio, perCntRatio, aspectRatio

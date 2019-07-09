@@ -4,6 +4,7 @@ import HandDrawingMode.BoxesExtraction as BoxesExtraction
 import HandDrawingMode.TextExtraction as TextExtraction
 import Utils
 import time
+import Constants
 
 def getFirstTextBoxAndRatio(boxesInBacket,textsInBacket):
     text = ""
@@ -67,15 +68,15 @@ def extractComponents(image,imgCopy,image4Txt,appName): # TODO: Remove appName.
     # TODO: Uncomment after testing and delete the line after this.
     textTime = time.time()
     extractedTexts, textPositions= TextExtraction.extractText(image4Txt) # List of strings coreesponding to the text in each box.
-    print("Time for text = ",time.time()-textTime)
+    Constants.timeFile.write("Time for text = "+str(time.time()-textTime)+"\n")
     #extractedTexts,textPositions = getFromAppName(appName)
     timeExtract = time.time()
     extratctedBoxes,extractedTexts = BoxesExtraction.extractBoxes(image, extractedTexts, textPositions)
-    print("Time for boxes = ",time.time()-timeExtract)
+    Constants.timeFile.write("Time for boxes = "+str(time.time()-timeExtract)+"\n")
     myImageBox = extratctedBoxes[0]
     timePredict = time.time()
     extratctedBoxes,extractedTexts,predictedComponents = filterComponentsAndPredict(extratctedBoxes[1:len(extratctedBoxes)],extractedTexts[1:len(extratctedBoxes)],imgCopy)
-    print("Time for predict = ",time.time()-timePredict)
+    Constants.timeFile.write("Time for predict = "+str(time.time()-timePredict)+"\n")
     # Translate x and y and handle outside range.
     extratctedBoxesTranslated = []
     i = 0

@@ -36,3 +36,4 @@ noOfLayouts = 0
 myParentColor = ""
 textBrowserWidth = 0.42
 androidPath = "/app/src/main"
+timeFile=open('time.txt', 'w+')

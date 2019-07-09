@@ -16,7 +16,6 @@ def processImage(subdir, file,model,invVocab):
     imgXML = np.array(imgXML,dtype='float32')  
     file = file.replace('.jpeg','.jpg')
     boxes, texts ,addedManuallyBool ,predictedComponents = ComponentsExtraction.extractComponentsAndPredict(img,imgCopy,imgXML,model,invVocab)
-    print("Time for prediction for "+file+" = ",time.time()-startTime)
     margin = 10
     if Constants.DEBUG_MODE == True :
         if not os.path.exists(subdir+'/compOutputsAll'+file[:-4]):
@@ -78,17 +77,14 @@ def processAllImages(imagesPath,model,invVocab):
     Constants.mapToGui = {}
     _,_, files= next(os.walk(imagesPath))
     for file in files:
-        print(file)
         imgPath = os.path.join(imagesPath, file)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             start = time.time()
             processImage(imagesPath, file,model,invVocab)
-            print("Time for "+file+" = ",time.time()-start)
-    print("Total time = ",time.time()-startTime)
-
+    Constants.timeFile.write("Total time = "+str(time.time()-startTime)+"\n")
+    Constants.timeFile.close()
 
 def updateAllImages(imagesPath,mapUpdatedFromGui):
-    startTime=time.time()
     # TODO: Comment after testing.
     # mapUpdatedFromGui = {"drAD.png":[[[36, 315, 128, 88]],['ImageView_0_2_0'],['android.widget.'+"TextView"],Constants.mapToGui.get("drAD.png")[5]]}
     Constants.mapToGui = {}
@@ -96,7 +92,6 @@ def updateAllImages(imagesPath,mapUpdatedFromGui):
         imgPath = os.path.join(imagesPath, key)
         if (".png" in imgPath or ".jpeg" in imgPath or ".jpg" in imgPath) and ('._' not in imgPath):
             updateImage(imagesPath, key,val)
-    print("Total time = = ",time.time()-startTime)
 
             
 # UI2XMLclassification_224_245000_99_93
