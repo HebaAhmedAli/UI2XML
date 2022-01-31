@@ -12,7 +12,7 @@ psd-tools3==1.8.2
 imagesize==1.1.0
 google-cloud-vision==0.37.0
 asn1crypto==0.24.0
-cryptography==2.1.4
+cryptography==3.3.2
 enum34==1.1.6
 idna==2.6
 ipaddress==1.0.17
