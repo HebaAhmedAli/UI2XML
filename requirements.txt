@@ -1,5 +1,5 @@
 Keras==2.2.4
-numpy==1.13.3
+numpy==1.22.0
 opencv-python==3.2.0.8
 h5py==2.9.0
 tensorflow==1.14.0
@@ -18,7 +18,7 @@ idna==2.6
 ipaddress==1.0.17
 keyring==10.6.0
 keyrings.alt==3.0
-numpy==1.13.3
+numpy==1.22.0
 pip==9.0.1
 pycrypto==2.6.1
 pyxdg==0.25
