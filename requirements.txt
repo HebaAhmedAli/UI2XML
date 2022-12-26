@@ -25,6 +25,6 @@ pyxdg==0.25
 SecretStorage==2.3.1
 setuptools==39.0.1
 six==1.11.0
-wheel==0.30.0
+wheel==0.38.1
 skimage==0.12.3
 scikit-image==0.15.0
