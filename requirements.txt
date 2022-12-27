@@ -23,7 +23,7 @@ pip==9.0.1
 pycrypto==2.6.1
 pyxdg==0.25
 SecretStorage==2.3.1
-setuptools==39.0.1
+setuptools==65.5.1
 six==1.11.0
 wheel==0.30.0
 skimage==0.12.3
